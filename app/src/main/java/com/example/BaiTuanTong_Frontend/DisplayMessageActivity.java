@@ -15,11 +15,17 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        String UserName = intent.getStringExtra(MainActivity.USER_EXTRA_MESSAGE);
+        String Password = intent.getStringExtra(MainActivity.PASS_EXTRA_MESSAGE);
 
-        // Capture the layout's TextView and set the string as its text
+
         TextView textView = findViewById(R.id.textView);
-        textView.setText(message);
+        if(UserName.equals("zhp")&&Password.equals("123")){
+            textView.setText("登录成功！");
+        }
+        else{
+            textView.setText("用户名或密码错误！请重试");
+        }
     }
 
 }

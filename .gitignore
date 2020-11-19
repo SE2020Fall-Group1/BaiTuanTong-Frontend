@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+test.png
+test.jpg
+test_icon*.xml
+.gitignore
