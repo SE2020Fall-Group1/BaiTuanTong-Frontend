@@ -9,8 +9,9 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
-        <activity android:name="com.example.BaiTuanTong_Frontend.DisplayMessageActivity"></activity>
-        <activity android:name="com.example.BaiTuanTong_Frontend.MainActivity">
+        <activity android:name=".PostListDisplayActivity"></activity>
+        <activity android:name=".DisplayMessageActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
