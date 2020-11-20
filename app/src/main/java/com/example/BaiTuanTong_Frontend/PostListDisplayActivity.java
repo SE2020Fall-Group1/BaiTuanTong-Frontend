@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PostListDisplayActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-    private MyAdapter mHomeAdapter;
+    private MyAdapter mMyAdapter;
     private List<String> mList;
 
     @Override
@@ -31,14 +31,14 @@ public class PostListDisplayActivity extends AppCompatActivity {
         // 设置 item 增加和删除时的动画
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mList = getList();
-        mHomeAdapter = new MyAdapter(this, mList);
-        mRecyclerView.setAdapter(mHomeAdapter);
+        mMyAdapter = new MyAdapter(this, mList);
+        mRecyclerView.setAdapter(mMyAdapter);
     }
 
     private List<String> getList() {
         List<String> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            list.add(i + "");
+        for (int i = 0; i < 20; i++) {
+            list.add("动态" + i + "");
         }
         return list;
     }
