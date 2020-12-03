@@ -17,7 +17,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view){
-        Intent intent = new Intent(this, PostListDisplayActivity.class);
+        Intent intent1 = new Intent(this, PostListDisplayActivity.class);
+        Intent intent2 = new Intent(this, DisplayMessageActivity.class);
+        EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
+        String UserName = UserNameEditText.getText().toString();
+        EditText PasswordEditText = (EditText) findViewById(R.id.PasswordText);
+        String Password = PasswordEditText.getText().toString();
         /*Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
         String UserName = UserNameEditText.getText().toString();
@@ -25,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
         String Password = PasswordEditText.getText().toString();
         intent.putExtra(USER_EXTRA_MESSAGE, UserName);
         intent.putExtra(PASS_EXTRA_MESSAGE, Password);*/
-        startActivity(intent);
+        if(UserName.equals("zhp")&&Password.equals("123")){
+            startActivity(intent1);
+        }
+        else
+            startActivity(intent2);
     }
 }
