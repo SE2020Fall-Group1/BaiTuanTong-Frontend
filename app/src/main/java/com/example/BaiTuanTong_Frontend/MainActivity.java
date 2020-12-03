@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 
 public class MainActivity extends AppCompatActivity {
     public static final String USER_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.UserMESSAGE";
@@ -17,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view){
-        Intent intent = new Intent(this, PostListDisplayActivity.class);
+        //Intent intent = new Intent(this, PostListDisplayActivity.class);
+        Intent intent = new Intent(this, HomePageActivity.class);
         /*Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
         String UserName = UserNameEditText.getText().toString();
