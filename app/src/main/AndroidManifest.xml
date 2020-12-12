@@ -11,11 +11,12 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
+        <activity android:name=".club.EditClubAdminActivity"></activity>
         <activity
             android:name=".club.ClubHomeActivity"
-            android:parentActivityName=".home.HomePageActivity"
             android:label="@string/title_activity_club_home"
-            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity
             android:name=".home.HomePageActivity"
             android:label="@string/title_activity_home_page" />
