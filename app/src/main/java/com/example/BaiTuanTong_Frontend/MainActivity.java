@@ -17,7 +17,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view){
-        Intent intent1 = new Intent(this, PostListDisplayActivity.class);
+        Intent intent1 = new Intent(this, FollowedClubsDisplayActivity.class);
+        //Intent intent1 = new Intent(this, PostListDisplayActivity.class);
         Intent intent2 = new Intent(this, DisplayMessageActivity.class);
         EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
         String UserName = UserNameEditText.getText().toString();

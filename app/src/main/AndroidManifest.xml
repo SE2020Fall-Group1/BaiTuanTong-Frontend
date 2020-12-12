@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
-        <activity android:name=".PostPageActivity"></activity>
+        <activity android:name=".FollowedClubsDisplayActivity"></activity>
+        <activity android:name=".PostPageActivity" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".MainActivity">
