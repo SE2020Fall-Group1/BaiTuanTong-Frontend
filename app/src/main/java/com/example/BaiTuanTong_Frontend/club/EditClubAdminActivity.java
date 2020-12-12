@@ -38,10 +38,6 @@ public class EditClubAdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_club_admin);
 
-//        Intent intent = getIntent();
-//        String message =intent.getStringExtra();//MainActivity.EXTRA_MESSAGE);
-
-
         adminListView = findViewById(R.id.recyclerView2);
         // 设置布局管理器
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
