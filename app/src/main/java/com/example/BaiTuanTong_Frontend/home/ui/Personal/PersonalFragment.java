@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.club.EditClubAdminActivity;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
@@ -49,7 +48,6 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FollowedClubsDisplayActivity.class);
-                //目前跳转到社团主页，为了调试
                 startActivityForResult(intent, 3);
             }
         });
@@ -60,23 +58,12 @@ public class PersonalFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 3 && resultCode == 3){
             HomePageActivity homePageActivity = (HomePageActivity)getActivity();
+            assert homePageActivity != null;
             FragmentManager fragmentManager = homePageActivity.getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             //fragmentTransaction.replace(R.id.personal_manage, new PersonalFragment());
             fragmentTransaction.commit();
         }
     }
-
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        Toast.makeText(getActivity(),"Personal is onResume",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Toast.makeText(getActivity(),"Personal is onPause",Toast.LENGTH_SHORT).show();
-    }*/
 
 }

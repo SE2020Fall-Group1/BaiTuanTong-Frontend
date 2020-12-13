@@ -1,12 +1,16 @@
 package com.example.BaiTuanTong_Frontend.club;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
@@ -54,6 +58,12 @@ public class EditClubAdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_club_admin);
 
+        ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         deleting = false;
 
         adminListView = findViewById(R.id.recyclerView2);
@@ -76,8 +86,10 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
                 if (deleting == false)
                     return ;
+                String p = Integer.toString(position);
                 adminList.remove(position);
-                mMyAdapter.notifyDataSetChanged();
+                mMyAdapter.notifyItemRemoved(position);
+                mMyAdapter.notifyItemRangeChanged(position, adminList.size());
             }
         });
 
@@ -93,6 +105,17 @@ public class EditClubAdminActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

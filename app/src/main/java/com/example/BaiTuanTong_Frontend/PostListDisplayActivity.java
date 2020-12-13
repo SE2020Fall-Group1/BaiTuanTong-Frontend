@@ -49,7 +49,8 @@ public class PostListDisplayActivity extends AppCompatActivity {
             public void onLongClick(int position) {
                 //长按删除数据
                 mList.remove(position);
-                mMyAdapter.notifyDataSetChanged();
+                mMyAdapter.notifyItemRemoved(position);
+                mMyAdapter.notifyItemRangeChanged(position, mList.size());
             }
         });
     }

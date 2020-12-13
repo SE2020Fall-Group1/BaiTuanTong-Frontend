@@ -24,7 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.MyAdapter;
@@ -77,7 +79,6 @@ public class ClubHomeActivity extends AppCompatActivity {
     });
 
     public void initToolBar() {
-        //mNavigation.setTitle("社团名称");
         setSupportActionBar(mNavigation);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
@@ -128,15 +129,48 @@ public class ClubHomeActivity extends AppCompatActivity {
                 sendMessage(position);
             }
         });
-        mMyAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
+        /*mMyAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
             @Override
             public void onLongClick(int position) {
                 //长按删除数据
                 mList.remove(position);
-                mMyAdapter.notifyDataSetChanged();
+                mMyAdapter.notifyItemRemoved(position);
+                mMyAdapter.notifyItemRangeChanged(position, mList.size());
             }
-        });
+        });*/
     }
+
+    /*@Override
+    public void onStart(){
+        super.onStart();
+        Toast.makeText(this,"ClubHomePage is onStart",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Toast.makeText(this,"ClubHomePage is onResume",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Toast.makeText(this,"ClubHomePage is onPause",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Toast.makeText(this,"ClubHomePage is onStop",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        Toast.makeText(this,"ClubHomePage is onRestart",Toast.LENGTH_SHORT).show();
+    }*/
+
+
 
     /**
      * 使用get获取数据
@@ -205,7 +239,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                 getDataFromGet("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
                 break;
             case R.id.club_admin_manage_menu_item:
-                getDataFromPost("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
+                Intent intent = new Intent(this, EditClubAdminActivity.class);
+                startActivity(intent);
+                //getDataFromPost("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
                 //getDataFromGet("http://10.0.2.2:5000/hello");
                 break;
         }
