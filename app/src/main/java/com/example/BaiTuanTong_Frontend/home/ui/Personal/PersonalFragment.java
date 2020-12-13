@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
@@ -46,7 +47,7 @@ public class PersonalFragment extends Fragment {
         followClubButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+                Intent intent = new Intent(getActivity(), FollowedClubsDisplayActivity.class);
                 //目前跳转到社团主页，为了调试
                 startActivityForResult(intent, 3);
             }

@@ -17,7 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:logo="@mipmap/ic_launcher"
         app:navigationIcon="?attr/homeAsUpIndicator"
-        app:subtitle="subTitle"
         app:title="Title"
         tools:layout_editor_absoluteY="6dp" />
 
@@ -25,10 +24,30 @@
         android:id="@+id/get_club_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="显示社团简介"
-        android:maxLines="4"
+        android:text=""
+        android:textColor="@color/grey"
+        android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintTop_toBottomOf="@+id/club_title" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_text" />
+
+    <TextView
+        android:id="@+id/details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[详情]"
+        android:textColor="@color/dodgerblue"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@+id/club_title"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/profile_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="社团简介:"
+        android:textColor="@color/grey"
+        app:layout_constraintTop_toBottomOf="@+id/club_title"
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/club_post_list"

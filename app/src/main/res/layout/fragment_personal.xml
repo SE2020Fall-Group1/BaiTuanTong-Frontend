@@ -37,5 +37,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="设置" />
+
+        <Button
+            android:id="@+id/sign_out"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="退出登录" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

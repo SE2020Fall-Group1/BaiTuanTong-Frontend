@@ -23,6 +23,19 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
         this.mList = mList;
     }
 
+    // 下面是为点击事件添加的代码
+    public interface OnItemClickListener {
+        void onClick(int position);
+    }
+
+    MyAdapter.OnItemClickListener onItemClickListener;
+
+
+    public void setOnItemClickListener(MyAdapter.OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+    // 上面是为点击事件添加的代码
+
     class FollowedClubsDisplayViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout club_list_content;
         private ImageView club_img;
@@ -52,7 +65,7 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
         holder.club_intro.setTag(position);
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);
-/*        //自己做item点击
+        //自己做item点击
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,15 +73,6 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
                     onItemClickListener.onClick(position);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (onItemLongClickListener != null)
-                    onItemLongClickListener.onLongClick(position);
-                //返回false会在长按结束后继续点击
-                return true;
-            }
-        });*/
     }
     @Override
     public int getItemCount() {

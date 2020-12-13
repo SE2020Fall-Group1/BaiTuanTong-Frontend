@@ -1,7 +1,8 @@
-/**
- * 这个activity是社团主页，在页面上方的工具栏中显示有社团名称，右上角的菜单键提供了社团管理员发布动态，
- * 社团总管理员管理社团的入口。在工具栏下方显示社团简介，再下方显示社团发布的动态的列表。
- * 作者：谷丰
+/*
+  文件名: ClubHomeActivity.java
+  创建者: 谷丰
+  描述: 这个activity是社团主页，在页面上方的工具栏中显示有社团名称，右上角的菜单键提供了社团管理员发布动态，
+  社团总管理员管理社团的入口。在工具栏下方显示社团简介，再下方显示社团发布的动态的列表。
  */
 package com.example.BaiTuanTong_Frontend.club;
 
@@ -43,14 +44,15 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
-    private Toolbar mNavigation;
-    private TextView get_result;
+    private Toolbar mNavigation;  //顶部导航栏
+    private TextView club_profile;   //社团简介文本框
+    private TextView detail_button;  //"详情" "收起" 按钮
+    private boolean extended;    //当前文本框是否展开
     private OkHttpClient client = new OkHttpClient();
-    //private OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).build();
     private  static final int GET = 1;
     private  static final int POST = 2;
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;  //动态列表
     private MyAdapter mMyAdapter;
     private List<String> mList;
 
@@ -64,10 +66,10 @@ public class ClubHomeActivity extends AppCompatActivity {
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
-                    get_result.setText((String)msg.obj);
+                    club_profile.setText((String)msg.obj);
                     break;
                 case POST:
-                    get_result.setText((String)msg.obj);
+                    club_profile.setText((String)msg.obj);
                     break;
             }
             return true;
@@ -75,7 +77,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     });
 
     public void initToolBar() {
-        mNavigation.setTitle("社团名称");
+        //mNavigation.setTitle("社团名称");
         setSupportActionBar(mNavigation);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
@@ -90,16 +92,26 @@ public class ClubHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_club_home);
         mNavigation = findViewById(R.id.club_title);
         initToolBar();
-        //mNavigation.setTitle("社团名称");
-        mNavigation.setNavigationOnClickListener(new View.OnClickListener(){
+        mNavigation.setTitle(getIntent().getStringExtra("club_name"));
+
+        club_profile = (TextView) findViewById(R.id.get_club_profile);
+        club_profile.setText(getIntent().getStringExtra("club_profile"));
+        detail_button = (TextView) findViewById(R.id.details);
+        extended = false;
+        detail_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                setResult(3);
-                finish();
+            public void onClick(View view) {
+                extended = !extended;
+                if(extended){
+                    club_profile.setMaxLines(20);
+                    detail_button.setText("[收起]");
+                }
+                else{
+                    club_profile.setMaxLines(1);
+                    detail_button.setText("[详情]");
+                }
             }
         });
-
-        get_result = (TextView) findViewById(R.id.get_club_profile);
 
         mRecyclerView = this.findViewById(R.id.club_post_list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -130,12 +142,10 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 使用get获取数据
      */
     private void getDataFromGet(String url) {
-        //Log.e("TAG", "Start getDataFromGet()");
         new Thread(){
             @Override
             public void run() {
                 super.run();
-                //Log.e("TAG", "new thread run.");
                 try {
                     String result = get(url);
                     Log.e("TAG", result);
@@ -174,16 +184,19 @@ public class ClubHomeActivity extends AppCompatActivity {
         }.start();
     }
 
+    /**
+     *初始化右上角菜单按钮
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //MenuItem index = menu.add(Menu.NONE, Menu.FIRST, Menu.FIRST, "发布动态");
-        //index.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        //menu.add(Menu.NONE, Menu.FIRST + 1, Menu.FIRST + 1, "管理社团");
         getMenuInflater().inflate(R.menu.club_home_menu, menu);
         return super.onCreateOptionsMenu(menu);
-        //return true;
     }
 
+    /**
+     *菜单中按钮被点击时的回调函数
+     * 目前用来测试okhttp
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
@@ -232,10 +245,13 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 点击列表中某一项时的处理函数
+     * @param position 被点击项的序号
+     */
     public void sendMessage(int position) {
         Intent intent = new Intent(this, PostPageActivity.class);
         String message = mList.get(position);
-        //intent.putExtra(PAGE_EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 
