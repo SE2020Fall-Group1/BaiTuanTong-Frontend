@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.club.EditClubAdminActivity;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
