@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
+// import com.example.BaiTuanTong_Frontend.ManagerHomePage;
 
 public class MainActivity extends AppCompatActivity {
     public static final String USER_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.UserMESSAGE";
@@ -29,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
         String Password = PasswordEditText.getText().toString();
         intent.putExtra(USER_EXTRA_MESSAGE, UserName);
         intent.putExtra(PASS_EXTRA_MESSAGE, Password);*/
+        startActivity(intent);
+    }
+
+    public void managerLogin(View view){
+
+        // Intent intent = new Intent(this, HomePageActivity.class);
+        Intent intent = new Intent(this, ManagerHomePage.class);
         startActivity(intent);
     }
 }
