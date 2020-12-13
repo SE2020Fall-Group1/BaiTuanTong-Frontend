@@ -22,9 +22,17 @@
         tools:layout_editor_absoluteY="6dp" />
 
     <TextView
-        android:id="@+id/get_result"
+        android:id="@+id/get_club_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="显示请求数据"
+        android:text="显示社团简介"
+        android:maxLines="4"
+        android:ellipsize="end"
         app:layout_constraintTop_toBottomOf="@+id/club_title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/club_post_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/get_club_profile" />
 </androidx.constraintlayout.widget.ConstraintLayout>

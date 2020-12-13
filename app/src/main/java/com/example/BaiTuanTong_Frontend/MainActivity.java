@@ -26,18 +26,13 @@ public class MainActivity extends AppCompatActivity {
         String UserName = UserNameEditText.getText().toString();
         EditText PasswordEditText = (EditText) findViewById(R.id.PasswordText);
         String Password = PasswordEditText.getText().toString();
-        //Intent intent = new Intent(this, HomePageActivity.class);
-        /*Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
-        String UserName = UserNameEditText.getText().toString();
-        EditText PasswordEditText = (EditText) findViewById(R.id.PasswordText);
-        String Password = PasswordEditText.getText().toString();
-        intent.putExtra(USER_EXTRA_MESSAGE, UserName);
-        intent.putExtra(PASS_EXTRA_MESSAGE, Password);*/
-        if(UserName.equals("zhp")&&Password.equals("123")){
+        /*if(UserName.equals("zhp")&&Password.equals("123")){
             startActivity(intent1);
         }
         else
-            startActivity(intent2);
+            startActivity(intent2);*/
+
+        Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
     }
 }

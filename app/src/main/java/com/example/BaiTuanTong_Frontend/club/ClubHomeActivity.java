@@ -5,26 +5,29 @@
  */
 package com.example.BaiTuanTong_Frontend.club;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NavUtils;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
-//import com.squareup.okhttp.*;
+import com.example.BaiTuanTong_Frontend.MyAdapter;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -32,7 +35,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ClubHomeActivity extends AppCompatActivity {
@@ -45,6 +49,11 @@ public class ClubHomeActivity extends AppCompatActivity {
     //private OkHttpClient client = new OkHttpClient.Builder().retryOnConnectionFailure(true).connectTimeout(30, TimeUnit.SECONDS).build();
     private  static final int GET = 1;
     private  static final int POST = 2;
+
+    private RecyclerView mRecyclerView;
+    private MyAdapter mMyAdapter;
+    private List<String> mList;
+
     /**
      * 处理get请求与post请求的回调函数
      */
@@ -90,7 +99,31 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         });
 
-        get_result = (TextView) findViewById(R.id.get_result);
+        get_result = (TextView) findViewById(R.id.get_club_profile);
+
+        mRecyclerView = this.findViewById(R.id.club_post_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mList = getList();
+        mMyAdapter = new MyAdapter(this, mList);
+        mRecyclerView.setAdapter(mMyAdapter);
+
+        mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                sendMessage(position);
+            }
+        });
+        mMyAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
+            @Override
+            public void onLongClick(int position) {
+                //长按删除数据
+                mList.remove(position);
+                mMyAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     /**
@@ -197,5 +230,20 @@ public class ClubHomeActivity extends AppCompatActivity {
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
+    }
+
+    public void sendMessage(int position) {
+        Intent intent = new Intent(this, PostPageActivity.class);
+        String message = mList.get(position);
+        //intent.putExtra(PAGE_EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
+    private List<String> getList() {
+        List<String> list = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            list.add("动态" + i + "\n社团发布的第"+ i + "条动态" + "");
+        }
+        return list;
     }
 }
