@@ -24,9 +24,6 @@
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ManagerHomePage"
             android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
-        <activity android:name=".ManageAdministrator"
-            android:parentActivityName=".ManagerHomePage"
-            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

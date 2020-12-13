@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend;
 
+import com.example.BaiTuanTong_Frontend.EditClubDialogFragment.CreateClubListener;
 import com.example.BaiTuanTong_Frontend.R;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.MenuInflater;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -33,9 +35,10 @@ import java.io.IOException;
 import android.util.Log;
 import java.util.List;
 import java.util.ArrayList;
+import android.app.DialogFragment;
 
 
-public class ManagerHomePage extends AppCompatActivity {
+public class ManagerHomePage extends AppCompatActivity implements CreateClubListener {
     private Toolbar mNavigation;
     private RecyclerView rv_manage_club;
     private LinearLayoutManager manager;
@@ -65,7 +68,7 @@ public class ManagerHomePage extends AppCompatActivity {
     // List初始化，随意实现的
     private List<String> getList(){
         List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 0; i < 20; i++) {
             list.add("管理员测试\n"+"社团"+i+"");
         }
         return list;
@@ -76,16 +79,27 @@ public class ManagerHomePage extends AppCompatActivity {
         return true;
     }
 
+
+
+    // menu选项
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add:
-                adapter.addData(1);
+                EditClubDialogFragment editClubDialog = new EditClubDialogFragment();
+                editClubDialog.show(getFragmentManager(), "EditClubDialog");
+                // adapter.addData(1);
                 break;
             case R.id.delete:
                 adapter.removeData(1);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void createClubComplete(String clubName, String adminName) {
+        Toast.makeText(this, clubName+adminName, Toast.LENGTH_SHORT).show();
+        adapter.addData(1, clubName, adminName);
     }
 
     public void initRecyclerLinear() {
@@ -100,11 +114,19 @@ public class ManagerHomePage extends AppCompatActivity {
 
         adapter.setOnItemClickListener(new ManagerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(ManagerHomePage.this, ManageAdministrator.class);
-                intent.putExtra("clubName", mList.get(position));
-                startActivity(intent);
+            public void onItemClick(View view, ManagerAdapter.ViewName viewName, int position) {
+                switch (viewName) {
+                    case PRACTISE:
+                        Toast.makeText(ManagerHomePage.this, position + " button click", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
+                //Intent intent = new Intent(ManagerHomePage.this, ManageAdministrator.class);
+                //intent.putExtra("clubName", mList.get(position));
+                //startActivity(intent);
             }
 
             @Override
