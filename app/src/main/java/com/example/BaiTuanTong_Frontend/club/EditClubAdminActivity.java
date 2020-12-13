@@ -93,8 +93,6 @@ public class EditClubAdminActivity extends AppCompatActivity {
             }
         });
 
-        addAdminButton = findViewById(R.id.add_club_admin);
-        addAdminButton.setOnItemLickListener
     }
 
 
