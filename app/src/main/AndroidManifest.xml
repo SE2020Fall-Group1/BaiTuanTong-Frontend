@@ -22,6 +22,7 @@
             android:name=".home.HomePageActivity"
             android:label="@string/title_activity_home_page" />
         <activity android:name=".PostPageActivity" />
+        <activity android:name=".FollowedClubsDisplayActivity"></activity>
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".MainActivity">
