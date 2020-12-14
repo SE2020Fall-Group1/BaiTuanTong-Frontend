@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
+import com.example.BaiTuanTong_Frontend.PostListDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
@@ -29,6 +30,8 @@ public class PersonalFragment extends Fragment {
 
     private PersonalViewModel personalViewModel;
     private Button followClubButton;
+    private Button signOutButton;
+    private Button collectedPost;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +40,8 @@ public class PersonalFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_personal, container, false);
 
         followClubButton = (Button)root.findViewById(R.id.follow_club);
+        signOutButton = (Button)root.findViewById((R.id.sign_out));
+        collectedPost = (Button)root.findViewById(R.id.collect_post);
 
         return root;
     }
@@ -49,6 +54,19 @@ public class PersonalFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FollowedClubsDisplayActivity.class);
                 startActivityForResult(intent, 3);
+            }
+        });
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        });
+        collectedPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PostListDisplayActivity.class);
+                startActivity(intent);
             }
         });
     }

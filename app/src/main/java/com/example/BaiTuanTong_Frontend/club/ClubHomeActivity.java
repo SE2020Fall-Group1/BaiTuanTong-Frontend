@@ -24,12 +24,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.MyAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -41,22 +43,33 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.GONE;
+
 
 public class ClubHomeActivity extends AppCompatActivity {
 
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
+    public static final MediaType STRING
+            = MediaType.get("text/plain; charset=utf-8");
+
     private Toolbar mNavigation;  //顶部导航栏
     private TextView club_profile;   //社团简介文本框
     private TextView detail_button;  //"详情" "收起" 按钮
+    private TextView empty_note;   //列表为空的提示信息
     private boolean extended;    //当前文本框是否展开
-    private OkHttpClient client = new OkHttpClient();
-    private  static final int GET = 1;
-    private  static final int POST = 2;
+    private final OkHttpClient client = new OkHttpClient();
+    private static final int GET = 1;
+    private static final int POST = 2;
+    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final String LOCALURL = "http://10.0.2.2:5000/";
 
     private RecyclerView mRecyclerView;  //动态列表
     private MyAdapter mMyAdapter;
-    private List<String> mList;
+
+    private List<String> postList; //动态列表
+    private String clubInfo;  //社团简介
+    private String clubPresident;  //社长
 
     /**
      * 处理get请求与post请求的回调函数
@@ -71,13 +84,38 @@ public class ClubHomeActivity extends AppCompatActivity {
                     club_profile.setText((String)msg.obj);
                     break;
                 case POST:
-                    club_profile.setText((String)msg.obj);
+                    //club_profile.setText((String)msg.obj);
+                    try {
+                        parseJsonPacket((String)msg.obj);
+                        String print = clubInfo+"\n"+"社长: "+clubPresident;
+                        club_profile.setText(print);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     break;
             }
             return true;
         }
     });
 
+    /**
+     * 解析post返回的json包
+     * @param json post返回的json包
+     * @throws JSONException 解析出错
+     */
+    private void parseJsonPacket(String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        clubInfo = jsonObject.getString("introduction");
+        clubPresident = jsonObject.getString("president");
+        JSONArray jsonArray = jsonObject.getJSONArray("club_post_list");
+        for(int i = 0; i < jsonArray.length(); i++){
+            postList.add(jsonArray.getString(i));
+        }
+    }
+
+    /**
+     * 初始化页面上方标题栏
+     */
     public void initToolBar() {
         setSupportActionBar(mNavigation);
         ActionBar supportActionBar = getSupportActionBar();
@@ -89,14 +127,19 @@ public class ClubHomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_club_home);
+
+        club_profile = (TextView) findViewById(R.id.get_club_profile);
+        //club_profile.setText(getIntent().getStringExtra("club_profile"));
+
+        String clubName = "yuanhuo";
+        postList = new ArrayList<>();
+        getDataFromPost(LOCALURL + "club/homepage", "{\"clubName\":\"" + clubName + "\"}");
+
         mNavigation = findViewById(R.id.club_title);
         initToolBar();
         mNavigation.setTitle(getIntent().getStringExtra("club_name"));
 
-        club_profile = (TextView) findViewById(R.id.get_club_profile);
-        club_profile.setText(getIntent().getStringExtra("club_profile"));
         detail_button = (TextView) findViewById(R.id.details);
         extended = false;
         detail_button.setOnClickListener(new View.OnClickListener() {
@@ -114,15 +157,20 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         });
 
+        empty_note = this.findViewById(R.id.empty_note);
         mRecyclerView = this.findViewById(R.id.club_post_list);
+        if(postList.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
+            mRecyclerView.setVisibility(GONE);
+        }
+        else{
+            empty_note.setVisibility(GONE);
+        }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mList = getList();
-        mMyAdapter = new MyAdapter(this, mList);
+        mMyAdapter = new MyAdapter(this, postList);
         mRecyclerView.setAdapter(mMyAdapter);
-
         mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
@@ -197,15 +245,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     /**
      * 使用post获取数据
      */
-    private void getDataFromPost(String url) {
-        //Log.e("TAG", "Start getDataFromGet()");
+    private void getDataFromPost(String url, String json) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
-                //Log.e("TAG", "new thread run.");
                 try {
-                    String result = post(url, ""); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
@@ -236,7 +282,8 @@ public class ClubHomeActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.release_post_menu_item:
-                getDataFromGet("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
+                //getDataFromGet("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
+                getDataFromGet("http://47.92.233.174:5000/");
                 break;
             case R.id.club_admin_manage_menu_item:
                 Intent intent = new Intent(this, EditClubAdminActivity.class);
@@ -251,9 +298,9 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     /**
      * Okhttp的get请求
-     * @param url
+     * @param url 向服务器请求的url
      * @return 服务器返回的字符串
-     * @throws IOException
+     * @throws IOException 请求出错
      */
     private String get(String url) throws IOException {
         Request request = new Request.Builder()
@@ -265,10 +312,10 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     /**
      * Okhttp的post请求
-     * @param url
-     * @param json
+     * @param url 向服务器请求的url
+     * @param json 向服务器发送的json包
      * @return 服务器返回的字符串
-     * @throws IOException
+     * @throws IOException 请求出错
      */
     private String post(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(json, JSON);
@@ -287,7 +334,7 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     public void sendMessage(int position) {
         Intent intent = new Intent(this, PostPageActivity.class);
-        String message = mList.get(position);
+        String message = postList.get(position);
         startActivity(intent);
     }
 
