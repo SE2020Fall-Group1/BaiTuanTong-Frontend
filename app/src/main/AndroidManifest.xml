@@ -26,6 +26,10 @@
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
+        <activity
+            android:name=".home.ui.home.SearchResultActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".MainActivity">

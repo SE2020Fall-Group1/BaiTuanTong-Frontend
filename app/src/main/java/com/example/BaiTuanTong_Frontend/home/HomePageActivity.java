@@ -1,8 +1,12 @@
 package com.example.BaiTuanTong_Frontend.home;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.PostPageActivity;
+import com.example.BaiTuanTong_Frontend.home.ui.home.SearchResultActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +17,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.BaiTuanTong_Frontend.R;
 
-public class HomePageActivity extends AppCompatActivity {
+import com.example.BaiTuanTong_Frontend.home.ui.home.HomeFragment.MyListener;
+
+public class HomePageActivity extends AppCompatActivity implements MyListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,14 @@ public class HomePageActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
     }
 
+    public static final String PAGE_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.pageMESSAGE";
+
+    public void sendContent(String info){
+        Intent intent = new Intent(this, SearchResultActivity.class);
+        Log.d("asdsadsa","assaddsadsa");
+        intent.putExtra(PAGE_EXTRA_MESSAGE, info);
+        startActivity(intent);
+    }
     /*@Override
     public void onStart(){
         super.onStart();
