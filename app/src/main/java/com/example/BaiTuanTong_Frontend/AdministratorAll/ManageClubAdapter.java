@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend;
+package com.example.BaiTuanTong_Frontend.AdministratorAll;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,30 +12,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.Toast;
 
-import android.app.DialogFragment;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
+import com.example.BaiTuanTong_Frontend.R;
 
-public class ManagerAdapter extends RecyclerView.Adapter<ManagerAdapter.MyViewHolder> {
-    private List<String> mList;
+public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.MyViewHolder> {
+    private List<ClubData> mClubData;
     private Context mContext;
     public enum ViewName {  // 区分多个控件的点击事件
         ITEM,
         PRACTISE
     }
 
-    public ManagerAdapter(Context mContext, List<String> mList) {
-        this.mContext = mContext;
-        this.mList = mList;
+    public ManageClubAdapter(Context context, List<ClubData> clubData) {
+        this.mContext = context;
+        this.mClubData = clubData;
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mClubData.size();
     }
     @Override
     public long getItemId(int i) {
@@ -43,15 +38,19 @@ public class ManagerAdapter extends RecyclerView.Adapter<ManagerAdapter.MyViewHo
     }
 
     public void addData(int position, String clubName, String adminName) {
-        mList.add(position, clubName+adminName);
+        mClubData.add(position, new ClubData(clubName, adminName));
         notifyItemInserted(position);
     }
 
     public void removeData(int position) {
-        mList.remove(position);
+        mClubData.remove(position);
         notifyItemRemoved(position);
     }
 
+    public void changeAdmin(int position, String adminName) {
+        mClubData.get(position).setAdminName(adminName);
+        notifyItemChanged(position);
+    }
 
     // 下面是为点击事件添加的代码
     //定义接口 OnItemClickListener
@@ -75,7 +74,7 @@ public class ManagerAdapter extends RecyclerView.Adapter<ManagerAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv.setText(mList.get(position));
+        holder.tv.setText(mClubData.get(position).getClubName() + "\n" + mClubData.get(position).getAdminName());
 
         //自己做item点击
         if (mOnItemClickListener != null) {

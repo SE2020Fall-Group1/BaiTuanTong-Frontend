@@ -4,12 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+
+import com.example.BaiTuanTong_Frontend.AdministratorAll.ManagerHomePage;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-// import com.example.BaiTuanTong_Frontend.ManagerHomePage;
+// import com.example.BaiTuanTong_Frontend.AdministratorAll.ManagerHomePage;
 
 public class MainActivity extends AppCompatActivity {
     public static final String USER_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.UserMESSAGE";

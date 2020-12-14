@@ -22,7 +22,7 @@
         <activity android:name=".PostPageActivity" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
-        <activity android:name=".ManagerHomePage"
+        <activity android:name=".AdministratorAll.ManagerHomePage"
             android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
