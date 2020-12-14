@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import android.util.Log;
 import android.util.Patterns;
 
 import com.example.BaiTuanTong_Frontend.data.LoginRepository;
@@ -11,11 +12,24 @@ import com.example.BaiTuanTong_Frontend.data.Result;
 import com.example.BaiTuanTong_Frontend.data.model.LoggedInUser;
 import com.example.BaiTuanTong_Frontend.R;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private LoginRepository loginRepository;
+
 
     LoginViewModel(LoginRepository loginRepository) {
         this.loginRepository = loginRepository;
@@ -29,8 +43,41 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public void login(String username, String password) {
+    public String login(String username, String password) {
         // can be launched in a separate asynchronous job
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        String baseUrl = "";
+
+        FormBody formBody = new FormBody.Builder()
+                .add("username", username)
+                .add("password", password)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(baseUrl+"login")
+                .post(formBody)
+                .build();
+
+
+
+        Call call = okHttpClient.newCall(request);
+
+        /*
+        String msg = null;
+
+
+        try{
+            Response response = call.execute();
+            System.out.println(response.body().string());
+            msg="valid";
+        }catch(IOException e){
+            e.printStackTrace();
+            msg="valid";
+        }*/
+
+        return "valid";
+        /*
         Result<LoggedInUser> result = loginRepository.login(username, password);
 
         if (result instanceof Result.Success) {
@@ -39,6 +86,7 @@ public class LoginViewModel extends ViewModel {
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }
+         */
     }
 
     public void loginDataChanged(String username, String password) {

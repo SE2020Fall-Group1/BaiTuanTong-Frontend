@@ -6,18 +6,18 @@ package com.example.BaiTuanTong_Frontend.data.model;
 public class LoggedInUser {
 
     private String userId;
-    private String displayName;
+    private String msg;
 
-    public LoggedInUser(String userId, String displayName) {
+    public LoggedInUser(String userId, String msg) {
         this.userId = userId;
-        this.displayName = displayName;
+        this.msg = msg;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getMsg() {
+        return msg;
     }
 }

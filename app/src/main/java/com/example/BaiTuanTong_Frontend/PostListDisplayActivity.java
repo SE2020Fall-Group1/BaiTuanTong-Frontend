@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +61,7 @@ public class PostListDisplayActivity extends AppCompatActivity {
     }
 
     public void sendMessage(int position) {
-        Intent intent = new Intent(this, PostPageActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         String message = mList.get(position);
         intent.putExtra(PAGE_EXTRA_MESSAGE, message);
         startActivity(intent);
