@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendMessage(View view){
-        Intent intent1 = new Intent(this, FollowedClubsDisplayActivity.class);
+        Intent intent1 = new Intent(this, SearchResultActivity.class);
         //Intent intent1 = new Intent(this, PostListDisplayActivity.class);
         Intent intent2 = new Intent(this, DisplayMessageActivity.class);
         EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
@@ -31,10 +31,11 @@ public class MainActivity extends AppCompatActivity {
         String Password = PasswordEditText.getText().toString();
         intent.putExtra(USER_EXTRA_MESSAGE, UserName);
         intent.putExtra(PASS_EXTRA_MESSAGE, Password);*/
-        if(UserName.equals("zhp")&&Password.equals("123")){
+/*        if(UserName.equals("zhp")&&Password.equals("123")){
             startActivity(intent1);
         }
         else
-            startActivity(intent2);
+            startActivity(intent2);*/
+        startActivity(intent1);
     }
 }
