@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                     Log.e("Toast", userId);
                     String welcomeMessage = "欢迎！" + username;
                     Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
-                    startHomePage()
+                    startHomePage();
                 }
 
             } catch (JSONException e) {
@@ -173,12 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                 map.put("password", password);
                 Gson gson = new Gson();
                 String data = gson.toJson(map);
-                try {
-
-                    getDataFromPost(baseUrl+"user/login", data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                getDataFromPost(baseUrl+"user/login", data);
             }
         });
 
