@@ -48,7 +48,6 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FollowedClubsDisplayActivity.class);
-                //目前跳转到社团主页，为了调试
                 startActivityForResult(intent, 3);
             }
         });
