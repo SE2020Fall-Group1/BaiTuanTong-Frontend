@@ -24,6 +24,7 @@
             android:label="@string/title_activity_login" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
+        <activity android:name=".ui.register.ModifyInformationActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

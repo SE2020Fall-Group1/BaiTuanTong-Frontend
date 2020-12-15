@@ -3,23 +3,26 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="@color/white">
+    android:padding="0dp"
+    android:gravity="center">
 
     <EditText
         android:id="@+id/input_comment_edit_text"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="5"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
         android:hint="说点什么吧"
         android:inputType="text"
-        android:textColorHint="@android:color/darker_gray" />
+        android:textColorHint="@android:color/darker_gray"
+        android:layout_marginLeft="5dp"/>
     <Button
         android:id="@+id/send_button"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="发送" />
+        android:text="发送"
+        android:layout_marginRight="5dp"/>
 
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
+import com.example.BaiTuanTong_Frontend.ui.register.ModifyInformationActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        Intent intentLogin = new Intent(this, LoginActivity.class);
+        Intent intentLogin = new Intent(this, ModifyInformationActivity.class);
         startActivity(intentLogin);
     }
 }

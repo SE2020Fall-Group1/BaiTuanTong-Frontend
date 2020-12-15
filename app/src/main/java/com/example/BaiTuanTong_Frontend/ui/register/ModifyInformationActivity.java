@@ -26,10 +26,10 @@ public class ModifyInformationActivity extends AppCompatActivity {
         modifyInfViewModel = new ViewModelProvider(this, new RegistViewModelFactory())
                 .get(RegistViewModel.class);
 
-        //final EditText usernameEditText = findViewById(R.id.modifyInfUserName);
+        final EditText usernameEditText = findViewById(R.id.modifyInfUserName);
         final EditText passwordEditText = findViewById(R.id.modifyInfPassword);
         final EditText passwordConfirmText = findViewById(R.id.modifyInfConfirmPassword);
-        //final EditText emailEditText = findViewById(R.id.modifyInfEmail);
+        final EditText emailEditText = findViewById(R.id.modifyInfEmail);
         final Button modifyInfButton = findViewById(R.id.modifyInfButton);
 
         String username = "zhp";
@@ -37,8 +37,8 @@ public class ModifyInformationActivity extends AppCompatActivity {
         String password = "123456";
         String confirmPassword = password;
 
-        //usernameEditText.setText(username);
-        //emailEditText.setText(email);
+        usernameEditText.setText(username);
+        emailEditText.setText(email);
         passwordEditText.setText(password);
         passwordConfirmText.setText(confirmPassword);
 
