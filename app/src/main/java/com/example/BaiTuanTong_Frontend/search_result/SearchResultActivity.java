@@ -38,7 +38,12 @@ public class SearchResultActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
     private String searchText;
 
-
+    /**
+     * 设置flag标记当前显示的是哪个fragment
+     * 用于解决fragment0网络请求返回但此时显示fragment1时的程序报错
+     * 当Activity中 切换
+     */
+    public static int flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +69,24 @@ public class SearchResultActivity extends AppCompatActivity {
         titles.add("社团");
         titles.add("动态");
 
-        /*mTabLayout.addTab(mTabLayout.newTab().setText("社团"));
-        mTabLayout.addTab(mTabLayout.newTab().setText("动态"));*/
 
-        //TabLayout和Viewpager2进行关联
+        // TabLayout和ViewPager2进行关联
         new TabLayoutMediator(mTabLayout, mViewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 tab.setText(titles.get(position));
             }
         }).attach();
+
+        // 监听ViewPager2页面切换，以设置flag
+        mViewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                flag = position;
+                Log.e("FALG", "" + flag);
+            }
+        });
     }
 
     @Override

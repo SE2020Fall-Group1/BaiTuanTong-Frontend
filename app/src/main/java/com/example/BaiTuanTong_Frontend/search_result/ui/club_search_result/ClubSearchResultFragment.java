@@ -30,11 +30,12 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity.flag;
+
 public class ClubSearchResultFragment extends Fragment {
 
     private View mView;
     private RecyclerView mRecyclerView;
-    private List<String> mList;
     private ClubSearchResultAdapter mClubSearchResultAdapter;
 
     // 与后端通信
@@ -58,15 +59,11 @@ public class ClubSearchResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
+
         mView = inflater.inflate(R.layout.fragment_club_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.club_search_result_recyclerView));
 
-        String searchText = getArguments().getString("searchText");
-        Log.e("searchText", searchText);
-        getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
-
-        // mList = getList(getArguments().getString("searchText"));
-        // Log.e("size", "" + clubId.size() + "");
         mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction);
         mRecyclerView.setAdapter(mClubSearchResultAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -84,12 +81,11 @@ public class ClubSearchResultFragment extends Fragment {
         return fragment;
     }
 
-    private List<String> getList(String text) {
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("社团" + i + "：“" + text + "”的搜索结果");
-        }
-        return list;
+    // 在获得GET请求返回的数据后更新UI
+    private void updateView() {
+        mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction);
+        mRecyclerView.setAdapter(mClubSearchResultAdapter);
+        mView.invalidate();
     }
 
     // 处理get请求与post请求的回调函数
@@ -101,9 +97,8 @@ public class ClubSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction);
-                        mRecyclerView.setAdapter(mClubSearchResultAdapter);
-                        mView.invalidate();
+                        while (flag != 0);
+                        updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

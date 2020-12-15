@@ -73,6 +73,7 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
             }
         });*/
     }
+
     @Override
     public int getItemCount() {
         return clubName.size();
