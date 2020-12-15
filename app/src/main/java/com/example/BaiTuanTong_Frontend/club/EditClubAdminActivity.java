@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class EditClubAdminActivity extends AppCompatActivity {
 
     private RecyclerView adminListView;
@@ -38,6 +39,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
     private MyAdapter mMyAdapter;
     private boolean deleting;
     private Switch mySwitch;
+    private AddClubAdminDialogFragment dialogFragment;
+    private Button addAdminButton;
 
     private List<String> getList()
     {
@@ -66,13 +69,16 @@ public class EditClubAdminActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.add_club_admin:
-                Toast.makeText(getApplicationContext(),
+            /*    Toast.makeText(getApplicationContext(),
                         "点击了添加成员按钮",
                         Toast.LENGTH_SHORT).show();
+                        */
+                dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 
     @Override
@@ -132,8 +138,48 @@ public class EditClubAdminActivity extends AppCompatActivity {
             }
         });
 
+        dialogFragment = new AddClubAdminDialogFragment();
 
 
+    }
+/*
+    class MyOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()){
+                case R.id.add_club_admin:
+                    Toast.makeText(getApplicationContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
+                    break;
+
+            }
+        }
+    }
+*/
+    /*
+        Button commentButton = (Button)findViewById(R.id.comment_button);
+        commentButton.setOnClickListener(new MyOnClickListener());
+
+    }
+    class MyOnClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()){
+                case R.id.comment_button:
+                    commentDialogFragment.show(getSupportFragmentManager(),"dialog");
+                    break;
+
+            }
+        }
+    }*/
+
+ /*       addAdminButton = (Button)findViewById(R.id.add_button);
+        addAdminButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "提交！", Toast.LENGTH_SHORT).show();
+            }
+        });
+*/
 
 /*        PopupMenu popupMenu = new PopupMenu(this, view);
         getMenuInflater().inflate(R.menu.edit_club_admin_menu, popupMenu.getMenu());
@@ -148,6 +194,5 @@ public class EditClubAdminActivity extends AppCompatActivity {
         });
         popupMenu.show();
 */
-    }
 
 }
