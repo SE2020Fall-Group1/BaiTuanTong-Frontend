@@ -33,6 +33,7 @@ import com.example.BaiTuanTong_Frontend.data.model.LoggedInUser;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginViewModel;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginViewModelFactory;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistActivity;
+import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            Log.e("handler",(String)msg.obj);
             //super.handleMessage(msg);
             try {
                 String msgBody = (String)msg.obj;
@@ -75,12 +77,12 @@ public class LoginActivity extends AppCompatActivity {
                     Log.e("Toast", userId);
                     String welcomeMessage = "欢迎！" + username;
                     Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
-                    Intent postContentIntent = new Intent(LoginActivity.this, PostContentActivity.class);
-                    startActivity(postContentIntent);
+                    startHomePage()
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
+
             }
 
             return true;
@@ -90,7 +92,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         Intent intentShift = new Intent(this, RegistActivity.class);
 
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
@@ -164,6 +165,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 String baseUrl = "http://47.92.233.174:5000/";
 
+
                 username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 HashMap<String, String> map = new HashMap<>();
@@ -171,8 +173,12 @@ public class LoginActivity extends AppCompatActivity {
                 map.put("password", password);
                 Gson gson = new Gson();
                 String data = gson.toJson(map);
+                try {
 
-                getDataFromPost(baseUrl+"user/login", data);
+                    getDataFromPost(baseUrl+"user/login", data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -183,6 +189,11 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intentShift);
             }
         });
+    }
+    // 转到HomePageActivity
+    private void startHomePage(){
+        Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
     }
 
     //Toast提示登录结果信息，暂时忽略

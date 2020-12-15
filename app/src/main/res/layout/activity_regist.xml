@@ -22,7 +22,7 @@
         android:id="@+id/registUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="150dp"
         android:ems="10"
         android:hint="User Name"
         android:inputType="textEmailAddress"
@@ -53,16 +53,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registPassword" />
+    <EditText
+        android:id="@+id/captcha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:ems="10"
+        android:hint="Captcha"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registConfirmPassword" />
+
+    <Button
+        android:id="@+id/getCatchaButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Catcha"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/captcha"
+        app:layout_constraintVertical_bias="0.184" />
 
     <Button
         android:id="@+id/registButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="注册"
+        android:text="Regist"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registConfirmPassword"
-        app:layout_constraintVertical_bias="0.314" />
+        app:layout_constraintTop_toBottomOf="@+id/getCatchaButton"
+        app:layout_constraintVertical_bias="0.235" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

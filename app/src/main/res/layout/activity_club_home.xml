@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".club.ClubHomeActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/club_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintTop_toTopOf="parent"
+        app:logo="@mipmap/ic_launcher"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title="Title"
+        tools:layout_editor_absoluteY="6dp" />
+
+    <TextView
+        android:id="@+id/get_club_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/grey"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@+id/profile_text" />
+
+    <TextView
+        android:id="@+id/details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[详情]"
+        android:textColor="@color/dodgerblue"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@+id/club_title"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
+        android:id="@+id/profile_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="社团简介:"
+        android:textColor="@color/grey"
+        app:layout_constraintTop_toBottomOf="@+id/club_title"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/club_post_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/get_club_profile" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,13 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 
@@ -31,7 +27,7 @@ public class PostListDisplayActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        mRecyclerView = this.findViewById(R.id.recyclerView);
+        mRecyclerView = this.findViewById(R.id.followed_club_list);
         // 设置布局管理器
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);

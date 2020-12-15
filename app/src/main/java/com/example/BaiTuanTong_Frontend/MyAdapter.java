@@ -48,10 +48,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
     // 上面是为点击事件添加的代码
 
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        private TextView tv;
+
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tv = itemView.findViewById(R.id.tvItem);
+        }
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_recycler, parent, false);
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.post_list_recycler_item, parent, false);
         MyViewHolder holder = new MyViewHolder(itemView);
         return holder;
     }
@@ -80,14 +89,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public int getItemCount() {
         return mList.size();
-    }
-
-    class MyViewHolder extends RecyclerView.ViewHolder {
-        private TextView tv;
-
-        public MyViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tv = itemView.findViewById(R.id.tvItem);
-        }
     }
 }
