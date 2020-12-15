@@ -17,7 +17,10 @@
     <style name="Theme.HelloWorld.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+<<<<<<< HEAD
         <item name="android:textColor">@android:color/black</item>
+=======
+>>>>>>> registerpage
     </style>
 
     <style name="Theme.HelloWorld.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
