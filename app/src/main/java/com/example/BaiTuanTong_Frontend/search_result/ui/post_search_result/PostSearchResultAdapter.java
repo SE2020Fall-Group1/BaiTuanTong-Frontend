@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.ui.post_search_result;
+package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.example.BaiTuanTong_Frontend.R;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;

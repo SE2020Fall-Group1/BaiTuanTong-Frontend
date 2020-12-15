@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend;
+package com.example.BaiTuanTong_Frontend.search_result;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

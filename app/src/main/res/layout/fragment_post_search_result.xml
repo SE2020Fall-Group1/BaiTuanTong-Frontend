@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.post_search_result.PostSearchResultFragment">
+    tools:context=".search_result.ui.post_search_result.PostSearchResultFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/post_search_result_recyclerView"

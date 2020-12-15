@@ -1,14 +1,14 @@
-package com.example.BaiTuanTong_Frontend.ui.club_search_result;
+package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ClubSearchResultViewModel extends ViewModel {
+public class PostSearchResultViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public ClubSearchResultViewModel() {
+    public PostSearchResultViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is dashboard fragment");
     }

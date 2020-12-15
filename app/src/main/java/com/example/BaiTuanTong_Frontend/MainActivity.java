@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity;
+
 public class MainActivity extends AppCompatActivity {
     public static final String USER_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.UserMESSAGE";
     public static final String PASS_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.PassMESSAGE";
@@ -18,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendMessage(View view){
         Intent intent1 = new Intent(this, SearchResultActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("searchText", "zsh");
+        intent1.putExtras(bundle);
         //Intent intent1 = new Intent(this, PostListDisplayActivity.class);
         Intent intent2 = new Intent(this, DisplayMessageActivity.class);
         EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);

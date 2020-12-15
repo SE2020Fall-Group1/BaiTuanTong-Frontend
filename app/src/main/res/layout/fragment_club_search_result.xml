@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.club_search_result.ClubSearchResultFragment">
+    tools:context=".search_result.ui.club_search_result.ClubSearchResultFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/club_search_result_recyclerView"

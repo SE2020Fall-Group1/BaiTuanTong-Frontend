@@ -9,10 +9,10 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
+        <activity android:name=".SearchActivity"></activity>
         <activity
-            android:name=".SearchResultActivity"
-            android:label="@string/title_activity_search_result"></activity>
-
+            android:name=".search_result.SearchResultActivity"
+            android:label="@string/title_activity_search_result" />
         <activity android:name=".FollowedClubsDisplayActivity" />
         <activity android:name=".PostPageActivity" />
         <activity android:name=".PostListDisplayActivity" />
