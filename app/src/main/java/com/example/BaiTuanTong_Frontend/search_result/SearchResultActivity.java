@@ -2,6 +2,8 @@ package com.example.BaiTuanTong_Frontend.search_result;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +22,23 @@ import com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result.Post
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 
 public class SearchResultActivity extends AppCompatActivity {
 
     private ViewPager2 mViewPager2;
     private TabLayout mTabLayout;
     private String searchText;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,7 @@ public class SearchResultActivity extends AppCompatActivity {
         searchText = bundle.getString("searchText");
 
         List<Fragment> mFragments = new ArrayList<>();
+
         mFragments.add(ClubSearchResultFragment.newInstance(searchText, 0));
         mFragments.add(PostSearchResultFragment.newInstance(searchText, 1));
         SearchResultTabAdapter mSearchResultTabAdapter = new SearchResultTabAdapter(this, mFragments);
@@ -105,4 +117,5 @@ public class SearchResultActivity extends AppCompatActivity {
             }
         });
     }
+
 }

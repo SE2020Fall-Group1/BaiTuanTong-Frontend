@@ -16,12 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResultAdapter.ClubSearchResultViewHolder> {
-    private List<String> mList;
+    private List<String> clubName;
+    private List<String> introduction;
     private Context mContext;
 
-    public ClubSearchResultAdapter(Context mContext, List<String> mList) {
+    public ClubSearchResultAdapter(Context mContext, List<String> clubName, List<String> introduction) {
         this.mContext = mContext;
-        this.mList = mList;
+        this.clubName = clubName;
+        this.introduction = introduction;
     }
 
     class ClubSearchResultViewHolder extends RecyclerView.ViewHolder {
@@ -48,8 +50,8 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
 
     @Override
     public void onBindViewHolder(@NonNull ClubSearchResultAdapter.ClubSearchResultViewHolder holder, int position) {
-        holder.club_name.setText(mList.get(position));
-        holder.club_intro.setText("    这是社团" + (position+1) + "的简介" + "");
+        holder.club_name.setText(clubName.get(position));
+        holder.club_intro.setText(introduction.get(position));
         holder.club_intro.setTag(position);
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);
@@ -73,6 +75,6 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
     }
     @Override
     public int getItemCount() {
-        return mList.size();
+        return clubName.size();
     }
 }
