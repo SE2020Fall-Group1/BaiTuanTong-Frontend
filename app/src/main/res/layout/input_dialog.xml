@@ -6,14 +6,15 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@color/white">
+
     <EditText
         android:id="@+id/input_comment_edit_text"
-        android:layout_height="match_parent"
         android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="5"
-        android:inputType="text"
         android:hint="说点什么吧"
-        android:textColorHint="@color/black"/>
+        android:inputType="text"
+        android:textColorHint="@android:color/darker_gray" />
     <Button
         android:id="@+id/send_button"
         android:layout_width="0dp"

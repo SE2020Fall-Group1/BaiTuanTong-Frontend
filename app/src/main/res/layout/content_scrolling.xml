@@ -29,6 +29,27 @@
             android:src="@drawable/pic_liuxing"
             android:layout_margin="16dp" />
 
+        <androidx.cardview.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="0dp"
+            card_view:cardCornerRadius="4dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="评论"
+                android:textSize="15sp"
+                android:layout_gravity="center_vertical"/>
+        </androidx.cardview.widget.CardView>
+
         <com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll
             android:id="@+id/comment_list"
             android:layout_height="wrap_content"

@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.data.model.LoggedInUser;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginViewModel;
@@ -57,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     private LoginViewModel loginViewModel;
     private int loginResult;
     private OkHttpClient okHttpClient = new OkHttpClient();
+    private String username;
 
     //处理异步线程发来的消息
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -64,11 +66,19 @@ public class LoginActivity extends AppCompatActivity {
         public boolean handleMessage(@NonNull Message msg) {
             //super.handleMessage(msg);
             try {
-                Log.e("handle", (String)msg.obj);
-                JSONObject jsonObject = new JSONObject((String)msg.obj);
-                String resultMsg = jsonObject.getString("usrId");
-                Log.e("TAG", (String)msg.obj);
-                Toast.makeText(LoginActivity.this, resultMsg, Toast.LENGTH_SHORT).show();
+                String msgBody = (String)msg.obj;
+                if(msgBody.equals("wrong password")||msgBody.equals("wrong username")){
+                    Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                }else{
+                    JSONObject jsonObject = new JSONObject((String)msgBody);
+                    String userId = jsonObject.getString("userId");
+                    Log.e("Toast", userId);
+                    String welcomeMessage = "欢迎！" + username;
+                    Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
+                    Intent postContentIntent = new Intent(LoginActivity.this, PostContentActivity.class);
+                    startActivity(postContentIntent);
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -154,9 +164,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 String baseUrl = "http://47.92.233.174:5000/";
 
+                username = usernameEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
                 HashMap<String, String> map = new HashMap<>();
-                map.put("username","jhc");
-                map.put("password","hehehe");
+                map.put("username", username);
+                map.put("password", password);
                 Gson gson = new Gson();
                 String data = gson.toJson(map);
 
@@ -196,7 +208,7 @@ public class LoginActivity extends AppCompatActivity {
                 //Log.e("TAG", "new thread run.");
                 try {
                     String result = post(url, json); //jason用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    Log.e("result", result);
                     Message msg = Message.obtain();
                     msg.obj = result;
                     getHandler.sendMessage(msg);

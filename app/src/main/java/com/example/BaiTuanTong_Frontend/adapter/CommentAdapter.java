@@ -55,7 +55,6 @@ public class CommentAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         Comment comment = commentList.get(position);
-        holder.ll_item.setBackgroundColor(Color.WHITE);
         holder.tv_usr.setText(comment.getUser());
         holder.tv_comment.setText(comment.getComment());
         return convertView;
