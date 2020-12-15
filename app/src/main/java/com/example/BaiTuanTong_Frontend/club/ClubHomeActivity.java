@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
 import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.MyAdapter;
@@ -70,6 +71,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private List<String> postList; //动态列表
     private String clubInfo;  //社团简介
     private String clubPresident;  //社长
+    private Intent intent;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -283,10 +285,15 @@ public class ClubHomeActivity extends AppCompatActivity {
         {
             case R.id.release_post_menu_item:
                 //getDataFromGet("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
-                getDataFromGet("http://47.92.233.174:5000/");
+                //    getDataFromGet("http://47.92.233.174:5000/");
+                //test release post page __ by tbw
+
+                intent = new Intent(this, ReleasePostActivity.class);
+                startActivity(intent);
+
                 break;
             case R.id.club_admin_manage_menu_item:
-                Intent intent = new Intent(this, EditClubAdminActivity.class);
+                intent = new Intent(this, EditClubAdminActivity.class);
                 startActivity(intent);
                 //getDataFromPost("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
                 //getDataFromGet("http://10.0.2.2:5000/hello");
