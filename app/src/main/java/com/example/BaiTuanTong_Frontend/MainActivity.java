@@ -19,30 +19,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-<<<<<<< HEAD
         setContentView(R.layout.activity_main);
-    }
-
-    public void sendMessage(View view){
-        Intent intent1 = new Intent(this, FollowedClubsDisplayActivity.class);
-        //Intent intent1 = new Intent(this, PostListDisplayActivity.class);
-        Intent intent2 = new Intent(this, DisplayMessageActivity.class);
-        EditText UserNameEditText = (EditText) findViewById(R.id.UserNameText);
-        String UserName = UserNameEditText.getText().toString();
-        EditText PasswordEditText = (EditText) findViewById(R.id.PasswordText);
-        String Password = PasswordEditText.getText().toString();
-        /*if(UserName.equals("zhp")&&Password.equals("123")){
-            startActivity(intent1);
-        }
-        else
-            startActivity(intent2);*/
-
-        Intent intent = new Intent(this, HomePageActivity.class);
-        startActivity(intent);
-=======
-        //setContentView(R.layout.activity_main);
         Intent intentLogin = new Intent(this, LoginActivity.class);
         startActivity(intentLogin);
->>>>>>> registerpage
     }
+
 }

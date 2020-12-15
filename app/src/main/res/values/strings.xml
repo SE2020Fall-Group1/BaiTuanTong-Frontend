@@ -2,7 +2,6 @@
     <string name="app_name">百团通</string>
     <string name="edit_message">Enter a message</string>
     <string name="button_send">send</string>
-<<<<<<< HEAD
     <string name="title_activity_home_page">MainActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -16,7 +15,6 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-=======
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

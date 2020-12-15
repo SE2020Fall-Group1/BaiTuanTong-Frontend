@@ -32,6 +32,7 @@ import com.example.BaiTuanTong_Frontend.data.model.LoggedInUser;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginViewModel;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginViewModelFactory;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistActivity;
+import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,15 +63,13 @@ public class LoginActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            Log.e("handler",(String)msg.obj);
             //super.handleMessage(msg);
-            try {
-                Log.e("handle", (String)msg.obj);
-                JSONObject jsonObject = new JSONObject((String)msg.obj);
-                String resultMsg = jsonObject.getString("usrId");
-                Log.e("TAG", (String)msg.obj);
-                Toast.makeText(LoginActivity.this, resultMsg, Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (((String) msg.obj).contains("wrong username") || ((String) msg.obj).contains("wrong password")){
+                Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+            }
+            else{
+                startHomePage();
             }
 
             return true;
@@ -80,7 +79,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         Intent intentShift = new Intent(this, RegistActivity.class);
 
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
@@ -154,13 +152,17 @@ public class LoginActivity extends AppCompatActivity {
 
                 String baseUrl = "http://47.92.233.174:5000/";
 
-                HashMap<String, String> map = new HashMap<>();
-                map.put("username","jhc");
-                map.put("password","hehehe");
-                Gson gson = new Gson();
-                String data = gson.toJson(map);
+                JSONObject obj = new JSONObject();
+                String username = usernameEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
 
-                getDataFromPost(baseUrl+"user/login", data);
+                try {
+                    obj.put("username",username);
+                    obj.put("password",password);
+                    getDataFromPost(baseUrl+"user/login", obj.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -171,6 +173,11 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intentShift);
             }
         });
+    }
+    // 转到HomePageActivity
+    private void startHomePage(){
+        Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
     }
 
     //Toast提示登录结果信息，暂时忽略

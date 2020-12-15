@@ -153,42 +153,9 @@ public class RegistActivity extends AppCompatActivity {
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
-                    try {
-                        JSONObject obj = new JSONObject((String)msg.obj);
-                        int code = obj.getInt("code");
-                        switch (code){
-                            case 200:
-                                Toast.makeText(getBaseContext(), "验证码发送成功", Toast.LENGTH_SHORT).show();
-                                break;
-                            case 400:
-                                Toast.makeText(getBaseContext(), "邮箱地址为空", Toast.LENGTH_SHORT).show();
-                                break;
-                            case 500:
-                                Toast.makeText(getBaseContext(), "验证码发送失败", Toast.LENGTH_SHORT).show();
-                                break;
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
+                    Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
                 case POST:
-                    try {
-                        JSONObject obj = new JSONObject((String)msg.obj);
-                        int code = obj.getInt("code");
-                        String failData = obj.getString("data");
-                        Log.d("注册",failData);
-                        switch (code){
-                            case 200:
-                                Toast.makeText(getBaseContext(), "注册成功", Toast.LENGTH_SHORT).show();
-                                break;
-                            case 300:
-                                Toast.makeText(getBaseContext(), failData, Toast.LENGTH_SHORT).show();
-                                break;
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
+                    Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
             }
             return true;
         }
