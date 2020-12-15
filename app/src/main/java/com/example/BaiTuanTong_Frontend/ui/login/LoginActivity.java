@@ -64,11 +64,11 @@ public class LoginActivity extends AppCompatActivity {
         public boolean handleMessage(@NonNull Message msg) {
             //super.handleMessage(msg);
             try {
+                Log.e("handle", (String)msg.obj);
                 JSONObject jsonObject = new JSONObject((String)msg.obj);
-                JSONArray jsonArray = jsonObject.getJSONArray("data");
-                String resultMsg = jsonArray.getJSONObject(1).getString("msg");
+                String resultMsg = jsonObject.getString("usrId");
                 Log.e("TAG", (String)msg.obj);
-                Toast.makeText(LoginActivity.this, resultMsg, Toast.LENGTH_LONG);
+                Toast.makeText(LoginActivity.this, resultMsg, Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -152,11 +152,11 @@ public class LoginActivity extends AppCompatActivity {
                //         passwordEditText.getText().toString());
                 OkHttpClient okHttpClient = new OkHttpClient();
 
-                String baseUrl = "http://10.0.2.2:5000/";
+                String baseUrl = "http://47.92.233.174:5000/";
 
                 HashMap<String, String> map = new HashMap<>();
-                map.put("username","zhp");
-                map.put("password","123");
+                map.put("username","jhc");
+                map.put("password","hehehe");
                 Gson gson = new Gson();
                 String data = gson.toJson(map);
 

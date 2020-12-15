@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_marginBottom="100dp"
-            android:divider="@color/black"
+            android:divider="@null"
             android:dividerHeight="3px"/>
     </LinearLayout>
 

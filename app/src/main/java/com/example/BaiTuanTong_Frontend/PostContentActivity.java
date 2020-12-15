@@ -57,7 +57,7 @@ public class PostContentActivity extends AppCompatActivity {
 
         //设置评论list
         commentListView = (ListViewUnderScroll)findViewById(R.id.comment_list);
-        commentListView.addHeaderView(new ViewStub(this));
+        //commentListView.addHeaderView(new ViewStub(this));
         commentAdapter = new CommentAdapter(this, commentList);
         commentListView.setAdapter(commentAdapter);
 
