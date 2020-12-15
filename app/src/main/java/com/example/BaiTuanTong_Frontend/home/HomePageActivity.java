@@ -3,10 +3,8 @@ package com.example.BaiTuanTong_Frontend.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.BaiTuanTong_Frontend.PostPageActivity;
-import com.example.BaiTuanTong_Frontend.home.ui.home.SearchResultActivity;
+import com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,8 +38,9 @@ public class HomePageActivity extends AppCompatActivity implements MyListener{
 
     public void sendContent(String info){
         Intent intent = new Intent(this, SearchResultActivity.class);
-        Log.d("asdsadsa","assaddsadsa");
-        intent.putExtra(PAGE_EXTRA_MESSAGE, info);
+        Bundle bundle = new Bundle();
+        bundle.putString("searchText", info);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
     /*@Override
