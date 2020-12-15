@@ -26,16 +26,16 @@
         <activity
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"
-        android:theme="@style/Theme.HelloWorld">
+            android:theme="@style/Theme.HelloWorld" />
         <activity
             android:name=".PostContentActivity"
             android:label="@string/title_activity_post_content"
-            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity android:name=".ui.register.RegistActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login" 
-            android:theme="@style/Theme.HelloWorld.NoActionBar" /></activity>
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".MainActivity">
