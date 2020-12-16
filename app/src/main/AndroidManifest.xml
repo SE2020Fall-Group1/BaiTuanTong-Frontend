@@ -15,6 +15,11 @@
         android:theme="@style/Theme.HelloWorld">
         <activity android:name=".search_result.SearchResultActivity"></activity>
         <activity
+            android:name=".club.EditClubAdminActivity"
+            android:label="EditClubAdminActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            ></activity>
+        <activity
             android:name=".club.ClubHomeActivity"
             android:label="@string/title_activity_club_home"
             android:parentActivityName=".FollowedClubsDisplayActivity"

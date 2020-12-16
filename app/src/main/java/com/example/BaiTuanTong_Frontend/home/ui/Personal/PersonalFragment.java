@@ -6,24 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 //import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.club.EditClubAdminActivity;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
 public class PersonalFragment extends Fragment {
 
@@ -48,6 +42,11 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FollowedClubsDisplayActivity.class);
+            //    Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+                //目前跳转到社团主页，为了调试
+
+                //目前跳转到admin管理页面，为了调试————bytbw
+            //    Intent intent = new Intent(getActivity(), EditClubAdminActivity.class);
                 startActivityForResult(intent, 3);
             }
         });
