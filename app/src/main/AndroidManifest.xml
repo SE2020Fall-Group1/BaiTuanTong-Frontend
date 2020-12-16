@@ -38,8 +38,14 @@
         <activity android:name=".ui.register.RegistActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
-            android:label="@string/title_activity_login" 
-            android:theme="@style/Theme.HelloWorld.NoActionBar" />
+
+            android:theme="@style/Theme.HelloWorld.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".EditPostActivity"
             android:parentActivityName=".PostListDisplayActivity" />
@@ -48,11 +54,6 @@
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
