@@ -20,7 +20,7 @@ public class EditAdminDialogFragment extends DialogFragment {
     private int position;
 
     public interface ChangeAdminListener {
-        void changeAdminComplete(String adminName, int position);
+        void changeAdminComplete(String newAdminName, int position);
     }
 
     @Override

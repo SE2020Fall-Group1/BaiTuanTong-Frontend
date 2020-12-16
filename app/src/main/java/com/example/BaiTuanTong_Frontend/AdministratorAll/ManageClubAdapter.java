@@ -16,7 +16,7 @@ import android.view.View.OnLongClickListener;
 import com.example.BaiTuanTong_Frontend.R;
 
 public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.MyViewHolder> {
-    private List<ClubData> mClubData;
+    public List<ClubData> mClubData;
     private Context mContext;
     public enum ViewName {  // 区分多个控件的点击事件
         ITEM,
@@ -28,6 +28,8 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
         this.mClubData = clubData;
     }
 
+
+
     @Override
     public int getItemCount() {
         return mClubData.size();
@@ -38,7 +40,11 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
     }
 
     public void addData(int position, String clubName, String adminName) {
-        mClubData.add(position, new ClubData(clubName, adminName));
+        if (mClubData.size() < position) {
+            mClubData.add(new ClubData(clubName, adminName));
+        }
+        else
+            mClubData.add(position, new ClubData(clubName, adminName));
         notifyItemInserted(position);
     }
 

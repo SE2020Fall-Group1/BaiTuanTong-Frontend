@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 
 import com.example.BaiTuanTong_Frontend.AdministratorAll.ManagerHomePage;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
@@ -34,6 +35,13 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent2);*/
 
         Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
+    }
+
+    public void managerLogin(View view){
+
+        // Intent intent = new Intent(this, HomePageActivity.class);
+        Intent intent = new Intent(this, ManagerHomePage.class);
         startActivity(intent);
     }
 }
