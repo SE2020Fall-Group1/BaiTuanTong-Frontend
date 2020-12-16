@@ -59,8 +59,6 @@ public class ClubSearchResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
-
         mView = inflater.inflate(R.layout.fragment_club_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.club_search_result_recyclerView));
 
@@ -79,6 +77,13 @@ public class ClubSearchResultFragment extends Fragment {
         ClubSearchResultFragment fragment = new ClubSearchResultFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((flag == 0) && (clubId.isEmpty()))
+            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
     }
 
     // 在获得GET请求返回的数据后更新UI

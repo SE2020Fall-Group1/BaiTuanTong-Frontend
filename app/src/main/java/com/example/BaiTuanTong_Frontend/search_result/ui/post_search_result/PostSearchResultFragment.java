@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.search_result.ui.club_search_result.ClubSearchResultAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,8 +61,6 @@ public class PostSearchResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
-
         mView = inflater.inflate(R.layout.fragment_post_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.post_search_result_recyclerView));
 
@@ -82,6 +79,13 @@ public class PostSearchResultFragment extends Fragment {
         PostSearchResultFragment fragment = new PostSearchResultFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((flag == 1) && (postId.isEmpty()))
+        getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
     }
 
     // 在获得GET请求返回的数据后更新UI
