@@ -1,17 +1,11 @@
 package com.example.BaiTuanTong_Frontend;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
-import com.example.BaiTuanTong_Frontend.ui.register.ModifyInformationActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         Intent intentLogin = new Intent(this, LoginActivity.class);
-
         startActivity(intentLogin);
     }
 

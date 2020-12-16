@@ -41,7 +41,7 @@ public class SearchResultActivity extends AppCompatActivity {
     /**
      * 设置flag标记当前显示的是哪个fragment
      * 用于解决fragment0网络请求返回但此时显示fragment1时的程序报错
-     * 当Activity中 切换
+     * 当Activity中选定某个fragment时切换
      */
     public static int flag;
 

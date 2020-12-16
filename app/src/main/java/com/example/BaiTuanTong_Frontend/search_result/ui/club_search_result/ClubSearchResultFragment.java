@@ -34,6 +34,7 @@ import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivit
 
 public class ClubSearchResultFragment extends Fragment {
 
+    private int item;
     private View mView;
     private RecyclerView mRecyclerView;
     private ClubSearchResultAdapter mClubSearchResultAdapter;
@@ -59,6 +60,8 @@ public class ClubSearchResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        item = getArguments().getInt("item");
+
         mView = inflater.inflate(R.layout.fragment_club_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.club_search_result_recyclerView));
 
@@ -71,8 +74,8 @@ public class ClubSearchResultFragment extends Fragment {
 
     public static ClubSearchResultFragment newInstance(String text, int item) {
         Bundle bundle = new Bundle();
-        bundle.putInt("item", item);
         bundle.putString("searchText", text);
+        bundle.putInt("item", item);
 
         ClubSearchResultFragment fragment = new ClubSearchResultFragment();
         fragment.setArguments(bundle);
@@ -82,7 +85,7 @@ public class ClubSearchResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if ((flag == 0) && (clubId.isEmpty()))
+        if ((flag == item) && (clubId.isEmpty()))
             getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
     }
 
@@ -102,7 +105,7 @@ public class ClubSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        while (flag != 0);
+                        while (flag != item);
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -141,7 +144,7 @@ public class ClubSearchResultFragment extends Fragment {
                 try {
                     Log.e("URL", url);
                     String result = get(url);
-                    Log.e("TAG", result);
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -160,8 +163,8 @@ public class ClubSearchResultFragment extends Fragment {
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    String result = post(url, json); //json用于上传数据，目前不需要
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
                     msg.obj = result;

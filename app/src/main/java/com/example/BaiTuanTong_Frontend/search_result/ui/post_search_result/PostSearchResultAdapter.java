@@ -8,10 +8,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.BaiTuanTong_Frontend.R;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.BaiTuanTong_Frontend.R;
 
 import java.util.List;
 
@@ -32,6 +32,24 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         this.commentCnt = commentCnt;
     }
 
+    // 设置一个枚举类型给使用接口的Activity/Fragment传参，使其知道点击类型
+    public enum ViewName{
+        CLUB_IMG,
+        CLUB_NAME,
+        POST_CONTENT
+    }
+
+    public interface OnItemClickListener {
+        void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position);
+    }
+
+    // Item内部空间点击事件处理
+    private PostSearchResultAdapter.OnItemClickListener mOnItemClickListener;
+
+    public void setOnItemClickListener(PostSearchResultAdapter.OnItemClickListener onItemClickListener) {
+        this.mOnItemClickListener = onItemClickListener;
+    }
+
     class PostSearchResultViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout post_list_content;
         private ImageView club_img;
@@ -41,7 +59,7 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         private TextView post_likeCnt;
         private TextView post_commentCnt;
 
-        public PostSearchResultViewHolder(@NonNull View itemView) {
+        public PostSearchResultViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
             post_list_content = itemView.findViewById(R.id.post_list_content);
             club_img = itemView.findViewById(R.id.club_img);
@@ -50,13 +68,48 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
             post_text = itemView.findViewById(R.id.post_text);
             post_likeCnt = itemView.findViewById(R.id.post_likeCnt);
             post_commentCnt = itemView.findViewById(R.id.post_commentCnt);
+
+            // 设置内部点击事件
+            club_img.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_IMG, position);
+                        }
+                    }
+                }
+            });
+            post_clubName.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_NAME, position);
+                        }
+                    }
+                }
+            });
+            post_list_content.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, ViewName.POST_CONTENT, position);
+                        }
+                    }
+                }
+            });
         }
     }
 
     @Override
     public PostSearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_post_list_recycler, parent, false);
-        PostSearchResultAdapter.PostSearchResultViewHolder holder = new PostSearchResultAdapter.PostSearchResultViewHolder(itemView);
+        PostSearchResultAdapter.PostSearchResultViewHolder holder = new PostSearchResultAdapter.PostSearchResultViewHolder(itemView, mOnItemClickListener);
         return holder;
     }
 
@@ -69,24 +122,10 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         holder.post_likeCnt.setText("Likes: " + likeCnt.get(position));
         holder.post_commentCnt.setText("Comments: " + commentCnt.get(position));
         holder.post_list_content.setTag(position);
-/*        //自己做item点击
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onItemClickListener != null)
-                    onItemClickListener.onClick(position);
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (onItemLongClickListener != null)
-                    onItemLongClickListener.onLongClick(position);
-                //返回false会在长按结束后继续点击
-                return true;
-            }
-        });*/
     }
+
+
+
     @Override
     public int getItemCount() {
         return title.size();

@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
 
 import org.json.JSONArray;
@@ -34,6 +37,7 @@ import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivit
 
 public class PostSearchResultFragment extends Fragment {
 
+    private int item;
     private View mView;
     private RecyclerView mRecyclerView;
     private PostSearchResultAdapter mPostSearchResultAdapter;
@@ -61,6 +65,8 @@ public class PostSearchResultFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        item = getArguments().getInt("item");
+
         mView = inflater.inflate(R.layout.fragment_post_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.post_search_result_recyclerView));
 
@@ -84,14 +90,36 @@ public class PostSearchResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if ((flag == 1) && (postId.isEmpty()))
-        getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
+        if ((flag == item) && (postId.isEmpty()))
+            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
+    }
+
+    // 跳转到动态内容界面，传递参数post_id
+    private void startPostContentActivity(Integer post_id){
+        Intent intent = new Intent(getActivity(), PostContentActivity.class);
+        intent.putExtra("postId", post_id);
+        startActivity(intent);
     }
 
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
         mPostSearchResultAdapter = new PostSearchResultAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mPostSearchResultAdapter);
+
+        // 下面是为点击事件添加的代码
+        mPostSearchResultAdapter.setOnItemClickListener(new PostSearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position) {
+                if ((viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) || (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME)) {
+                    Toast.makeText(getActivity().getBaseContext(), "跳转到社团", Toast.LENGTH_SHORT).show();
+                }
+                else if (viewName == PostSearchResultAdapter.ViewName.POST_CONTENT) {
+                    Integer post_id = postId.get(position);
+                    startPostContentActivity(post_id);
+                }
+            }
+        });
+
         mView.invalidate();
     }
 
@@ -104,7 +132,7 @@ public class PostSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        while (flag != 1);
+                        while (flag != item);
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -146,7 +174,7 @@ public class PostSearchResultFragment extends Fragment {
                 try {
                     Log.e("URL", url);
                     String result = get(url);
-                    Log.e("TAG", result);
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -165,8 +193,8 @@ public class PostSearchResultFragment extends Fragment {
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    String result = post(url, json); //json用于上传数据，目前不需要
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
                     msg.obj = result;
