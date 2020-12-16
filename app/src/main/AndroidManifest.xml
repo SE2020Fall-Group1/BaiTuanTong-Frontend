@@ -19,8 +19,7 @@
         <activity
             android:name=".club.EditClubAdminActivity"
             android:label="EditClubAdminActivity"
-            android:parentActivityName=".home.HomePageActivity"
-            ></activity>
+            android:parentActivityName=".home.HomePageActivity" />
         <activity
             android:name=".club.ClubHomeActivity"
             android:label="@string/title_activity_club_home"
@@ -43,9 +42,9 @@
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login" 
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
-        <activity android:name=".EditPostActivity"
-                android:parentActivityName=".PostListDisplayActivity"
-            ></activity>
+        <activity
+            android:name=".EditPostActivity"
+            android:parentActivityName=".PostListDisplayActivity" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
