@@ -189,6 +189,7 @@ public class LoginActivity extends AppCompatActivity {
     private void startHomePage(){
         Intent intent = new Intent(this, HomePageActivity.class);
         startActivity(intent);
+        this.finish();
     }
 
     //Toast提示登录结果信息，暂时忽略
