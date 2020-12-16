@@ -132,7 +132,7 @@ public class PostSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        while (flag != item);
+                        if (flag == item)
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
