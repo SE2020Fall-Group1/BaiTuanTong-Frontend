@@ -239,11 +239,11 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 String data1 = jsonObject1.getString("data");
                 // Toast.makeText(this, "add club " + jsonObject1.toString(), Toast.LENGTH_SHORT).show();
                 switch (data1) {
-                    case "president do not exist":
+                    case "invalid username":
                         Log.e("AddClub", data1);
                         Toast.makeText(this, data1, Toast.LENGTH_LONG).show();
                         break;
-                    case "club name exist":
+                    case "club name used":
                         Log.e("AddClub", data1);
                         Toast.makeText(this, data1, Toast.LENGTH_LONG).show();
                         break;
@@ -257,7 +257,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 JSONObject jsonObject4 = new JSONObject(json);
                 String data4 = jsonObject4.getString("data");
                 switch (data4) {
-                    case "club do not exist":
+                    case "invalid clubname":
                         Log.e("DeleteClub", data4);
                         break;
                     case "success":
@@ -270,10 +270,10 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 JSONObject jsonObject3 = new JSONObject(json);
                 String data3 = jsonObject3.getString("data");
                 switch (data3) {
-                    case "new president do not exist":
+                    case "invalid username":
                         Log.e("ChangePresident", data3);
                         break;
-                    case "club do not exist":
+                    case "invalid clubname":
                         Log.e("ChangePresident", data3);
                         break;
                     case "success":
