@@ -25,6 +25,7 @@ import com.example.BaiTuanTong_Frontend.MainActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result.PostSearchResultAdapter;
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
 
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,8 +54,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity.flag;
-
 public class HomeFragment extends Fragment {
 
     private Context mContext;
@@ -78,8 +77,8 @@ public class HomeFragment extends Fragment {
     public List<String> title = new ArrayList<>();          // 动态标题
     public List<String> clubName = new ArrayList<>();       // 社团名字
     public List<String> text = new ArrayList<>();           // 动态内容
-    public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
-    public List<String> commentCnt = new ArrayList<>();     // 动态评论数
+    public List<Integer> likeCnt = new ArrayList<>();        // 动态点赞数
+    public List<Integer> commentCnt = new ArrayList<>();     // 动态评论数
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -95,7 +94,7 @@ public class HomeFragment extends Fragment {
         super.onAttach(context);
         ac = (MyListener)getActivity();
     }
-    // 实现一个接口，给SearchResultActivity传输搜索字符串info
+    // 实现一个接口，搜索框给SearchResultActivity传输搜索字符串info
     public interface MyListener{
         public void sendContent(String info);//发送给SearchResultActivity
     }
@@ -134,41 +133,23 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-    /*
-    // 前端调试用，实现一个简易的list
-    private List<String> mList;
-    // List初始化，随意实现的
-    private List<String> getList(){
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("首页测试动态专用\n"+"这是一条无聊的动态"+"");
-        }
-        return list;
-    }*/
-
+    // 跳转到动态内容界面，传递参数post_id
+    private void startPostContentActivity(Integer post_id){
+        Intent intent = new Intent(getActivity(),PostContentActivity.class);
+        intent.putExtra("postId", post_id);
+        startActivity(intent);
+    }
     // 初始化线性布局的循环视图
     private void initRecyclerLinear() {
-        rv_post_list = mView.findViewById(R.id.rv_post_list);
+        rv_post_list = (RecyclerView)mView.findViewById(R.id.rv_post_list);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
+        Log.e("init rv","1");
+        //myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
+        //rv_post_list.setAdapter(myAdapter);
+        //rv_post_list.setItemAnimator(new DefaultItemAnimator());
         // 通过url传输数据
         getDataFromGet(SERVERURL + "post/homepage");
-
-        // 下面是为点击事件添加的代码
-        myAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
-            @Override
-            public void onInternalViewClick(View view, PostAdapter.ViewName viewName, int position) {
-                if (viewName == PostAdapter.ViewName.CLUB_IMG) {
-                    Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
-                }
-                else if(viewName == PostAdapter.ViewName.POST_TEXT) {
-                    Toast.makeText(getActivity().getBaseContext(), "点击了文本", Toast.LENGTH_SHORT).show();
-                }
-                //Toast.makeText(getBaseContext(), mList.get(position), Toast.LENGTH_SHORT).show();
-                //sendMessage(position);
-            }
-        });
-        rv_post_list.setItemAnimator(new DefaultItemAnimator());
     }
     // 提示框，未实现
     private void doSearch(String text) {
@@ -196,6 +177,23 @@ public class HomeFragment extends Fragment {
     private void updateView() {
         myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
         rv_post_list.setAdapter(myAdapter);
+
+        // 下面是为点击事件添加的代码
+        myAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+            @Override
+            public void onInternalViewClick(View view, PostAdapter.ViewName viewName, int position) {
+                if (viewName == PostAdapter.ViewName.CLUB_IMG) {
+                    Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
+                }
+                else if(viewName == PostAdapter.ViewName.POST_TEXT) {
+                    Integer post_id = postId.get(position);
+                    startPostContentActivity(post_id);
+                    //Toast.makeText(getActivity().getBaseContext(), "点击了文本", Toast.LENGTH_SHORT).show();
+                }
+                //Toast.makeText(getBaseContext(), mList.get(position), Toast.LENGTH_SHORT).show();
+                //sendMessage(position);
+            }
+        });
         mView.invalidate();
     }
     // 处理get请求与post请求的回调函数
@@ -207,7 +205,6 @@ public class HomeFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        while (flag != 1);
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -234,9 +231,9 @@ public class HomeFragment extends Fragment {
             title.add(postList.getJSONObject(i).getString("title"));
             clubName.add(postList.getJSONObject(i).getString("clubName"));
             text.add(postList.getJSONObject(i).getString("text"));
-            likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
-            // 目前没有回传评论数，伪造一个0
-            commentCnt.add("0");
+            likeCnt.add(postList.getJSONObject(i).getInt("likeCnt"));
+            commentCnt.add(postList.getJSONObject(i).getInt("commentCnt"));
+            Log.e("text", ""+ postId.get(i));
         }
     }
 
