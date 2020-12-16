@@ -13,7 +13,9 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
-        <activity android:name=".search_result.SearchResultActivity" />
+        <activity
+            android:name=".search_result.SearchResultActivity"
+            android:parentActivityName=".home.HomePageActivity" />
         <activity
             android:name=".club.EditClubAdminActivity"
             android:label="EditClubAdminActivity"
@@ -49,7 +51,6 @@
         <activity
             android:name=".EditPostActivity"
             android:parentActivityName=".PostListDisplayActivity" />
-        <activity android:name=".PostPageActivity" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
