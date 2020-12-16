@@ -1,10 +1,12 @@
 package com.example.BaiTuanTong_Frontend.GridView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -25,6 +27,7 @@ public class ReleasePostActivity extends AppCompatActivity {
     private ArrayList<String> mPicList = new ArrayList<>();
     private MyGridViewAdapter myGridViewAdapter;
     private Button myButton;
+
 
     private void viewPluImg(int pos){
         Toast.makeText(this, "click a pic", Toast.LENGTH_SHORT).show();
@@ -59,9 +62,27 @@ public class ReleasePostActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_post);
+
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
 //        myOnClickListener = new MyOnClickListener();
 
@@ -75,6 +96,7 @@ public class ReleasePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
+                ReleasePostActivity.this.finish();
             }
         });
 

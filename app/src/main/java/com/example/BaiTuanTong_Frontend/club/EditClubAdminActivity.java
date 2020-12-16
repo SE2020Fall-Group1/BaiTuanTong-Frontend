@@ -2,6 +2,7 @@ package com.example.BaiTuanTong_Frontend.club;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -75,6 +76,11 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         */
                 dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;
+
+
+            case android.R.id.home:
+                this.finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -83,6 +89,9 @@ public class EditClubAdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_club_admin);
+
+
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
         if(actionBar != null){
