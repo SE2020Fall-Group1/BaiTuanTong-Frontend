@@ -1,45 +1,28 @@
 package com.example.BaiTuanTong_Frontend.home.ui.home;
 
-import android.content.Intent;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
-import com.example.BaiTuanTong_Frontend.MainActivity;
-import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-import com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result.PostSearchResultAdapter;
-import com.example.BaiTuanTong_Frontend.PostContentActivity;
-
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.SearchManager;
-import android.app.SearchableInfo;
-import android.content.ComponentName;
-import android.content.Context;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.SearchView;
-import android.widget.Toast;
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
+import com.example.BaiTuanTong_Frontend.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -186,10 +169,11 @@ public class HomeFragment extends Fragment {
                 if (viewName == PostAdapter.ViewName.CLUB_IMG) {
                     Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
                 }
-                else if(viewName == PostAdapter.ViewName.POST_TEXT) {
-                    Integer post_id = postId.get(position);
-                    startPostContentActivity(post_id);
-                    //Toast.makeText(getActivity().getBaseContext(), "点击了文本", Toast.LENGTH_SHORT).show();
+                else if (viewName == PostAdapter.ViewName.CLUB_NAME) {
+                    Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
+                }
+                else if (viewName == PostAdapter.ViewName.POST_CONTENT) {
+                    startPostContentActivity(position);
                 }
                 //Toast.makeText(getBaseContext(), mList.get(position), Toast.LENGTH_SHORT).show();
                 //sendMessage(position);

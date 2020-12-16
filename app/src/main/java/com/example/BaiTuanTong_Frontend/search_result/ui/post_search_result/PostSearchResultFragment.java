@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
+import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,8 +34,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity.flag;
 
 public class PostSearchResultFragment extends Fragment {
 
@@ -60,6 +60,7 @@ public class PostSearchResultFragment extends Fragment {
     public List<String> text = new ArrayList<>();           // 动态内容
     public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
+    public List<Integer> clubId = new ArrayList<>();        // 社团ID
 
     @Nullable
     @Override
@@ -90,14 +91,23 @@ public class PostSearchResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if ((flag == item) && (postId.isEmpty()))
+        Log.e("msg", "onResume");
+        if (postId.isEmpty()){
+            Log.e("msg", "empty");
             getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
+        }
     }
 
-    // 跳转到动态内容界面，传递参数post_id
-    private void startPostContentActivity(Integer post_id){
+    // 跳转到社团主页，传递参数position（该动态再列表中的位置）
+    private void startClubHomeActivity(Integer position) {
+        Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+        intent.putExtra("clubId", clubId.get(position));
+    }
+
+    // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
+    private void startPostContentActivity(Integer position) {
         Intent intent = new Intent(getActivity(), PostContentActivity.class);
-        intent.putExtra("postId", post_id);
+        intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 
@@ -111,15 +121,21 @@ public class PostSearchResultFragment extends Fragment {
             @Override
             public void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position) {
                 if ((viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) || (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME)) {
-                    Toast.makeText(getActivity().getBaseContext(), "跳转到社团", Toast.LENGTH_SHORT).show();
+                    // startClubHomeActivity(position);
+                    // 还未实现和社团主页的对接，用消息提示代替
+                    if (viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) {
+                        Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME) {
+                        Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else if (viewName == PostSearchResultAdapter.ViewName.POST_CONTENT) {
-                    Integer post_id = postId.get(position);
-                    startPostContentActivity(post_id);
+                    startPostContentActivity(position);
                 }
             }
         });
-
+        Log.e("msg", "invalidate");
         mView.invalidate();
     }
 
@@ -131,8 +147,8 @@ public class PostSearchResultFragment extends Fragment {
             switch (msg.what){
                 case GET:
                     try {
+                        Log.e("msg", "startParsing");
                         parseJsonPacket((String)msg.obj);
-                        if (flag == item)
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -160,8 +176,8 @@ public class PostSearchResultFragment extends Fragment {
             clubName.add(postList.getJSONObject(i).getString("clubName"));
             text.add(postList.getJSONObject(i).getString("text"));
             likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
-            // 目前没有回传评论数，伪造一个0
-            commentCnt.add("0");
+            commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
+            clubId.add(postList.getJSONObject(i).getInt("clubId"));
         }
     }
 
