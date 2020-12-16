@@ -319,10 +319,12 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
     }
 
     // List初始化，测试用
+    /*
     private void getClubData(){
         for (int i = 0; i < 20; i++)
             mClubData.add(new ClubData("Club " + i + "", "Admin " + i + ""));
     }
+     */
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.manager_homepage_menu, menu);
@@ -378,7 +380,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                         // Toast.makeText(ManagerHomePage.this, position + " button click", Toast.LENGTH_SHORT).show();
                         break;
                     default:
-                        Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
                         Log.e("Click", position + " click");
                         break;
                 }

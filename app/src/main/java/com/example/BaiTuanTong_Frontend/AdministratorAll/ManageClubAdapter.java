@@ -92,7 +92,7 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
                 }
             });
 
-            holder.bt.setOnClickListener(new OnClickListener() {
+            holder.changePresidentButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = holder.getLayoutPosition();
@@ -113,12 +113,12 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tv;
-        private Button bt;
+        private Button changePresidentButton;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             tv = itemView.findViewById(R.id.clubItem);
-            bt = itemView.findViewById(R.id.changeAdministrator);
+            changePresidentButton = itemView.findViewById(R.id.changeAdministrator);
         }
     }
 }
