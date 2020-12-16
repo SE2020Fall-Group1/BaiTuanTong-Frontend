@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
@@ -33,6 +34,7 @@ public class FollowedClubsDisplayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("DEBUG", "onCreat");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_followed_clubs_display);
 
@@ -68,8 +70,8 @@ public class FollowedClubsDisplayActivity extends AppCompatActivity {
 
     public void sendMessage(int position) {
         Intent intent = new Intent(this, ClubHomeActivity.class);
-        intent.putExtra("club_name", mList.get(position));                 //通过Intent传递社团名称
-        intent.putExtra("club_profile", "社团" + (position + 1) + "的简介");    //传递社团简介
+        //intent.putExtra("club_name", mList.get(position));                 //通过Intent传递社团名称
+        //intent.putExtra("club_profile", "社团" + (position + 1) + "的简介");    //传递社团简介
         intent.putExtra("club_id", position);             //社团id，目前临时用position代替
         startActivity(intent);
     }

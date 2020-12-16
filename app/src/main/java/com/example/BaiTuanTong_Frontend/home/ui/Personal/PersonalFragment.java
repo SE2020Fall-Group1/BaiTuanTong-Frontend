@@ -6,32 +6,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 //import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.PostListDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
 public class PersonalFragment extends Fragment {
 
     private PersonalViewModel personalViewModel;
+    private Button manageClubButton;
     private Button followClubButton;
+    private Button collectedPostButton;
+    private Button configureButton;
     private Button signOutButton;
-    private Button collectedPost;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,7 +36,7 @@ public class PersonalFragment extends Fragment {
 
         followClubButton = (Button)root.findViewById(R.id.follow_club);
         signOutButton = (Button)root.findViewById((R.id.sign_out));
-        collectedPost = (Button)root.findViewById(R.id.collect_post);
+        collectedPostButton = (Button)root.findViewById(R.id.collect_post);
 
         return root;
     }
@@ -62,7 +57,7 @@ public class PersonalFragment extends Fragment {
                 getActivity().finish();
             }
         });
-        collectedPost.setOnClickListener(new View.OnClickListener() {
+        collectedPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PostListDisplayActivity.class);

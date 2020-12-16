@@ -69,9 +69,10 @@ public class ClubHomeActivity extends AppCompatActivity {
     private MyAdapter mMyAdapter;
 
     private List<String> postList; //动态列表
+    private String clubName;
     private String clubInfo;  //社团简介
     private String clubPresident;  //社长
-    private Intent intent;
+    private int clubId;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -83,8 +84,8 @@ public class ClubHomeActivity extends AppCompatActivity {
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
-                    club_profile.setText((String)msg.obj);
-                    break;
+                    //club_profile.setText((String)msg.obj);
+                    //break;
                 case POST:
                     //club_profile.setText((String)msg.obj);
                     try {
@@ -107,11 +108,17 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
+        int code = jsonObject.getInt("code");
+        if(code == 403)
+            return;
+        clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
-        JSONArray jsonArray = jsonObject.getJSONArray("club_post_list");
+        JSONArray jsonArray = jsonObject.getJSONArray("postSummary");
         for(int i = 0; i < jsonArray.length(); i++){
-            postList.add(jsonArray.getString(i));
+            JSONObject postObj = jsonArray.getJSONObject(i);
+            postList.add(postObj.getString("title"));
+            //todo 添加对postSummary中其他两项数据的处理
         }
     }
 
@@ -130,17 +137,16 @@ public class ClubHomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club_home);
+        clubId = getIntent().getIntExtra("clubId", -1);
+        //String clubName = "yuanhuo";
+        postList = new ArrayList<>();
+        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);
 
         club_profile = (TextView) findViewById(R.id.get_club_profile);
-        //club_profile.setText(getIntent().getStringExtra("club_profile"));
-
-        String clubName = "yuanhuo";
-        postList = new ArrayList<>();
-        getDataFromPost(LOCALURL + "club/homepage", "{\"clubName\":\"" + clubName + "\"}");
 
         mNavigation = findViewById(R.id.club_title);
         initToolBar();
-        mNavigation.setTitle(getIntent().getStringExtra("club_name"));
+        mNavigation.setTitle(clubName);
 
         detail_button = (TextView) findViewById(R.id.details);
         extended = false;
@@ -149,7 +155,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 extended = !extended;
                 if(extended){
-                    club_profile.setMaxLines(20);
+                    club_profile.setMaxLines(10);
                     detail_button.setText("[收起]");
                 }
                 else{
@@ -288,7 +294,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 //    getDataFromGet("http://47.92.233.174:5000/");
                 //test release post page __ by tbw
 
-                intent = new Intent(this, ReleasePostActivity.class);
+                Intent intent = new Intent(this, ReleasePostActivity.class);
                 startActivity(intent);
 
                 break;
