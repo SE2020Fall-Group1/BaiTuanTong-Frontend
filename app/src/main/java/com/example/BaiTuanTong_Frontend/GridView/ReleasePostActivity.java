@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -23,13 +24,13 @@ public class ReleasePostActivity extends AppCompatActivity {
     private Context mContext;
     private ArrayList<String> mPicList = new ArrayList<>();
     private MyGridViewAdapter myGridViewAdapter;
-
+    private Button myButton;
 
     private void viewPluImg(int pos){
-        Toast.makeText(getApplicationContext(), "click a pic", Toast.LENGTH_SHORT);
+        Toast.makeText(this, "click a pic", Toast.LENGTH_SHORT).show();
     }
     private void selectPic(int maxTotal) {
-        Toast.makeText(getApplicationContext(), "want to update a pic", Toast.LENGTH_SHORT);
+        Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
      //   PictureSelector.create(this, maxTotal);
     }
 
@@ -62,12 +63,24 @@ public class ReleasePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_post);
 
+//        myOnClickListener = new MyOnClickListener();
+
         mContext = this;
         gridView = (GridView)findViewById(R.id.Gridview1);
      //   gridView.setAdapter(myGridViewAdapter);
         initGridView();
      //   gridView.setAdapter(new MyGridViewAdapter(ReleasePostActivity.this));
+        myButton = (Button) findViewById(R.id.Submit_button);
+        myButton.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
+
 
     // 处理选择的照片的地址
  /*   private void refreshAdapter(List<LocalMedia> picList) {
