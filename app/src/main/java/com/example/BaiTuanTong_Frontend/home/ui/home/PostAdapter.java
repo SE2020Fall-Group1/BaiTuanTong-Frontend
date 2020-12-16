@@ -15,22 +15,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> {
+    private List<String> title;
+    private List<String> clubName;
+    private List<String> text;
+    private List<String> likeCnt;
+    private List<String> commentCnt;
     private Context mContext;
-    private List<String> mList;
 
-    public PostAdapter(Context context, List<String> list){
-        mContext = context;
-        mList = list;
+    public PostAdapter(Context context, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt){
+        this.mContext = mContext;
+        this.title = title;
+        this.clubName = clubName;
+        this.text = text;
+        this.likeCnt = likeCnt;
+        this.commentCnt = commentCnt;
     }
 
     public int getItemCount(){
-        return mList.size();
+        return title.size();
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup vg, int viewType){
-        View v = LayoutInflater.from(mContext).inflate(R.layout.item_post,vg,false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.item_post_list_recycler,vg,false);
         return new MyViewHolder(v, mOnItemClickListener);
     }
     // Item内部空间点击事件处理
@@ -39,8 +47,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.mOnItemClickListener = onItemClickListener;
     }
+    // 设置一个枚举类型给使用接口的Activity/Fragment传参，使其知道点击类型
     public enum ViewName{
-        USR_IMG,
+        CLUB_IMG,
         POST_TEXT,
         ITEM
     }
@@ -51,12 +60,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position){
         // 给post设置内容，尚未从后端获取，在前端自定义实现
-        holder.usr_id.setText("测试用户"+position);
+        holder.post_clubName.setText("测试用户"+position);
         //holder.post_text.setText(mList.get(position));
         holder.post_text.setText("这是一条无聊的动态"+"\n"+"第二行"+"\n"+"第三行");
-        holder.usr_img.setTag(position);
+        holder.club_img.setTag(position);
         holder.post_text.setTag(position);
-        holder.post_content.setTag(position);
+        holder.post_list_content.setTag(position);
         /*
         holder.post_content.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,25 +78,43 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder{
+        /*
         public LinearLayout post_content;
         public ImageView usr_img;
         public TextView usr_id;
-        public TextView post_text;
+        public TextView post_text;*/
+
+        private LinearLayout post_list_content;
+        private ImageView club_img;
+        private TextView post_title;
+        private TextView post_clubName;
+        private TextView post_text;
+        private TextView post_likeCnt;
+        private TextView post_commentCnt;
 
         public MyViewHolder(View v, OnItemClickListener onItemClickListener){
             super(v);
+
+            post_list_content = v.findViewById(R.id.post_list_content);
+            club_img = v.findViewById(R.id.club_img);
+            post_title = v.findViewById(R.id.post_title);
+            post_clubName = v.findViewById(R.id.post_clubName);
+            post_text = v.findViewById(R.id.post_text);
+            post_likeCnt = v.findViewById(R.id.post_likeCnt);
+            post_commentCnt = v.findViewById(R.id.post_commentCnt);
+            /*
             post_content = v.findViewById(R.id.post_content);
             usr_id = v.findViewById(R.id.usr_id);
             usr_img = v.findViewById(R.id.usr_img);
-            post_text = v.findViewById(R.id.post_text);
+            post_text = v.findViewById(R.id.post_text);*/
 
-            usr_img.setOnClickListener(new View.OnClickListener(){
+            club_img.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view){
                     if (onItemClickListener!=null){
                         int position = getAdapterPosition();
                         if (position!=RecyclerView.NO_POSITION){
-                            onItemClickListener.onInternalViewClick(view, ViewName.USR_IMG,position);
+                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_IMG,position);
                         }
                     }
                 }
