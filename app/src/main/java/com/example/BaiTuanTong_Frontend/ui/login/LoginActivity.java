@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend.ui.login;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -59,6 +60,14 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject((String)msgBody);
                     String userId = jsonObject.getString("userId");
                     Log.e("Toast", userId);
+                    //共享参数对象，用来全局共享userId
+                    SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = shared.edit();
+                    // 把userId(String)放到全局变量userId中
+                    // 取出只需调用shared.getString
+                    editor.putString("userId", userId);
+                    editor.commit();// 提交编辑
+
                     String welcomeMessage = "欢迎！" + username;
                     Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
                     startHomePage();
