@@ -36,6 +36,10 @@
             android:name=".ui.login.LoginActivity"
             android:label="@string/title_activity_login" 
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
+        <activity android:name=".EditPostActivity"
+                android:parentActivityName=".PostListDisplayActivity"
+            ></activity>
+        <activity android:name=".PostPageActivity" />
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
