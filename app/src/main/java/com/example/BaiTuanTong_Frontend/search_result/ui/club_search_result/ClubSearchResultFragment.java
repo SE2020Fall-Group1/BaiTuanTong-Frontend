@@ -83,7 +83,7 @@ public class ClubSearchResultFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if ((flag == 0) && (clubId.isEmpty()))
-            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
+            getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
     }
 
     // 在获得GET请求返回的数据后更新UI
