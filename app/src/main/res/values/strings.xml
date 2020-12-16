@@ -3,9 +3,9 @@
     <string name="edit_message">Enter a message</string>
     <string name="button_send">send</string>
     <string name="title_activity_home_page">MainActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_personal">Personal</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">动态</string>
+    <string name="title_personal">我的</string>
     <string name="title_activity_club_home">ClubHomeActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

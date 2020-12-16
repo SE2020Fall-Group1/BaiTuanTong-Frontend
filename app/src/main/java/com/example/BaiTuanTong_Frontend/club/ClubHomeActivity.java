@@ -300,6 +300,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 break;
             case R.id.club_admin_manage_menu_item:
                 intent = new Intent(this, EditClubAdminActivity.class);
+                intent.putExtra("club_id", clubId);
                 startActivity(intent);
                 //getDataFromPost("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
                 //getDataFromGet("http://10.0.2.2:5000/hello");
