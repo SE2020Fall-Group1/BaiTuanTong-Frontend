@@ -8,9 +8,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.BaiTuanTong_Frontend.R;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.BaiTuanTong_Frontend.R;
 
 import java.util.List;
 
@@ -50,8 +51,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
     // 设置一个枚举类型给使用接口的Activity/Fragment传参，使其知道点击类型
     public enum ViewName{
         CLUB_IMG,
-        POST_TEXT,
-        ITEM
+        CLUB_NAME,
+        POST_CONTENT
     }
     public interface OnItemClickListener {
         void onInternalViewClick(View view, ViewName viewName, int position);
@@ -60,10 +61,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position){
         // 给post设置内容，尚未从后端获取，在前端自定义实现
+        holder.post_title.setText(title.get(position));
         holder.post_clubName.setText(clubName.get(position));
         holder.post_text.setText(text.get(position));
         holder.club_img.setTag(position);
-        holder.post_text.setTag(position);
+        holder.post_likeCnt.setText("Likes: " + likeCnt.get(position));
+        holder.post_commentCnt.setText("Comments: " + commentCnt.get(position));
         holder.post_list_content.setTag(position);
         /*
         holder.post_content.setOnClickListener(new View.OnClickListener() {
@@ -107,24 +110,36 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
             usr_img = v.findViewById(R.id.usr_img);
             post_text = v.findViewById(R.id.post_text);*/
 
-            club_img.setOnClickListener(new View.OnClickListener(){
+            // 设置内部点击事件
+            club_img.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view){
-                    if (onItemClickListener!=null){
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
                         int position = getAdapterPosition();
-                        if (position!=RecyclerView.NO_POSITION){
-                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_IMG,position);
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, PostAdapter.ViewName.CLUB_IMG, position);
                         }
                     }
                 }
             });
-            post_text.setOnClickListener(new View.OnClickListener(){
+            post_clubName.setOnClickListener(new View.OnClickListener(){
                 @Override
-                public void onClick(View view){
-                    if (onItemClickListener!=null){
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
                         int position = getAdapterPosition();
-                        if (position!=RecyclerView.NO_POSITION){
-                            onItemClickListener.onInternalViewClick(view, ViewName.POST_TEXT,position);
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, PostAdapter.ViewName.CLUB_NAME, position);
+                        }
+                    }
+                }
+            });
+            post_list_content.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (onItemClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemClickListener.onInternalViewClick(view, PostAdapter.ViewName.POST_CONTENT, position);
                         }
                     }
                 }
