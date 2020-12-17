@@ -1,32 +1,21 @@
 package com.example.BaiTuanTong_Frontend.club;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.R;
@@ -37,11 +26,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -158,7 +143,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
     private void getDataFromGet(String url) {
         new Thread(){
-            @Override
+           @Override
             public void run() {
                 super.run();
                 try {
@@ -259,8 +244,9 @@ public class EditClubAdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_club_admin);
 
         adminList = getList();
-//        clubID = getIntent().getIntExtra("club_id", 1);
-      clubID = 1;//for test server
+        clubID = getIntent().getIntExtra("club_id", 1);
+        Log.e("club-id",""+clubID);
+        // clubID = 1;//for test server
 
         adminListView = findViewById(R.id.recyclerView2);
         // 设置布局管理器
