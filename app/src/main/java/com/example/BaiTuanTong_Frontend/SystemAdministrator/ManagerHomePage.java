@@ -56,10 +56,10 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
     private static final int ADD_CLUB_POST = 2;
     private static final int DELETE_CLUB_POST = 3;
     private static final int CHANGE_PRESIDENT_POST = 4;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final String SERVERURL = "http://47.92.233.174:80/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
     private static final String TESTURL = "http://api.m.mtime.cn/PageSubArea/TrailerList.api";
-
+    private static final String CURRENTURL = SERVERURL;
     /**
      * Okhttp的get请求
      * @param url 向服务器请求的url
@@ -347,13 +347,13 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
 
     @Override
     public void createClubComplete(String clubName, String adminName) {
-        addClubPost(LOCALURL+"systemAdmin/homepage/addClub", clubName, adminName);
+        addClubPost(CURRENTURL+"systemAdmin/homepage/addClub", clubName, adminName);
         //adapter.addData(1, clubName, adminName);
     }
 
     @Override
     public void changeAdminComplete(String newAdminName, int position) {
-        changePresidentPost(LOCALURL+"systemAdmin/homepage/changeClubPresident", position, newAdminName);
+        changePresidentPost(CURRENTURL+"systemAdmin/homepage/changeClubPresident", position, newAdminName);
         // adapter.changeAdmin(position, newAdminName);
     }
 
@@ -366,7 +366,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
         adapter = new ManageClubAdapter(this, mClubData);
         rv_manage_club.setAdapter(adapter);
         rv_manage_club.setItemAnimator(new DefaultItemAnimator());
-        getDataFromGet(LOCALURL+"systemAdmin/homepage");
+        getDataFromGet(CURRENTURL+"systemAdmin/homepage");
 
         adapter.setOnItemClickListener(new ManageClubAdapter.OnItemClickListener() {
             @Override
@@ -405,7 +405,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 });
                 delete_confirm.setPositiveButton("确定", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
-                        deleteClubPost(LOCALURL+"systemAdmin/homepage/deleteClub", position);
+                        deleteClubPost(CURRENTURL+"systemAdmin/homepage/deleteClub", position);
                         //adapter.removeData(position);
                     }
                 });
