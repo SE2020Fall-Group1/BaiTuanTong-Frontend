@@ -12,6 +12,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -21,28 +24,24 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
+import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.MyAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.view.View.GONE;
 
@@ -89,9 +88,13 @@ public class ClubHomeActivity extends AppCompatActivity {
                 case POST:
                     //club_profile.setText((String)msg.obj);
                     try {
+                        Log.e("TAG", "startParsing");
                         parseJsonPacket((String)msg.obj);
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         club_profile.setText(print);
+                        empty_note.setVisibility(GONE);
+                        mRecyclerView.setVisibility(View.VISIBLE);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -108,9 +111,9 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        int code = jsonObject.getInt("code");
+        /*int code = jsonObject.getInt("code");
         if(code == 403)
-            return;
+            return;*/
         clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
@@ -120,6 +123,9 @@ public class ClubHomeActivity extends AppCompatActivity {
             postList.add(postObj.getString("title"));
             //todo 添加对postSummary中其他两项数据的处理
         }
+
+        Log.e("clubName", clubName);
+        Log.e("clubInfo", clubInfo);
     }
 
     /**
@@ -138,6 +144,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club_home);
         clubId = getIntent().getIntExtra("clubId", -1);
+        Log.e("Club-Id", ""+clubId);
         //String clubName = "yuanhuo";
         postList = new ArrayList<>();
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);

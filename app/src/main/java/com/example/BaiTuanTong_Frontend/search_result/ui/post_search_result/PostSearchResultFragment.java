@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
-import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,6 +100,7 @@ public class PostSearchResultFragment extends Fragment {
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
+        startActivity(intent);
     }
 
     // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
@@ -121,14 +120,14 @@ public class PostSearchResultFragment extends Fragment {
             @Override
             public void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position) {
                 if ((viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) || (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME)) {
-                    // startClubHomeActivity(position);
+                    startClubHomeActivity(position);
                     // 还未实现和社团主页的对接，用消息提示代替
-                    if (viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) {
+                    /*if (viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) {
                         Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
                     }
                     else if (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME) {
                         Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
                 }
                 else if (viewName == PostSearchResultAdapter.ViewName.POST_CONTENT) {
                     startPostContentActivity(position);
