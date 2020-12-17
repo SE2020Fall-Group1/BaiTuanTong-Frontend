@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
+import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModel;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModelFactory;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModel;
@@ -52,6 +54,10 @@ public class RegistActivity extends AppCompatActivity {
     private  static final int POST = 2;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+    private String username;
+    private String password;
+    private String email;
+    private String captcha;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,10 +130,10 @@ public class RegistActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 JSONObject mJson =new JSONObject();
-                String username = usernameEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-                String email = emailEditText.getText().toString();
-                String captcha = captchaEditText.getText().toString();
+                username = usernameEditText.getText().toString();
+                password = passwordEditText.getText().toString();
+                email = emailEditText.getText().toString();
+                captcha = captchaEditText.getText().toString();
                 try {
                     mJson.put("username",username);
                     mJson.put("password",password);
@@ -154,12 +160,25 @@ public class RegistActivity extends AppCompatActivity {
             switch (msg.what){
                 case GET:
                     Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
                 case POST:
                     Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                    if (((String) msg.obj).contains("user established")) {
+                        String welcomeMessage = "欢迎！" + username;
+                        Toast.makeText(RegistActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
+                        startHomePage();
+                    }
+                    break;
             }
             return true;
         }
     });
+    // 转到HomePageActivity
+    private void startHomePage(){
+        Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
+        this.finish();
+    }
     /**
      * 使用get获取数据
      */
@@ -193,7 +212,7 @@ public class RegistActivity extends AppCompatActivity {
                 super.run();
                 //Log.e("TAG", "new thread run.");
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
