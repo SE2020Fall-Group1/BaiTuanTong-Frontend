@@ -31,6 +31,7 @@ public class AddClubAdminDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 Toast.makeText(view.getContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
                 //这里传递文本框的数据。
+                getDialog().dismiss();
             }
         });
 
