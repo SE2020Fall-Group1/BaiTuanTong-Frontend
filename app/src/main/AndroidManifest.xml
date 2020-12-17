@@ -13,7 +13,13 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
-        <activity android:name=".search_result.SearchResultActivity"></activity>
+        <activity
+            android:name=".search_result.SearchResultActivity"
+            android:parentActivityName=".home.HomePageActivity" />
+        <activity
+            android:name=".club.EditClubAdminActivity"
+            android:label="EditClubAdminActivity"
+            android:parentActivityName=".home.HomePageActivity" />
         <activity
             android:name=".club.ClubHomeActivity"
             android:label="@string/title_activity_club_home"
@@ -34,17 +40,21 @@
         <activity android:name=".ui.register.RegistActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
-            android:label="@string/title_activity_login" 
-            android:theme="@style/Theme.HelloWorld.NoActionBar" />
-        <activity android:name=".PostListDisplayActivity" />
-        <activity android:name=".DisplayMessageActivity" />
-        <activity android:name=".ui.register.ModifyInformationActivity" />
-        <activity android:name=".MainActivity">
+
+            android:theme="@style/Theme.HelloWorld.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".EditPostActivity"
+            android:parentActivityName=".PostListDisplayActivity" />
+        <activity android:name=".PostListDisplayActivity" />
+        <activity android:name=".DisplayMessageActivity" />
+        <activity android:name=".ui.register.ModifyInformationActivity" />
+        <activity android:name=".MainActivity">
         </activity>
     </application>
 

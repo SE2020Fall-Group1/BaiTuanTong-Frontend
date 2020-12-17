@@ -51,13 +51,23 @@ public class PostListDisplayActivity extends AppCompatActivity {
             public void onLongClick(int position) {
                 //长按删除数据
                 mList.remove(position);
-                mMyAdapter.notifyDataSetChanged();
+                mMyAdapter.notifyItemRemoved(position);
+                mMyAdapter.notifyItemRangeChanged(position, mList.size());
             }
         });
     }
-
+/*
     public void sendMessage(int position) {
         Intent intent = new Intent(this, LoginActivity.class);
+        String message = mList.get(position);
+        intent.putExtra(PAGE_EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+*/
+
+    //稍作修改 直接进入编辑界面！
+    public void sendMessage(int position) {
+        Intent intent = new Intent(this, EditPostActivity.class);
         String message = mList.get(position);
         intent.putExtra(PAGE_EXTRA_MESSAGE, message);
         startActivity(intent);

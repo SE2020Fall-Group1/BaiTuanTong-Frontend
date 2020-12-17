@@ -66,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                     // 把userId(String)放到全局变量userId中
                     // 取出只需调用shared.getString
                     editor.putString("userId", userId);
+                    editor.putBoolean("logged", true);
                     editor.commit();// 提交编辑
 
                     String welcomeMessage = "欢迎！" + username;
@@ -84,6 +85,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+        if(shared.getBoolean("logged", false)){  //如果已经登录过，直接进入主页
+            startHomePage();
+        }
+
+
         setContentView(R.layout.activity_login);
         Intent intentShift = new Intent(this, RegistActivity.class);
 
@@ -182,6 +189,7 @@ public class LoginActivity extends AppCompatActivity {
     private void startHomePage(){
         Intent intent = new Intent(this, HomePageActivity.class);
         startActivity(intent);
+        this.finish();
     }
 
     //Toast提示登录结果信息，暂时忽略

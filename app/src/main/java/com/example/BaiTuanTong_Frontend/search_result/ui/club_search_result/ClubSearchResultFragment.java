@@ -30,8 +30,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.example.BaiTuanTong_Frontend.search_result.SearchResultActivity.flag;
-
 public class ClubSearchResultFragment extends Fragment {
 
     private int item;
@@ -85,7 +83,7 @@ public class ClubSearchResultFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if ((flag == item) && (clubId.isEmpty()))
+        if (clubId.isEmpty())
             getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
     }
 
@@ -105,7 +103,6 @@ public class ClubSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         parseJsonPacket((String)msg.obj);
-                        while (flag != item);
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();

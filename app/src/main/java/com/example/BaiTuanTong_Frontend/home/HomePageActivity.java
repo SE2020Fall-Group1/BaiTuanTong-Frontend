@@ -46,27 +46,4 @@ public class HomePageActivity extends AppCompatActivity implements MyListener{
         intent.putExtras(bundle);
         startActivity(intent);
     }
-    /*@Override
-    public void onStart(){
-        super.onStart();
-        Toast.makeText(this,"HomePage is onStart",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Toast.makeText(this,"HomePage is onResume",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Toast.makeText(this,"HomePage is onPause",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStop(){
-        super.onStop();
-        Toast.makeText(this,"HomePage is onStop",Toast.LENGTH_SHORT).show();
-    }*/
 }

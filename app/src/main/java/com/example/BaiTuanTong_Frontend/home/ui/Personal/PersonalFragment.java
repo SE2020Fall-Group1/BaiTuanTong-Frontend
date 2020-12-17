@@ -1,34 +1,44 @@
 package com.example.BaiTuanTong_Frontend.home.ui.Personal;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-//import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
+import com.example.BaiTuanTong_Frontend.PostListDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
+import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
+import com.example.BaiTuanTong_Frontend.ui.register.RegistActivity;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class PersonalFragment extends Fragment {
 
     private PersonalViewModel personalViewModel;
+    private Button manageClubButton;
     private Button followClubButton;
+    private Button collectedPostButton;
+    private Button configureButton;
+    private Button signOutButton;
+    private SharedPreferences shared;
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        shared = getActivity().getSharedPreferences("share", MODE_PRIVATE);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +47,8 @@ public class PersonalFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_personal, container, false);
 
         followClubButton = (Button)root.findViewById(R.id.follow_club);
+        signOutButton = (Button)root.findViewById((R.id.sign_out));
+        collectedPostButton = (Button)root.findViewById(R.id.collect_post);
 
         return root;
     }
@@ -51,6 +63,24 @@ public class PersonalFragment extends Fragment {
                 startActivityForResult(intent, 3);
             }
         });
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = shared.edit();
+                editor.remove("logged");
+                editor.commit();
+                getActivity().finish();
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+        collectedPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PostListDisplayActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -58,23 +88,12 @@ public class PersonalFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 3 && resultCode == 3){
             HomePageActivity homePageActivity = (HomePageActivity)getActivity();
+            assert homePageActivity != null;
             FragmentManager fragmentManager = homePageActivity.getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             //fragmentTransaction.replace(R.id.personal_manage, new PersonalFragment());
             fragmentTransaction.commit();
         }
     }
-
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        Toast.makeText(getActivity(),"Personal is onResume",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Toast.makeText(getActivity(),"Personal is onPause",Toast.LENGTH_SHORT).show();
-    }*/
 
 }
