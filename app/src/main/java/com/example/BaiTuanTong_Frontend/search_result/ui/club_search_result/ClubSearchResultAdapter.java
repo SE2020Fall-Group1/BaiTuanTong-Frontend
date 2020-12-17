@@ -26,6 +26,17 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
         this.introduction = introduction;
     }
 
+    // 下面是为点击事件添加的代码
+    public interface OnItemClickListener {
+        void onClick(int position);
+    }
+
+    OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
     class ClubSearchResultViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout club_list_content;
         private ImageView club_img;
@@ -55,7 +66,8 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
         holder.club_intro.setTag(position);
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);
-/*        //自己做item点击
+
+        //自己做item点击
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,15 +75,6 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
                     onItemClickListener.onClick(position);
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (onItemLongClickListener != null)
-                    onItemLongClickListener.onLongClick(position);
-                //返回false会在长按结束后继续点击
-                return true;
-            }
-        });*/
     }
 
     @Override

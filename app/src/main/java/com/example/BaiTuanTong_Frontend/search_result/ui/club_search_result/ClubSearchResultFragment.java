@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend.search_result.ui.club_search_result;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,10 +89,25 @@ public class ClubSearchResultFragment extends Fragment {
             getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
     }
 
+    // 跳转到社团主页，传递参数position（该动态再列表中的位置）
+    private void startClubHomeActivity(Integer position) {
+        Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+        intent.putExtra("clubId", clubId.get(position));
+        startActivity(intent);
+    }
+
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
         mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction);
         mRecyclerView.setAdapter(mClubSearchResultAdapter);
+
+        // 下面是为点击事件添加的代码
+        mClubSearchResultAdapter.setOnItemClickListener(new ClubSearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                startClubHomeActivity(position);
+            }
+        });
         mView.invalidate();
     }
 
