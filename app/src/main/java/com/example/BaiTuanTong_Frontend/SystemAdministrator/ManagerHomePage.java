@@ -1,8 +1,8 @@
-package com.example.BaiTuanTong_Frontend.AdministratorAll;
+package com.example.BaiTuanTong_Frontend.SystemAdministrator;
 
-import com.example.BaiTuanTong_Frontend.AdministratorAll.EditClubDialogFragment.CreateClubListener;
+import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditClubDialogFragment.CreateClubListener;
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.AdministratorAll.EditAdminDialogFragment.ChangeAdminListener;
+import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditAdminDialogFragment.ChangeAdminListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;

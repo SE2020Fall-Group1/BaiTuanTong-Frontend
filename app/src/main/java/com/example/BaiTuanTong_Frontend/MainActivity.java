@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.BaiTuanTong_Frontend.AdministratorAll.ManagerHomePage;
+import com.example.BaiTuanTong_Frontend.SystemAdministrator.ManagerHomePage;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
-// import com.example.BaiTuanTong_Frontend.AdministratorAll.ManagerHomePage;
+// import com.example.BaiTuanTong_Frontend.SystemAdministrator.ManagerHomePage;
 
 public class MainActivity extends AppCompatActivity {
     public static final String USER_EXTRA_MESSAGE = "com.example.BaiTuanTong_Frontend.UserMESSAGE";

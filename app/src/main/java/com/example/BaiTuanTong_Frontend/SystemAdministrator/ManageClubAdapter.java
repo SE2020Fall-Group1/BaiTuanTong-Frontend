@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.AdministratorAll;
+package com.example.BaiTuanTong_Frontend.SystemAdministrator;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.AdministratorAll;
+package com.example.BaiTuanTong_Frontend.SystemAdministrator;
 
 public class ClubData {
     private String ClubName;
