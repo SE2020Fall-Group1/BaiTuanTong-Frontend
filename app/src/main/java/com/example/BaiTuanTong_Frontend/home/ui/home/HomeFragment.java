@@ -173,7 +173,7 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
                 }
                 else if (viewName == PostAdapter.ViewName.POST_CONTENT) {
-                    startPostContentActivity(position);
+                    startPostContentActivity(postId.get(position));
                 }
                 //Toast.makeText(getBaseContext(), mList.get(position), Toast.LENGTH_SHORT).show();
                 //sendMessage(position);
