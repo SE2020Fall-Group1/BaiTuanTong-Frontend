@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
 
     @Override
     public FollowedClubsDisplayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.followed_clubs_recycler_item, parent, false);
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_club_list_recycler, parent, false);
         FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder holder = new FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder(itemView);
         return holder;
     }

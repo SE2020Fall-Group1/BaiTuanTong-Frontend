@@ -8,10 +8,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.BaiTuanTong_Frontend.R;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.BaiTuanTong_Frontend.R;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
 
     @Override
     public ClubSearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.followed_clubs_recycler_item, parent, false);
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_club_list_recycler, parent, false);
         ClubSearchResultAdapter.ClubSearchResultViewHolder holder = new ClubSearchResultAdapter.ClubSearchResultViewHolder(itemView);
         return holder;
     }

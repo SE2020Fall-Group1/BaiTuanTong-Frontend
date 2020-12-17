@@ -3,7 +3,8 @@
     <style name="Theme.HelloWorld" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <!--<item name="colorPrimary">@color/PekingUnivRed</item>-->
-        <item name="colorPrimary">@android:color/holo_blue_light</item>
+        <!--<item name="colorPrimary">@android:color/holo_blue_light</item>-->
+        <item name="colorPrimary">@color/skyblue</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -12,7 +13,8 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <!--<item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
-        <item name="android:statusBarColor" tools:targetApi="21">@android:color/holo_blue_light</item>
+        <!--<item name="android:statusBarColor" tools:targetApi="21">@android:color/holo_blue_light</item>-->
+        <item name="android:statusBarColor" tools:targetApi="21">@color/skyblue</item>
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@color/backgroundgrey</item>
     </style>

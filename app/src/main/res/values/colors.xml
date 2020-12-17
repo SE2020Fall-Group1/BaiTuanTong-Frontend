@@ -7,8 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!--<color name="backgroundgrey">#FBFBFB</color>-->
-    <color name="backgroundgrey">#EFF3F8</color>
+    <color name="bargrey">#FBFBFB</color>
+    <color name="backgroundgrey">#EFF3F8</color> <!--背景用的灰色 -->
     <color name="lightcyan">#E0FFFF</color> <!--亮青色 -->
     <color name="powderblue">#B0E0E6</color> <!--粉蓝色 -->
     <color name="lightsteelblue">#B0C4DE</color> <!--亮钢兰色-->
