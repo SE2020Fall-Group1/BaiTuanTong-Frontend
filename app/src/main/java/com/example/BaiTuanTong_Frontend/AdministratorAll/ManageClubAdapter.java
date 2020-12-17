@@ -16,7 +16,7 @@ import android.view.View.OnLongClickListener;
 import com.example.BaiTuanTong_Frontend.R;
 
 public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.MyViewHolder> {
-    public List<ClubData> mClubData;
+    private List<ClubData> mClubData;
     private Context mContext;
     public enum ViewName {  // 区分多个控件的点击事件
         ITEM,
@@ -28,7 +28,9 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
         this.mClubData = clubData;
     }
 
-
+    public ClubData getClubOnPosition(int position) {
+        return mClubData.get(position);
+    }
 
     @Override
     public int getItemCount() {

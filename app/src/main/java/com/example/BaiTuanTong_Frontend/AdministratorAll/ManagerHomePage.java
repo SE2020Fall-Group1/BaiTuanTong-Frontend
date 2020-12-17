@@ -137,7 +137,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             public void run() {
                 super.run();
                 try {
-                    String clubName = adapter.mClubData.get(position).getClubName();
+                    String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\"}";
                     String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
@@ -158,7 +158,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             public void run() {
                 super.run();
                 try {
-                    String clubName = adapter.mClubData.get(position).getClubName();
+                    String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\",\"president\":\"" + newAdminName +"\"}";
                     String result = post(url, json);
                     Log.e("TAG", result);
@@ -230,38 +230,39 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 // adapter.addData(1, jsonObject.getString("clubSummary"), "");
                 JSONArray jsonArray = jsonObject.getJSONArray("clubSummary");
                 for (int i = 0; i < jsonArray.length(); ++i) {
-                    JSONObject jsonObject2 = jsonArray.getJSONObject(i);
-                    adapter.addData(i, jsonObject2.getString("clubName"), jsonObject2.getString("president_name"));
+                    JSONObject jsonObjectClubSummary = jsonArray.getJSONObject(i);
+                    adapter.addData(i, jsonObjectClubSummary.getString("clubName"),
+                            jsonObjectClubSummary.getString("president_name"));
                 }
                 break;
             case ADD_CLUB_POST:
                 JSONObject jsonObject1 = new JSONObject(json);
                 String data1 = jsonObject1.getString("data");
-                // Toast.makeText(this, "add club " + jsonObject1.toString(), Toast.LENGTH_SHORT).show();
                 switch (data1) {
                     case "invalid username":
-                        Log.e("AddClub", data1);
-                        Toast.makeText(this, data1, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "该用户不存在", Toast.LENGTH_LONG).show();
                         break;
                     case "club name used":
-                        Log.e("AddClub", data1);
-                        Toast.makeText(this, data1, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "社团名已被使用", Toast.LENGTH_LONG).show();
+                        Log.e("ADD_CLUB", "社团名已被使用");
                         break;
                     case "success":
                         adapter.addData(1, jsonObject1.getString("clubName"), jsonObject1.getString("president"));
+                        Toast.makeText(this, "添加成功", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
                 }
             case DELETE_CLUB_POST:
-                JSONObject jsonObject4 = new JSONObject(json);
-                String data4 = jsonObject4.getString("data");
-                switch (data4) {
+                JSONObject jsonObject2 = new JSONObject(json);
+                String data2 = jsonObject2.getString("data");
+                switch (data2) {
                     case "invalid clubname":
-                        Log.e("DeleteClub", data4);
+                        Toast.makeText(this, "该社团不存在", Toast.LENGTH_LONG).show();
                         break;
                     case "success":
-                        adapter.removeData(jsonObject4.getInt("position"));
+                        adapter.removeData(jsonObject2.getInt("position"));
+                        Toast.makeText(this, "删除成功", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -271,13 +272,14 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 String data3 = jsonObject3.getString("data");
                 switch (data3) {
                     case "invalid username":
-                        Log.e("ChangePresident", data3);
+                        Toast.makeText(this, "该用户不存在", Toast.LENGTH_LONG).show();
                         break;
                     case "invalid clubname":
-                        Log.e("ChangePresident", data3);
+                        Toast.makeText(this, "该社团不存在", Toast.LENGTH_LONG).show();
                         break;
                     case "success":
                         adapter.changeAdmin(jsonObject3.getInt("position"), jsonObject3.getString("president"));
+                        Toast.makeText(this, "修改成功", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -345,7 +347,6 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
 
     @Override
     public void createClubComplete(String clubName, String adminName) {
-        Toast.makeText(this, clubName+adminName, Toast.LENGTH_LONG).show();
         addClubPost(LOCALURL+"systemAdmin/homepage/addClub", clubName, adminName);
         //adapter.addData(1, clubName, adminName);
     }
