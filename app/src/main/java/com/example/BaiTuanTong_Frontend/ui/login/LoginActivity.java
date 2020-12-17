@@ -144,7 +144,6 @@ public class LoginActivity extends AppCompatActivity {
         //好像是如果输入密码后按回车直接登录，暂时忽略
         /*
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -160,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //String msg = loginViewModel.login(usernameEditText.getText().toString(),
-               //         passwordEditText.getText().toString());
+                //         passwordEditText.getText().toString());
                 OkHttpClient okHttpClient = new OkHttpClient();
 
                 String baseUrl = "http://47.92.233.174:5000/";
