@@ -80,7 +80,7 @@
             android:layout_margin="0dp"
             android:layout_weight="1"
             android:background="@color/white"
-            android:text="转发" />
+            android:text="收藏" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

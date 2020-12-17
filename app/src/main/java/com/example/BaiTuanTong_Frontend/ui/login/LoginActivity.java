@@ -88,7 +88,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         if(shared.getBoolean("logged", false)){  //如果已经登录过，直接进入主页
-            startHomePage();
+
+            //startHomePage();
         }
 
 

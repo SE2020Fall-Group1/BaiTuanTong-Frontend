@@ -144,7 +144,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club_home);
         clubId = getIntent().getIntExtra("clubId", -1);
-        Log.e("Club-Id", ""+clubId);
         //String clubName = "yuanhuo";
         postList = new ArrayList<>();
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);

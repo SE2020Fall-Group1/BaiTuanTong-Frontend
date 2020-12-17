@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -114,7 +113,7 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-    // 跳转到社团主页，传递参数position（该动态再列表中的位置）
+    // 跳转到社团主页，传递参数position（该动态在列表中的位置）
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
@@ -170,7 +169,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onInternalViewClick(View view, PostAdapter.ViewName viewName, int position) {
                 if (viewName == PostAdapter.ViewName.CLUB_IMG) {
-                    Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
+                    startClubHomeActivity(position);
                 }
                 else if (viewName == PostAdapter.ViewName.CLUB_NAME) {
                     startClubHomeActivity(position);
