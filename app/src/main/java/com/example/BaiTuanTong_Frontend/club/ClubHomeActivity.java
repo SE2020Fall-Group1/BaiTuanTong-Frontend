@@ -294,7 +294,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 //    getDataFromGet("http://47.92.233.174:5000/");
                 //test release post page __ by tbw
 
-                intent = new Intent(this, ReleasePostActivity.class);
+                Intent intent = new Intent(this, ReleasePostActivity.class);
             //    intent.putExtra("clubID", clubID);
                 startActivity(intent);
 

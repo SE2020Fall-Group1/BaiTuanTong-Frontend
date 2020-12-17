@@ -259,8 +259,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_club_admin);
 
         adminList = getList();
-//        clubID = getIntent().getIntExtra("clubID");
-        clubID = 1;//for test server
+//        clubID = getIntent().getIntExtra("club_id", 1);
+      clubID = 1;//for test server
 
         adminListView = findViewById(R.id.recyclerView2);
         // 设置布局管理器
