@@ -302,6 +302,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 //test release post page __ by tbw
 
                 Intent intent = new Intent(this, ReleasePostActivity.class);
+            //    intent.putExtra("clubID", clubID);
                 startActivity(intent);
 
                 break;

@@ -66,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                     // 把userId(String)放到全局变量userId中
                     // 取出只需调用shared.getString
                     editor.putString("userId", userId);
+                    editor.putString("userName", username);
                     editor.putBoolean("logged", true);
                     editor.commit();// 提交编辑
 
