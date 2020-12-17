@@ -68,24 +68,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
         holder.post_likeCnt.setText("Likes: " + likeCnt.get(position));
         holder.post_commentCnt.setText("Comments: " + commentCnt.get(position));
         holder.post_list_content.setTag(position);
-        /*
-        holder.post_content.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnItemClickListener!=null){
-                    mOnItemClickListener.onClick(position);
-                }
             }
-        });*/
-    }
 
     class MyViewHolder extends RecyclerView.ViewHolder{
-        /*
-        public LinearLayout post_content;
-        public ImageView usr_img;
-        public TextView usr_id;
-        public TextView post_text;*/
-
         private LinearLayout post_list_content;
         private ImageView club_img;
         private TextView post_title;
@@ -104,11 +89,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
             post_text = v.findViewById(R.id.post_text);
             post_likeCnt = v.findViewById(R.id.post_likeCnt);
             post_commentCnt = v.findViewById(R.id.post_commentCnt);
-            /*
-            post_content = v.findViewById(R.id.post_content);
-            usr_id = v.findViewById(R.id.usr_id);
-            usr_img = v.findViewById(R.id.usr_img);
-            post_text = v.findViewById(R.id.post_text);*/
 
             // 设置内部点击事件
             club_img.setOnClickListener(new View.OnClickListener() {

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +64,7 @@ public class HomeFragment extends Fragment {
     public List<String> text = new ArrayList<>();           // 动态内容
     public List<Integer> likeCnt = new ArrayList<>();        // 动态点赞数
     public List<Integer> commentCnt = new ArrayList<>();     // 动态评论数
+    public List<Integer> clubId = new ArrayList<>();        // 社团ID
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -94,12 +96,7 @@ public class HomeFragment extends Fragment {
         searchView.setSubmitButtonEnabled(true);
         //设置提示词
         searchView.setQueryHint("搜索社团或动态");
-        /*
-        SearchManager sm = (SearchManager)mContext.getSystemService(Context.SEARCH_SERVICE);
-        ComponentName cn = new ComponentName(homePageActivity, SearchResultActivity.class);
-        SearchableInfo info = sm.getSearchableInfo(cn);
-        searchView.setSearchableInfo(info);
-        */
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             // 搜索关键词完成输入
             @Override
@@ -116,6 +113,12 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+    }
+    // 跳转到社团主页，传递参数position（该动态再列表中的位置）
+    private void startClubHomeActivity(Integer position) {
+        Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+        intent.putExtra("clubId", clubId.get(position));
+        startActivity(intent);
     }
     // 跳转到动态内容界面，传递参数post_id
     private void startPostContentActivity(Integer post_id){
@@ -170,13 +173,11 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
                 }
                 else if (viewName == PostAdapter.ViewName.CLUB_NAME) {
-                    Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
+                    startClubHomeActivity(position);
                 }
                 else if (viewName == PostAdapter.ViewName.POST_CONTENT) {
                     startPostContentActivity(postId.get(position));
                 }
-                //Toast.makeText(getBaseContext(), mList.get(position), Toast.LENGTH_SHORT).show();
-                //sendMessage(position);
             }
         });
         mView.invalidate();
@@ -218,6 +219,7 @@ public class HomeFragment extends Fragment {
             text.add(postList.getJSONObject(i).getString("text"));
             likeCnt.add(postList.getJSONObject(i).getInt("likeCnt"));
             commentCnt.add(postList.getJSONObject(i).getInt("commentCnt"));
+            clubId.add(postList.getJSONObject(i).getInt("clubId"));
             Log.e("text", ""+ postId.get(i));
         }
     }
