@@ -32,15 +32,8 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         this.commentCnt = commentCnt;
     }
 
-    // 设置一个枚举类型给使用接口的Activity/Fragment传参，使其知道点击类型
-    public enum ViewName{
-        CLUB_IMG,
-        CLUB_NAME,
-        POST_CONTENT
-    }
-
     public interface OnItemClickListener {
-        void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position);
+        void onItemClick(View view, int position);
     }
 
     // Item内部空间点击事件处理
@@ -76,7 +69,7 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
                     if (onItemClickListener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_IMG, position);
+                            onItemClickListener.onItemClick(view, position);
                         }
                     }
                 }
@@ -87,7 +80,7 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
                     if (onItemClickListener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            onItemClickListener.onInternalViewClick(view, ViewName.CLUB_NAME, position);
+                            onItemClickListener.onItemClick(view, position);
                         }
                     }
                 }
@@ -98,7 +91,7 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
                     if (onItemClickListener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            onItemClickListener.onInternalViewClick(view, ViewName.POST_CONTENT, position);
+                            onItemClickListener.onItemClick(view, position);
                         }
                     }
                 }
@@ -119,8 +112,8 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         holder.post_clubName.setText(clubName.get(position));
         holder.post_text.setText(text.get(position));
         holder.club_img.setTag(position);
-        holder.post_likeCnt.setText("Likes: " + likeCnt.get(position));
-        holder.post_commentCnt.setText("Comments: " + commentCnt.get(position));
+        holder.post_likeCnt.setText("" + likeCnt.get(position));
+        holder.post_commentCnt.setText("" + commentCnt.get(position));
         holder.post_list_content.setTag(position);
     }
 

@@ -118,19 +118,11 @@ public class PostSearchResultFragment extends Fragment {
         // 下面是为点击事件添加的代码
         mPostSearchResultAdapter.setOnItemClickListener(new PostSearchResultAdapter.OnItemClickListener() {
             @Override
-            public void onInternalViewClick(View view, PostSearchResultAdapter.ViewName viewName, int position) {
-                if ((viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) || (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME)) {
-                    startClubHomeActivity(position);
-                    // 还未实现和社团主页的对接，用消息提示代替
-                    /*if (viewName == PostSearchResultAdapter.ViewName.CLUB_IMG) {
-                        Toast.makeText(getActivity().getBaseContext(), "拍了拍头像", Toast.LENGTH_SHORT).show();
-                    }
-                    else if (viewName == PostSearchResultAdapter.ViewName.CLUB_NAME) {
-                        Toast.makeText(getActivity().getBaseContext(), "点击了名字", Toast.LENGTH_SHORT).show();
-                    }*/
-                }
-                else if (viewName == PostSearchResultAdapter.ViewName.POST_CONTENT) {
-                    startPostContentActivity(position);
+            public void onItemClick(View view, int position) {
+                switch (view.getId()) {
+                    case R.id.post_clubName: startClubHomeActivity(position); break;
+                    case R.id.club_img: startClubHomeActivity(position); break;
+                    default: startPostContentActivity(position);
                 }
             }
         });

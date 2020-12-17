@@ -65,8 +65,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyViewHolder> 
         holder.post_clubName.setText(clubName.get(position));
         holder.post_text.setText(text.get(position));
         holder.club_img.setTag(position);
-        holder.post_likeCnt.setText("Likes: " + likeCnt.get(position));
-        holder.post_commentCnt.setText("Comments: " + commentCnt.get(position));
+        holder.post_likeCnt.setText("" + likeCnt.get(position));
+        holder.post_commentCnt.setText("" + commentCnt.get(position));
         holder.post_list_content.setTag(position);
             }
 

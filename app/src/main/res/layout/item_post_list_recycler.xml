@@ -70,20 +70,34 @@
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
 
+                <ImageView
+                    android:id="@+id/like_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/icon_like" />
+
                 <TextView
                     android:id="@+id/post_likeCnt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginRight="12dp"
                     android:textColor="@color/darkgrey"
                     android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/comment_icon"
+                    android:layout_width="14sp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/icon_comment" />
 
                 <TextView
                     android:id="@+id/post_commentCnt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/darkgrey"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
