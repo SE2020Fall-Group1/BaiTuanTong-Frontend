@@ -2,6 +2,7 @@ package com.example.BaiTuanTong_Frontend.home.ui.dashboard;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -86,38 +87,6 @@ public class DashboardFragment extends Fragment {
     public interface MyListener{
         public void sendContent(String info);//发送给SearchResultActivity
     }
-    /*
-    // 初始搜索框
-    private void initSearchView(Menu menu) {
-        MenuItem menuItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView)menuItem.getActionView();
-        // 设置搜索框默认自动缩小为图标
-        searchView.setIconifiedByDefault(true);
-        // 让键盘的回车键设置成搜索
-        searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        // 设置是否显示搜索按钮
-        searchView.setSubmitButtonEnabled(true);
-        //设置提示词
-        searchView.setQueryHint("搜索社团或动态");
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            // 搜索关键词完成输入
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.e("asdas",query);
-                ac.sendContent(query);
-                return false;
-            }
-            // 搜索关键词发生变化
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // 提示框，未实现
-                doSearch(newText);
-                return false;
-            }
-        });
-    }
-    */
     // 跳转到社团主页，传递参数position（该动态再列表中的位置）
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
@@ -136,35 +105,12 @@ public class DashboardFragment extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
         Log.e("init rv","1");
-        //myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
-        //rv_post_list.setAdapter(myAdapter);
-        //rv_post_list.setItemAnimator(new DefaultItemAnimator());
         // 通过url传输数据
-        getDataFromGet(SERVERURL + "post/homepage");
+        SharedPreferences shared = getActivity().getSharedPreferences("share",Context.MODE_PRIVATE);
+        String userId = shared.getString("userId", "");
+        getDataFromGet(SERVERURL + "post/followed?userId="+userId);
     }
-    // 提示框，未实现
-    private void doSearch(String text) {
-       /* if(text.indexOf("北")==0){
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                    R.layout.search_list_auto,hintArray);
-            sac_key.setAdapter(adapter);
-            sac_key.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    sac_key.setText(((TextView)view).getText());
-                }
-            });
-        }*/
-    }
-    /*
-    // 创建menu时调用，实现搜索框
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
-        inflater.inflate(R.menu.menu_search,menu);
-        initSearchView(menu);
-        //return true;
-    }
-    */
+
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
         myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
@@ -217,6 +163,9 @@ public class DashboardFragment extends Fragment {
         JSONObject jsonObject = new JSONObject(json);
 
         JSONArray postList = jsonObject.getJSONArray("postSummary");
+        if (postList.length()==0){
+            Toast.makeText(getActivity().getBaseContext(), "你关注的社团未发布动态！", Toast.LENGTH_SHORT).show();
+        }
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
             title.add(postList.getJSONObject(i).getString("title"));

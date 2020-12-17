@@ -26,6 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
+            android:layout_marginLeft="20dp"
             android:text="个人用户"
             android:textSize="25dp"
             android:textColor="@color/black"
@@ -33,36 +34,45 @@
     </LinearLayout>
     <Button
         android:id="@+id/manage_club"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:text="管理社团" />
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:text="管理社团"
+        android:textColor="@color/black"/>
 
     <Button
         android:id="@+id/follow_club"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
         android:text="关注社团" />
 
     <Button
         android:id="@+id/collect_post"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
         android:text="收藏动态" />
-
     <Button
         android:id="@+id/configuration"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
         android:text="设置" />
 
     <Button
         android:id="@+id/sign_out"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
         android:text="退出登录" />
 </LinearLayout>
