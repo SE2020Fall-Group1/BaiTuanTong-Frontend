@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,19 @@ import androidx.fragment.app.DialogFragment;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.utils.ScreenUtil;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static android.view.Gravity.*;
 
@@ -31,6 +46,11 @@ public class CommentDialogFragment extends DialogFragment {
     private Button sendButton;
     private EditText commentEditText;
 
+    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private OkHttpClient okHttpClient = new OkHttpClient();
+
+    private String baseUrl = "http://47.92.233.174:5000/";
+    private String viewUrl = baseUrl+"post/view/comment";
 
     @Nullable
     @Override
@@ -76,9 +96,32 @@ public class CommentDialogFragment extends DialogFragment {
             String comment = commentEditText.getText().toString();
             if(comment.equals(""))
                 Toast.makeText(getContext(), "输入评论不能为空", Toast.LENGTH_SHORT).show();
-            else
+            else{
+                PostContentActivity postContentActivity = (PostContentActivity)getActivity();
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("userId", postContentActivity.userId);
+                    jsonObject.put("postId", postContentActivity.postId);
+                    jsonObject.put("commentText", comment);
+                    String result = post(viewUrl, jsonObject.toString());
+                    Log.e("comment",result);
+                } catch (JSONException | java.io.IOException e) {
+                    e.printStackTrace();
+                }
+                postContentActivity.getDataFromGet(postContentActivity.getUrl, 0);
                 CommentDialogFragment.this.dismiss();
+            }
         }
     }
 
+    private String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = okHttpClient.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
 }
