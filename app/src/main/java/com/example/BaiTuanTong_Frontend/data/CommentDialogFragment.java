@@ -94,26 +94,47 @@ public class CommentDialogFragment extends DialogFragment {
         @Override
         public void onClick(View v) {
             String comment = commentEditText.getText().toString();
-            if(comment.equals(""))
+            if(comment.equals("")) {
+                Log.e("okclick","ok");
                 Toast.makeText(getContext(), "输入评论不能为空", Toast.LENGTH_SHORT).show();
+            }
             else{
+                Log.e("found in click","hey");
                 PostContentActivity postContentActivity = (PostContentActivity)getActivity();
+
                 JSONObject jsonObject = new JSONObject();
+
                 try {
                     jsonObject.put("userId", postContentActivity.userId);
                     jsonObject.put("postId", postContentActivity.postId);
                     jsonObject.put("commentText", comment);
-                    String result = post(viewUrl, jsonObject.toString());
-                    Log.e("comment",result);
-                } catch (JSONException | java.io.IOException e) {
+
+                }catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.e("post","result");
+                getDataFromPost(viewUrl, jsonObject.toString());
                 postContentActivity.getDataFromGet(postContentActivity.getUrl, 0);
                 CommentDialogFragment.this.dismiss();
             }
         }
     }
-
+    private void getDataFromPost(String url, String json) {
+        //Log.e("TAG", "Start getDataFromGet()");
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                //Log.e("TAG", "new thread run.");
+                try {
+                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    Log.e("result", result);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "post failed.");
+                }
+            }
+        }.start();
+    }
     private String post(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(json, JSON);
         Request request = new Request.Builder()

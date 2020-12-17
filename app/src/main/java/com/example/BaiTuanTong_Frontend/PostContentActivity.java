@@ -92,10 +92,11 @@ public class PostContentActivity extends AppCompatActivity {
                         contentTextView.setText(content);
                         likeButton.setText("点赞（"+Integer.toString(likeCnt)+"）");
 
+                        commentList.clear();
                         //创建一个评论列表
                         for(int i=0;i<commentJSONArray.length();i++) {
                             JSONObject commentJSONObject = commentJSONArray.getJSONObject(i);
-                            String commentUserName = commentJSONObject.getString("commenterUserName");
+                            String commentUserName = commentJSONObject.getString("commenterUsername");
                             String commentContent = commentJSONObject.getString("content");
                             commentList.add(new Comment(commentUserName+":", commentContent));
                         }
@@ -107,6 +108,7 @@ public class PostContentActivity extends AppCompatActivity {
                         commentListView.setAdapter(commentAdapter);
                         break;
                     case likeMsg:
+                        /*
                         String result = (String)msg.obj;
                         if(result.equals("success"))
                         {
@@ -119,7 +121,8 @@ public class PostContentActivity extends AppCompatActivity {
                                 likeCnt--;
                             }
                             likeButton.setText("点赞（"+Integer.toString(likeCnt)+"）");
-                        }
+                        }*/
+                        getDataFromGet(getUrl, getContentMsg);
                         break;
                 }
 
