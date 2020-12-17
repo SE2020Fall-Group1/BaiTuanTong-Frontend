@@ -93,6 +93,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
                             adminList.add("username：" + tmp.getString("username"));
+                            mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
                             Log.e("!!!", tmp.getString("username"));
                         }
 
@@ -215,10 +216,10 @@ public class EditClubAdminActivity extends AppCompatActivity {
     private List<String> getList()
     {
         List<String> ret = new ArrayList<>();
-        for (int i = 1; i <= 10; ++i)
+    /*    for (int i = 1; i <= 2; ++i)
         {
             ret.add("username：李子恒" + "\nid:"+ i + "" + "");
-        }
+        }*/
         return ret;
     }
 
@@ -259,21 +260,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
         adminList = getList();
 //        clubID = getIntent().getIntExtra("clubID");
-        clubID = 1;//for test サーバー
-
-
-
-        getDataFromGet(SERVERURL + "club/admin?clubId=1");
-
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
-        //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        deleting = false;
+        clubID = 1;//for test server
 
         adminListView = findViewById(R.id.recyclerView2);
         // 设置布局管理器
@@ -287,6 +274,24 @@ public class EditClubAdminActivity extends AppCompatActivity {
         mMyAdapter = new MyAdapter(this, adminList);
 
         adminListView.setAdapter(mMyAdapter);
+
+        adminListView.invalidate();
+
+        getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
+
+
+
+
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        deleting = false;
+
 
         mMyAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
             @Override
