@@ -20,6 +20,8 @@
             android:name=".club.EditClubAdminActivity"
             android:label="EditClubAdminActivity"
             android:parentActivityName=".home.HomePageActivity" />
+        <activity android:name=".GridView.ReleasePostActivity"
+            />
         <activity
             android:name=".club.ClubHomeActivity"
             android:label="@string/title_activity_club_home"
