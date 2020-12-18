@@ -2,9 +2,11 @@ package com.example.BaiTuanTong_Frontend.data;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -73,8 +76,29 @@ public class CommentDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        commentEditText.requestFocus();
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         resizeDialogFragment();
-
+        Window window = getDialog().getWindow();
+        if (window != null) {
+            //得到LayoutParams
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.dimAmount=0f;
+            //修改gravity
+            params.gravity = Gravity.BOTTOM;
+            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(params);
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        (new Handler()).postDelayed(new Runnable() {
+            public void run() {
+                InputMethodManager inManager = (InputMethodManager)commentEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        },50);
     }
 
     private void resizeDialogFragment() {
@@ -82,12 +106,24 @@ public class CommentDialogFragment extends DialogFragment {
         if (null != dialog) {
             Window window = dialog.getWindow();
             WindowManager.LayoutParams lp = getDialog().getWindow().getAttributes();
-            lp.height = (1 * ScreenUtil.getScreenHeight(getContext()) / 5);//获取屏幕的宽度，定义自己的宽度
-            lp.width = (9 * ScreenUtil.getScreenWidth(getContext()) / 10);
+            lp.height = (1 * ScreenUtil.getScreenHeight(getContext()) / 7);//获取屏幕的宽度，定义自己的宽度
+            lp.width = (ScreenUtil.getScreenWidth(getContext()));
             if (window != null) {
                 window.setLayout(lp.width, lp.height);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                window.getDecorView().setPadding(0,0,0,0);
             }
         }
+    }
+
+    protected WindowManager.LayoutParams getLayoutParams(WindowManager.LayoutParams params) {
+        if (params == null) {
+            return new WindowManager.LayoutParams();
+        }
+        //注意这里设置的宽高，需要设置成MATCH_PARENT,不然的话就不会起作用，就这一点坑。
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        return params;
     }
 
     public class sendOnClickListener implements View.OnClickListener{

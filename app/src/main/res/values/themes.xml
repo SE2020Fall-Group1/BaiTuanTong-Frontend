@@ -28,6 +28,10 @@
     <style name="Theme.HelloWorld.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.HelloWorld.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <style name="commentDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:background">@null</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
 </resources>

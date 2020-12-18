@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:padding="0dp"
+    android:background="@drawable/comment_linear_background"
     android:gravity="center">
 
     <EditText
@@ -17,13 +18,20 @@
         android:textColorHint="@android:color/darker_gray"
         android:layout_marginLeft="5dp"
         android:inputType="textMultiLine"
-        android:imeOptions="actionNext"/>
+        android:imeOptions="actionNext"
+        android:background="@drawable/comment_edit_text_background"
+        android:minHeight="50dp"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp">
+    </EditText>
     <Button
         android:id="@+id/send_button"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_weight="1"
         android:text="发送"
-        android:layout_marginRight="5dp"/>
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"/>
 
 </LinearLayout>
