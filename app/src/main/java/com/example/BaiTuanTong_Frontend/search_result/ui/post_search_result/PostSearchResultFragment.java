@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,12 +34,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class PostSearchResultFragment extends Fragment {
 
     private int item;
     private View mView;
     private RecyclerView mRecyclerView;
     private PostSearchResultAdapter mPostSearchResultAdapter;
+
+    public String userId;
 
     // 与后端通信
     public static final MediaType JSON
@@ -60,11 +65,22 @@ public class PostSearchResultFragment extends Fragment {
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> clubId = new ArrayList<>();        // 社团ID
 
+    /**
+     * 用户点击的动态的ID
+     * 由此页面点入某一条动态后，若从该动态回退到此页面，需要刷新该动态对应搜索结果列表项的点赞评论数
+     * 为此，在startActivity()调用前设置clickedPosition为对应列表位置
+     * 当回退时调用此Fragment的onResume()查询clickedPosition，若不是默认值-1则更新对应动态信息
+     * 最后将clickedPosition重新设置为默认值防止其他情况onResume()被调用时进行信息更新
+     */
+    private int clickedPosition = -1;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         item = getArguments().getInt("item");
+        SharedPreferences shared = getActivity().getSharedPreferences("share",  MODE_PRIVATE);
+        userId = shared.getString("userId", "");
 
         mView = inflater.inflate(R.layout.fragment_post_search_result, container, false);
         mRecyclerView = (RecyclerView) mView.findViewById((R.id.post_search_result_recyclerView));
@@ -94,6 +110,10 @@ public class PostSearchResultFragment extends Fragment {
             Log.e("msg", "empty");
             getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
         }
+        else if (clickedPosition != -1) {
+            String strPostId = postId.get(clickedPosition).toString();
+            getDataFromGet(SERVERURL + "post/info?userId=" + userId + "&postId=" + strPostId);
+        }
     }
 
     // 跳转到社团主页，传递参数position（该动态再列表中的位置）
@@ -105,6 +125,7 @@ public class PostSearchResultFragment extends Fragment {
 
     // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
     private void startPostContentActivity(Integer position) {
+        clickedPosition = position;
         Intent intent = new Intent(getActivity(), PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
         startActivity(intent);
@@ -127,7 +148,21 @@ public class PostSearchResultFragment extends Fragment {
             }
         });
         Log.e("msg", "invalidate");
-        mView.invalidate();
+        //mView.invalidate();
+    }
+
+    // 在获得GET请求返回的数据后更新点赞数、评论数和点赞状态
+    private void updatePostInfo() {
+        View view = mRecyclerView.getChildAt(clickedPosition);
+        if (null != mRecyclerView.getChildViewHolder(view)){
+            PostSearchResultAdapter.PostSearchResultViewHolder viewHolder =
+                    (PostSearchResultAdapter.PostSearchResultViewHolder)mRecyclerView.getChildViewHolder(view);
+            viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));
+            viewHolder.post_commentCnt.setText(commentCnt.get(clickedPosition));
+            //viewHolder.post_likeCnt.invalidate();
+            //viewHolder.post_commentCnt.invalidate();
+        }
+        clickedPosition = -1;
     }
 
     // 处理get请求与post请求的回调函数
@@ -139,8 +174,14 @@ public class PostSearchResultFragment extends Fragment {
                 case GET:
                     try {
                         Log.e("msg", "startParsing");
-                        parseJsonPacket((String)msg.obj);
-                        updateView();
+                        JSONObject jsonObject = new JSONObject((String)msg.obj);
+                        if (jsonObject.has("postSummary")) {
+                            parseJsonPacketForView((String)msg.obj);
+                            updateView();
+                        } else {
+                            parseJsonPacketForInfo((String)msg.obj);
+                            updatePostInfo();
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -153,11 +194,11 @@ public class PostSearchResultFragment extends Fragment {
     });
 
     /**
-     * 解析get返回的json包
+     * 解析为了更新整个列表而get返回的json包
      * @param json get返回的json包
      * @throws JSONException 解析出错
      */
-    private void parseJsonPacket(String json) throws JSONException {
+    private void parseJsonPacketForView(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
 
         JSONArray postList = jsonObject.getJSONArray("postSummary");
@@ -169,6 +210,21 @@ public class PostSearchResultFragment extends Fragment {
             likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
             commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
             clubId.add(postList.getJSONObject(i).getInt("clubId"));
+        }
+    }
+
+    /**
+     * 解析为了更新动态信息而get返回的json包
+     * @param json get返回的json包
+     * @throws JSONException 解析出错
+     */
+    private void parseJsonPacketForInfo(String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        int code = jsonObject.getInt("code");
+        if (code == 200 && clickedPosition != -1) {
+            //isLiked.set(clickedPosition, (jsonObject.getBool("isLiked"));
+            likeCnt.set(clickedPosition, ((Integer)jsonObject.getInt("likeCnt")).toString());
+            commentCnt.set(clickedPosition, ((Integer)jsonObject.getInt("commentCnt")).toString());
         }
     }
 

@@ -59,8 +59,8 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
     implementation "com.squareup.okhttp3:okhttp:4.9.0"
-    compile 'com.sackcentury:shinebutton:1.0.0'
-    compile 'com.github.jd-alexander:LikeButton:0.2.3'
+    implementation 'com.sackcentury:shinebutton:1.0.0'
+    implementation 'com.github.jd-alexander:LikeButton:0.2.3'
     // implementation "com.google.code.gson:gson:2.8.2"
 
 }

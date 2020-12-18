@@ -49,8 +49,8 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         private TextView post_title;
         private TextView post_clubName;
         private TextView post_text;
-        private TextView post_likeCnt;
-        private TextView post_commentCnt;
+        public TextView post_likeCnt;
+        public TextView post_commentCnt;
 
         public PostSearchResultViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
