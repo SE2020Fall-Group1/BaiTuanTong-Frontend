@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,6 +66,7 @@ public class PostContentActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
     private CommentDialogFragment commentDialogFragment;
     private CollapsingToolbarLayout toolBarLayout;
+    private Toolbar toolbar;
     private TextView contentTextView;
     private List<Comment> commentList = new ArrayList<Comment>();
     public String userId;
@@ -223,8 +225,9 @@ public class PostContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //找到组件
         setContentView(R.layout.activity_post_content);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         contentTextView = (TextView)findViewById(R.id.content_text);
         likeButton = (ShineButton)findViewById(R.id.like_button);
@@ -246,6 +249,7 @@ public class PostContentActivity extends AppCompatActivity {
         toolBarLayout.setTitle(" ");
         contentTextView.setText("");
 
+
         //获取postId和userId
         Intent intent = getIntent();
         Integer intPostId = intent.getIntExtra("postId", 0);
@@ -264,16 +268,22 @@ public class PostContentActivity extends AppCompatActivity {
         commentDialogFragment = new CommentDialogFragment();
 
         //按钮设置监听
-        //likeButton.setOnClickListener(new MyOnClickListener());
+        likeButton.setOnClickListener(new MyOnClickListener());
         likeButtonText.setOnClickListener(new MyOnClickListener());
         commentButton.setOnClickListener(new MyOnClickListener());
         commentButtonImage.setOnClickListener(new MyOnClickListener());
         collectButtonText.setOnClickListener(new MyOnClickListener());
+        toolbar.setNavigationOnClickListener(new MyOnClickListener());
     }
+
     class MyOnClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
+            Log.e("id",Integer.toString(v.getId()));
             switch(v.getId()){
+                case -1:
+                    finish();
+                    break;
                 case R.id.like_button:
                     JSONObject jsonObject = new JSONObject();
                     try {

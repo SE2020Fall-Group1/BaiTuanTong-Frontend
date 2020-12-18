@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend.club;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,6 +55,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
     private static final int POST = 2;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+    public static final int REQUEST_CODE_SUBMIT = 1;
 
 //clubID
     private int clubID;
@@ -216,6 +219,18 @@ public class EditClubAdminActivity extends AppCompatActivity {
         //这里是调用menu文件夹中的main.xml，在登陆界面label右上角的三角里显示其他功能
 
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SUBMIT && resultCode == RESULT_OK)
+        {
+            String newAdmin = data.getStringExtra("adminName");
+            adminList.add("username：" + newAdmin);
+            mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
+        }
     }
 
     @Override
