@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:droidicon="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -45,42 +46,113 @@
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
     <LinearLayout
-        android:layout_height="@dimen/bottom_button_height"
+        android:layout_height="50dp"
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:padding="0dp"
-        android:gravity="start">
+        android:background="@color/white"
+        android:gravity="center">
 
-        <Button
-            android:id="@+id/like_button"
-            style="?android:attr/buttonStyle"
+        <!-->点赞按钮<-->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:text="点赞" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/comment_button"
-            style="?android:attr/buttonStyle"
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|right">
+                <com.sackcentury.shinebuttonlib.ShineButton
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@android:color/darker_gray"
+                    android:id="@+id/like_button"
+                    app:btn_color="@android:color/darker_gray"
+                    app:btn_fill_color="@android:color/holo_green_light"
+                    app:allow_random_color="false"
+                    app:siShape="@raw/like" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/like_button_text"
+                android:layout_margin="5dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
+                android:text="点赞(0)"/>
+
+        </LinearLayout>
+
+        <!-->评论按钮<-->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:text="评论" />
+            android:gravity="center"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|right">
+                <ImageView
+                    android:id="@+id/comment_button_image"
+                    android:layout_height="25dp"
+                    android:layout_width="25dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/icon_comment"
+                    android:scaleType="fitCenter"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/comment_button"
+                android:layout_margin="5dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
+                android:text="评论(0)"/>
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/forward_button"
-            style="?android:attr/buttonStyle"
+        <!-->收藏按钮<-->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
-            android:text="收藏" />
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|right">
+
+                <com.sackcentury.shinebuttonlib.ShineButton
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@android:color/darker_gray"
+                    android:id="@+id/collect_button"
+                    app:btn_color="@android:color/darker_gray"
+                    app:btn_fill_color="@android:color/holo_orange_dark"
+                    app:allow_random_color="false"
+                    app:siShape="@raw/star"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/collect_button_text"
+                android:layout_margin="5dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
+                android:text="收藏(0)"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

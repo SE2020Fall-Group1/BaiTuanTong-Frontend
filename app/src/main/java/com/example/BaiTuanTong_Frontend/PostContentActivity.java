@@ -1,8 +1,10 @@
 package com.example.BaiTuanTong_Frontend;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.example.BaiTuanTong_Frontend.adapter.CommentAdapter;
@@ -14,6 +16,8 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.like.LikeButton;
+import com.sackcentury.shinebuttonlib.ShineButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,8 +52,12 @@ import okhttp3.Response;
 
 public class PostContentActivity extends AppCompatActivity {
 
-    private Button likeButton;
-    private Button commentButton;
+    private ShineButton likeButton;
+    private TextView likeButtonText;
+    private ShineButton collectButton;
+    private TextView collectButtonText;
+    private ImageView commentButtonImage;
+    private TextView commentButton;
     private ListView commentListView;
     private CommentAdapter commentAdapter;
     private CommentDialogFragment commentDialogFragment;
@@ -90,8 +99,7 @@ public class PostContentActivity extends AppCompatActivity {
                         //设置标题，动态内容
                         toolBarLayout.setTitle(title);
                         contentTextView.setText(content);
-                        likeButton.setText("点赞（"+Integer.toString(likeCnt)+"）");
-
+                        likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
                         commentList.clear();
                         //创建一个评论列表
                         for(int i=0;i<commentJSONArray.length();i++) {
@@ -108,6 +116,7 @@ public class PostContentActivity extends AppCompatActivity {
                         commentListView.setAdapter(commentAdapter);
                         break;
                     case likeMsg:
+
                         /*
                         String result = (String)msg.obj;
                         if(result.equals("success"))
@@ -215,7 +224,12 @@ public class PostContentActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         contentTextView = (TextView)findViewById(R.id.content_text);
-        likeButton = (Button)findViewById(R.id.like_button);
+        likeButton = (ShineButton)findViewById(R.id.like_button);
+        likeButtonText = (TextView)findViewById(R.id.like_button_text);
+        commentButton = (TextView)findViewById(R.id.comment_button);
+        commentButtonImage = (ImageView)findViewById(R.id.comment_button_image);
+        collectButton = (ShineButton)findViewById(R.id.collect_button);
+        collectButtonText = (TextView)findViewById(R.id.collect_button_text);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -240,22 +254,23 @@ public class PostContentActivity extends AppCompatActivity {
         //申请动态内容
         getUrl = viewUrl + "?userId="+userId+"&postId="+postId;
         getDataFromGet(getUrl, getContentMsg);
+        if(isliked)
+            likeButton.performClick();
 
         //创建dialogFragment
         commentDialogFragment = new CommentDialogFragment();
-        commentButton = (Button)findViewById(R.id.comment_button);
-        likeButton = (Button)findViewById(R.id.like_button);
 
-        likeButton.setOnClickListener(new MyOnClickListener());
+        //按钮设置监听
+        //likeButton.setOnClickListener(new MyOnClickListener());
+        likeButtonText.setOnClickListener(new MyOnClickListener());
         commentButton.setOnClickListener(new MyOnClickListener());
+        commentButtonImage.setOnClickListener(new MyOnClickListener());
+        collectButtonText.setOnClickListener(new MyOnClickListener());
     }
     class MyOnClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             switch(v.getId()){
-                case R.id.comment_button:
-                    commentDialogFragment.show(getSupportFragmentManager(),"dialog");
-                    break;
                 case R.id.like_button:
                     JSONObject jsonObject = new JSONObject();
                     try {
@@ -265,6 +280,36 @@ public class PostContentActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     getDataFromPost(viewUrl+"/like", jsonObject.toString(), likeMsg);
+                    break;
+                case R.id.like_button_text:
+                    PostContentActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            likeButton.performClick();
+                        }
+                    });
+                    break;
+                case R.id.comment_button:
+                    commentDialogFragment.show(getSupportFragmentManager(),"dialog");
+                    break;
+                case R.id.comment_button_image:
+                    PostContentActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            commentButton.performClick();
+                        }
+                    });
+                    break;
+                case R.id.collect_button_text:
+                    PostContentActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            collectButton.performClick();
+                        }
+                    });
+                    break;
+                default:
+                    Toast.makeText(PostContentActivity.this, "not implemented", Toast.LENGTH_SHORT);
             }
         }
     }
