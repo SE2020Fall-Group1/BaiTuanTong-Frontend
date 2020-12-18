@@ -14,9 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="3"
         android:hint="说点什么吧"
-        android:inputType="text"
         android:textColorHint="@android:color/darker_gray"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="5dp"
+        android:inputType="textMultiLine"
+        android:imeOptions="actionNext"/>
     <Button
         android:id="@+id/send_button"
         android:layout_width="0dp"

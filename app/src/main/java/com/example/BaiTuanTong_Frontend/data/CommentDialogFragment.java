@@ -99,6 +99,7 @@ public class CommentDialogFragment extends DialogFragment {
                 Toast.makeText(getContext(), "输入评论不能为空", Toast.LENGTH_SHORT).show();
             }
             else{
+                commentEditText.setText("");
                 Log.e("found in click","hey");
                 PostContentActivity postContentActivity = (PostContentActivity)getActivity();
 
