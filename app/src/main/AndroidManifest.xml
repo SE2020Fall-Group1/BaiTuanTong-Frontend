@@ -27,7 +27,8 @@
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity
             android:name=".home.HomePageActivity"
-            android:label="@string/title_activity_home_page" />
+            android:label="@string/title_activity_home_page"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".PostPageActivity" />
         <activity
             android:name=".FollowedClubsDisplayActivity"
@@ -36,7 +37,8 @@
         <activity
             android:name=".PostContentActivity"
             android:label="@string/title_activity_post_content"
-            android:theme="@style/Theme.HelloWorld.NoActionBar" />
+            android:theme="@style/Theme.HelloWorld.NoActionBar"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".ui.register.RegistActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
