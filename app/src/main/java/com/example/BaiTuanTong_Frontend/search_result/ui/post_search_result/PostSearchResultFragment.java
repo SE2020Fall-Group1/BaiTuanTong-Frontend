@@ -53,6 +53,8 @@ public class PostSearchResultFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
+    private static final int getSearchResult = 0;
+    private static final int getPostInfo = 1;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
@@ -108,11 +110,11 @@ public class PostSearchResultFragment extends Fragment {
         Log.e("msg", "onResume");
         if (postId.isEmpty()){
             Log.e("msg", "empty");
-            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"));
+            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"), getSearchResult);
         }
         else if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
-            getDataFromGet(SERVERURL + "post/info?userId=" + userId + "&postId=" + strPostId);
+            getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
     }
 
@@ -171,23 +173,25 @@ public class PostSearchResultFragment extends Fragment {
         public boolean handleMessage(@NonNull Message msg) {
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
-                case GET:
+                case getSearchResult:
                     try {
                         Log.e("msg", "startParsing");
-                        JSONObject jsonObject = new JSONObject((String)msg.obj);
-                        if (jsonObject.has("postSummary")) {
-                            parseJsonPacketForView((String)msg.obj);
-                            updateView();
-                        } else {
-                            parseJsonPacketForInfo((String)msg.obj);
-                            updatePostInfo();
-                        }
+                        parseJsonPacketForView((String)msg.obj);
+                        updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
-                case POST:
+                case getPostInfo:
+                    try {
+                        Log.e("msg", "startParsing");
+                        parseJsonPacketForInfo((String)msg.obj);
+                        updatePostInfo();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     break;
+                default: return false;
             }
             return true;
         }
@@ -220,8 +224,9 @@ public class PostSearchResultFragment extends Fragment {
      */
     private void parseJsonPacketForInfo(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        int code = jsonObject.getInt("code");
-        if (code == 200 && clickedPosition != -1) {
+        // int code = jsonObject.getInt("code");
+        //if (code == 200 && clickedPosition != -1) {
+        if (clickedPosition != -1) {
             //isLiked.set(clickedPosition, (jsonObject.getBool("isLiked"));
             likeCnt.set(clickedPosition, ((Integer)jsonObject.getInt("likeCnt")).toString());
             commentCnt.set(clickedPosition, ((Integer)jsonObject.getInt("commentCnt")).toString());
@@ -229,7 +234,7 @@ public class PostSearchResultFragment extends Fragment {
     }
 
     // 使用get获取数据
-    private void getDataFromGet(String url) {
+    private void getDataFromGet(String url, int what) {
         new Thread(){
             @Override
             public void run() {
@@ -239,7 +244,7 @@ public class PostSearchResultFragment extends Fragment {
                     String result = get(url);
                     Log.e("RES", result);
                     Message msg = Message.obtain();
-                    msg.what = GET;
+                    msg.what = what;
                     msg.obj = result;
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {

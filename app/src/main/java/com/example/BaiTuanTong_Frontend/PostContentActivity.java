@@ -1,51 +1,38 @@
 package com.example.BaiTuanTong_Frontend;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import com.example.BaiTuanTong_Frontend.adapter.CommentAdapter;
-import com.example.BaiTuanTong_Frontend.data.Comment;
-import com.example.BaiTuanTong_Frontend.data.CommentDialogFragment;
-import com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll;
-import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
-import com.like.LikeButton;
-import com.sackcentury.shinebuttonlib.ShineButton;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.ViewStub;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.example.BaiTuanTong_Frontend.adapter.CommentAdapter;
+import com.example.BaiTuanTong_Frontend.data.Comment;
+import com.example.BaiTuanTong_Frontend.data.CommentDialogFragment;
+import com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.sackcentury.shinebuttonlib.ShineButton;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -158,7 +145,7 @@ public class PostContentActivity extends AppCompatActivity {
                 super.run();
                 //Log.e("TAG", "new thread run.");
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json);
                     Log.e("result", result);
                     Message msg = Message.obtain();
                     msg.obj = result;
@@ -215,7 +202,9 @@ public class PostContentActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
+        Log.e("begin", "newCall");
         Response response = okHttpClient.newCall(request).execute();
+        Log.e("end", "newCall");
         return response.body().string();
     }
 
