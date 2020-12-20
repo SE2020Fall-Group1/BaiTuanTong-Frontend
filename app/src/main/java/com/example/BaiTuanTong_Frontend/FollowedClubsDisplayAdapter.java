@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
 
     @Override
     public FollowedClubsDisplayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.followed_clubs_recycler_item, parent, false);
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_club_list_recycler, parent, false);
         FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder holder = new FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder(itemView);
         return holder;
     }
@@ -61,7 +60,7 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
     @Override
     public void onBindViewHolder(@NonNull FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder holder, int position) {
         holder.club_name.setText(mList.get(position));
-        holder.club_intro.setText("这是社团" + position + "的简介" + "");
+        holder.club_intro.setText("这是社团" + (position+1) + "的简介，为了测试自动换行，我多加一些内容进去，看看会不会有问题。");
         holder.club_intro.setTag(position);
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);

@@ -12,6 +12,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -20,54 +23,267 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
-
+import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
+import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.PostPageActivity;
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.MyAdapter;
+import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
+import com.example.BaiTuanTong_Frontend.widget.CustomEmptyView;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 
 public class ClubHomeActivity extends AppCompatActivity {
-    private Toolbar mNavigation;  //顶部导航栏
-    private TextView club_profile;   //社团简介文本框
-    private TextView detail_button;  //"详情" "收起" 按钮
-    private TextView empty_note;   //列表为空的提示信息
-    private boolean extended;    //当前文本框是否展开
-    private RecyclerView mRecyclerView;  //动态列表
-    private MyAdapter mMyAdapter;
-
-    private List<String> postList; //动态列表
-    private String clubInfo;  //社团简介
-    private String clubPresident;  //社长
 
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     public static final MediaType STRING
             = MediaType.get("text/plain; charset=utf-8");
+
+    private Unbinder bind;
+    @BindView(R.id.club_title)
+    Toolbar mNavigation;  //顶部导航栏
+    @BindView(R.id.get_club_profile)
+    TextView clubProfile;   //社团简介文本框
+    @BindView(R.id.details)
+    TextView detailButton;  //"详情" "收起" 按钮
+    @BindView(R.id.empty_note)
+    TextView emptyNote;   //列表为空的提示信息
+    @BindView(R.id.club_post_list)
+    RecyclerView mRecyclerView;  //动态列表
+    @BindView(R.id.toolbar_club_picture)
+    CircleImageView mCircleImageView; //圆形头像
+    @BindView(R.id.toolbar_club_name)
+    TextView clubNameView;  //社团名称
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout; //下拉刷新布局
+    @BindView(R.id.empty_layout)
+    CustomEmptyView mCustomEmptyView; //加载失败页面
+
+    private boolean extended = false;    //当前文本框是否展开
+    private boolean mIsRefreshing = false; //是否正在刷新
+    private boolean recycleViewInitiated = false;
+
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
+    private static final int GETFAIL = 3;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+
+    private MyAdapter mMyAdapter;
+
+    private List<String> postList = new ArrayList<>(); //动态列表
+    private String clubName;
+    private String clubInfo;  //社团简介
+    private String clubPresident;  //社长
+    private int clubId;
+
+    /**
+     * 处理get请求与post请求的回调函数
+     */
+    private Handler getHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            //Log.e("TAG", (String)msg.obj);
+            switch (msg.what){
+                case GET:
+                case POST:
+                    try {
+                        String message = (String)msg.obj;
+                        if(!message.equals("club do not exist"))
+                            parseJsonPacket((String)msg.obj);
+                        String print = clubInfo+"\n"+"社长: "+clubPresident;
+                        clubNameView.setText(clubName);
+                        clubProfile.setText(print);
+                    } catch (JSONException e) {
+                        //refreshComplete();
+                        //TODO 等到前后端对接完成这里应该改成initEmptyView()
+                        e.printStackTrace();
+                    }
+                    break;
+                case GETFAIL:
+                    initEmptyView();
+                    return true;
+            }
+            if(!recycleViewInitiated) { //无论成功与否，第一次必须初始化RecycleView
+                initRecycleView();
+                recycleViewInitiated = true;
+            }
+            refreshComplete();
+            return true;
+        }
+    });
+
+    /**
+     * 刷新完成，更新动态列表
+     */
+    private void refreshComplete() {
+        Log.e("Re", "refreshComplete");
+        hideEmptyView();
+        mMyAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
+        mIsRefreshing = false;
+        if(postList.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
+            emptyNote.setVisibility(VISIBLE);
+            mRecyclerView.setVisibility(GONE);
+        }
+        else{
+            mRecyclerView.setVisibility(VISIBLE);
+            emptyNote.setVisibility(GONE);
+        }
+    }
+
+    /**
+     * 解析post返回的json包
+     * @param json post返回的json包
+     * @throws JSONException 解析出错
+     */
+    private void parseJsonPacket(String json) throws JSONException {
+        JSONObject jsonObject = new JSONObject(json);
+        /*int code = jsonObject.getInt("code");
+        if(code == 403)
+            return;*/
+        clubName = jsonObject.getString("clubName");
+        clubInfo = jsonObject.getString("introduction");
+        clubPresident = jsonObject.getString("president");
+        JSONArray jsonArray = jsonObject.getJSONArray("postSummary");
+        for(int i = 0; i < jsonArray.length(); i++){
+            JSONObject postObj = jsonArray.getJSONObject(i);
+            postList.add(postObj.getString("title"));
+            //todo 添加对postSummary中其他两项数据的处理
+        }
+        Log.e("clubName", clubName);
+        Log.e("clubInfo", clubInfo);
+    }
+
+
+
+    /**
+     * 初始化页面上方标题栏
+     */
+    public void initToolBar() {
+        setSupportActionBar(mNavigation);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
+        //TODO 从后端获取社团图标后更新图标
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_club_home);
+        bind = ButterKnife.bind(this);
+        clubId = getIntent().getIntExtra("clubId", -1);
+
+        initRefreshLayout();
+        //initEmptyView();
+
+        initDetailButton();
+
+        initToolBar();
+    }
+
+    /**
+     * 开始刷新前先清除信息，目前只清除动态列表，因为一般来说社团名称与简介不会发生变化
+     */
+    protected void clearData(){
+        mIsRefreshing = true;
+        postList.clear();
+    }
+
+
+    protected void loadData(){
+        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);
+    }
+
+    private void initDetailButton() {
+        detailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                extended = !extended;
+                if(extended){
+                    clubProfile.setMaxLines(10);
+                    detailButton.setText("[收起]");
+                }
+                else{
+                    clubProfile.setMaxLines(1);
+                    detailButton.setText("[详情]");
+                }
+            }
+        });
+    }
+
+    public void initRecycleView(){
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setNestedScrollingEnabled(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mMyAdapter = new MyAdapter(this, postList);
+        mRecyclerView.setAdapter(mMyAdapter);
+        mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                sendMessage(position);
+            }
+        });
+        mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
+    }
+
+    protected void initRefreshLayout() {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.holo_blue_light);
+        mSwipeRefreshLayout.post(() -> {
+            mSwipeRefreshLayout.setRefreshing(true);
+            mIsRefreshing = true;
+            loadData();
+        });
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            clearData();
+            loadData();
+        });
+    }
+
+    public void initEmptyView() {
+        mIsRefreshing = false;
+        mSwipeRefreshLayout.setRefreshing(false);
+        mCustomEmptyView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        emptyNote.setVisibility(GONE);
+        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
+        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~请刷新.");
+        Snackbar.make(mRecyclerView, "数据加载失败,请重新加载或者检查网络是否链接", Snackbar.LENGTH_SHORT).show();
+    }
+
+    public void hideEmptyView() {
+        mCustomEmptyView.setVisibility(View.GONE);
+    }
 
     /**
      * 使用get获取数据
@@ -86,6 +302,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
+                    Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();
@@ -100,7 +319,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //json用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
@@ -112,187 +331,6 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         }.start();
     }
-
-    /**
-     * Okhttp的get请求
-     * @param url 向服务器请求的url
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-
-    /**
-     * Okhttp的post请求
-     * @param url 向服务器请求的url
-     * @param json 向服务器发送的json包
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(json, JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        }
-    }
-
-    /**
-     * 处理get请求与post请求的回调函数
-     */
-    private Handler getHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            //super.handleMessage(msg);
-            Log.e("TAG", (String)msg.obj);
-            switch (msg.what){
-                case GET:
-                    club_profile.setText((String)msg.obj);
-                    break;
-                case POST:
-                    //club_profile.setText((String)msg.obj);
-                    try {
-                        parseJsonPacket((String)msg.obj);
-                        String print = clubInfo+"\n"+"社长: "+clubPresident;
-                        club_profile.setText(print);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-            return true;
-        }
-    });
-
-    /**
-     * 解析post返回的json包
-     * @param json post返回的json包
-     * @throws JSONException 解析出错
-     */
-    private void parseJsonPacket(String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-        clubInfo = jsonObject.getString("introduction");
-        clubPresident = jsonObject.getString("president");
-        JSONArray jsonArray = jsonObject.getJSONArray("club_post_list");
-        for(int i = 0; i < jsonArray.length(); i++){
-            postList.add(jsonArray.getString(i));
-        }
-    }
-
-
-
-    /**
-     * 初始化页面上方标题栏
-     */
-    public void initToolBar() {
-        setSupportActionBar(mNavigation);
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_club_home);
-
-        club_profile = (TextView) findViewById(R.id.get_club_profile);
-        //club_profile.setText(getIntent().getStringExtra("club_profile"));
-
-        String clubName = "yuanhuo";
-        postList = new ArrayList<>();
-        getDataFromPost(LOCALURL + "club/homepage", "{\"clubName\":\"" + clubName + "\"}");
-
-        mNavigation = findViewById(R.id.club_title);
-        initToolBar();
-        mNavigation.setTitle(getIntent().getStringExtra("club_name"));
-
-        detail_button = (TextView) findViewById(R.id.details);
-        extended = false;
-        detail_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                extended = !extended;
-                if(extended){
-                    club_profile.setMaxLines(20);
-                    detail_button.setText("[收起]");
-                }
-                else{
-                    club_profile.setMaxLines(1);
-                    detail_button.setText("[详情]");
-                }
-            }
-        });
-
-        empty_note = this.findViewById(R.id.empty_note);
-        mRecyclerView = this.findViewById(R.id.club_post_list);
-        if(postList.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
-            mRecyclerView.setVisibility(GONE);
-        }
-        else{
-            empty_note.setVisibility(GONE);
-        }
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mMyAdapter = new MyAdapter(this, postList);
-        mRecyclerView.setAdapter(mMyAdapter);
-        mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                sendMessage(position);
-            }
-        });
-        /*mMyAdapter.setOnItemLongClickListener(new MyAdapter.OnItemLongClickListener() {
-            @Override
-            public void onLongClick(int position) {
-                //长按删除数据
-                mList.remove(position);
-                mMyAdapter.notifyItemRemoved(position);
-                mMyAdapter.notifyItemRangeChanged(position, mList.size());
-            }
-        });*/
-    }
-
-    /*@Override
-    public void onStart(){
-        super.onStart();
-        Toast.makeText(this,"ClubHomePage is onStart",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Toast.makeText(this,"ClubHomePage is onResume",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Toast.makeText(this,"ClubHomePage is onPause",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStop(){
-        super.onStop();
-        Toast.makeText(this,"ClubHomePage is onStop",Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onRestart(){
-        super.onRestart();
-        Toast.makeText(this,"ClubHomePage is onRestart",Toast.LENGTH_SHORT).show();
-    }*/
 
     /**
      *初始化右上角菜单按钮
@@ -312,14 +350,14 @@ public class ClubHomeActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.release_post_menu_item:
-                //getDataFromGet("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
-                //getDataFromGet("http://47.92.233.174:5000/");
+                Intent intent = new Intent(this, ReleasePostActivity.class);
+                intent.putExtra("clubId", clubId);
+                startActivity(intent);
                 break;
             case R.id.club_admin_manage_menu_item:
-                Intent intent = new Intent(this, EditClubAdminActivity.class);
+                intent = new Intent(this, EditClubAdminActivity.class);
+                intent.putExtra("clubId", clubId);
                 startActivity(intent);
-                //getDataFromPost("http://api.m.mtime.cn/PageSubArea/TrailerList.api");
-                //getDataFromGet("http://10.0.2.2:5000/hello");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -342,5 +380,11 @@ public class ClubHomeActivity extends AppCompatActivity {
             list.add("动态" + i + "\n社团发布的第"+ i + "条动态" + "");
         }
         return list;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bind.unbind();
     }
 }
