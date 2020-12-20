@@ -109,7 +109,7 @@ public class PostContentActivity extends AppCompatActivity {
                         break;
                     case likeMsg:
 
-                        /*
+
                         String result = (String)msg.obj;
                         if(result.equals("success"))
                         {
@@ -121,8 +121,8 @@ public class PostContentActivity extends AppCompatActivity {
                             {
                                 likeCnt--;
                             }
-                            likeButton.setText("点赞（"+Integer.toString(likeCnt)+"）");
-                        }*/
+                            likeButtonText.setText("点赞（"+Integer.toString(likeCnt)+"）");
+                        }
                         getDataFromGet(getUrl, getContentMsg);
                         break;
                 }
