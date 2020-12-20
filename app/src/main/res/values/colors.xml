@@ -83,4 +83,6 @@
     <color name="darkblue">#00008B</color> <!--暗蓝色 -->
     <color name="navy">#000080</color> <!--海军色 -->
     <color name="PekingUnivRed">#8C0000</color> <!--北大红 -->
+    <color name="holo_blue_light">#33B5E5</color>
+    <color name="black_alpha_45">#71000000</color>
 </resources>
