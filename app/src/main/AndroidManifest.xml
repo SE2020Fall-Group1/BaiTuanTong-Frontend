@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_btt"
@@ -14,14 +15,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
         <activity
+            android:name=".ManageClubsActivity"
+            android:label="ManageClubsActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
+        <activity
             android:name=".search_result.SearchResultActivity"
             android:parentActivityName=".home.HomePageActivity" />
         <activity
             android:name=".club.EditClubAdminActivity"
             android:label="EditClubAdminActivity"
             android:parentActivityName=".home.HomePageActivity" />
-        <activity android:name=".GridView.ReleasePostActivity"
-            />
+        <activity android:name=".GridView.ReleasePostActivity" />
         <activity
             android:name=".club.ClubHomeActivity"
             android:label="@string/title_activity_club_home"
@@ -40,12 +45,11 @@
             android:name=".PostContentActivity"
             android:label="@string/title_activity_post_content"
             android:theme="@style/Theme.HelloWorld.NoActionBar"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.register.RegistActivity" />
         <activity
             android:name=".ui.login.LoginActivity"
-
-            android:theme="@style/Theme.HelloWorld.NoActionBar" >
+            android:theme="@style/Theme.HelloWorld.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,8 +62,7 @@
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
-        <activity android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>
