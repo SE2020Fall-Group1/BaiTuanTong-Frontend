@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend.search_result.ui.club_search_result;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.BaiTuanTong_Frontend.ClubListAdapter;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
@@ -55,6 +57,14 @@ public class ClubSearchResultFragment extends Fragment {
     public List<String> clubName = new ArrayList<>();      // 社团名字
     public List<String> introduction = new ArrayList<>();  // 社团简介
     public List<String> president = new ArrayList<>();     // 社团主席
+
+    // RecyclerView的适配器
+    public class ClubSearchResultAdapter extends ClubListAdapter {
+
+        public ClubSearchResultAdapter(Context mContext, List<String> clubName, List<String> introduction) {
+            super(mContext, clubName, introduction);
+        }
+    }
 
     @Nullable
     @Override

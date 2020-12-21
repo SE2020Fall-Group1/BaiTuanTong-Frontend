@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
+import com.example.BaiTuanTong_Frontend.PostListAdapter;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
@@ -75,6 +77,20 @@ public class PostSearchResultFragment extends Fragment {
      * 最后将clickedPosition重新设置为默认值防止其他情况onResume()被调用时进行信息更新
      */
     private int clickedPosition = -1;
+
+    // RecyclerView的适配器
+    public class PostSearchResultAdapter extends PostListAdapter {
+
+        public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt);
+        }
+
+        class PostSearchResultViewHolder extends PostListAdapter.PostListViewHolder {
+            public PostSearchResultViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+                super(itemView, onItemClickListener);
+            }
+        }
+    }
 
     @Nullable
     @Override
@@ -157,8 +173,8 @@ public class PostSearchResultFragment extends Fragment {
     private void updatePostInfo() {
         View view = mRecyclerView.getChildAt(clickedPosition);
         if (null != mRecyclerView.getChildViewHolder(view)){
-            PostSearchResultAdapter.PostSearchResultViewHolder viewHolder =
-                    (PostSearchResultAdapter.PostSearchResultViewHolder)mRecyclerView.getChildViewHolder(view);
+            PostListAdapter.PostListViewHolder viewHolder =
+                    (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
             viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));
             viewHolder.post_commentCnt.setText(commentCnt.get(clickedPosition));
             //viewHolder.post_likeCnt.invalidate();

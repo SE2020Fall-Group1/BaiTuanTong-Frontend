@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
+package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,19 +11,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.BaiTuanTong_Frontend.R;
-
 import java.util.List;
 
-public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResultAdapter.PostSearchResultViewHolder> {
-    private List<String> title;
-    private List<String> clubName;
-    private List<String> text;
-    private List<String> likeCnt;
-    private List<String> commentCnt;
+public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostListViewHolder> {
+    private List<String> title;         // 动态标题
+    private List<String> clubName;      // 社团名称
+    private List<String> text;          // 动态内容
+    private List<String> likeCnt;       // 点赞数
+    private List<String> commentCnt;    // 评论数
     private Context mContext;
 
-    public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+    public PostListAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
         this.mContext = mContext;
         this.title = title;
         this.clubName = clubName;
@@ -37,13 +35,13 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
     }
 
     // Item内部空间点击事件处理
-    private PostSearchResultAdapter.OnItemClickListener mOnItemClickListener;
+    private PostListAdapter.OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickListener(PostSearchResultAdapter.OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(PostListAdapter.OnItemClickListener onItemClickListener) {
         this.mOnItemClickListener = onItemClickListener;
     }
 
-    class PostSearchResultViewHolder extends RecyclerView.ViewHolder {
+    public class PostListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout post_list_content;
         private ImageView club_img;
         private TextView post_title;
@@ -52,7 +50,7 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
         public TextView post_likeCnt;
         public TextView post_commentCnt;
 
-        public PostSearchResultViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+        public PostListViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
             post_list_content = itemView.findViewById(R.id.post_list_content);
             club_img = itemView.findViewById(R.id.club_img);
@@ -100,24 +98,22 @@ public class PostSearchResultAdapter extends RecyclerView.Adapter<PostSearchResu
     }
 
     @Override
-    public PostSearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PostListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_post_list_recycler, parent, false);
-        PostSearchResultAdapter.PostSearchResultViewHolder holder = new PostSearchResultAdapter.PostSearchResultViewHolder(itemView, mOnItemClickListener);
+        PostListAdapter.PostListViewHolder holder = new PostListAdapter.PostListViewHolder(itemView, mOnItemClickListener);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostSearchResultAdapter.PostSearchResultViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PostListAdapter.PostListViewHolder holder, int position) {
         holder.post_title.setText(title.get(position));
         holder.post_clubName.setText(clubName.get(position));
         holder.post_text.setText(text.get(position));
         holder.club_img.setTag(position);
-        holder.post_likeCnt.setText("" + likeCnt.get(position));
-        holder.post_commentCnt.setText("" + commentCnt.get(position));
+        holder.post_likeCnt.setText(likeCnt.get(position));
+        holder.post_commentCnt.setText(commentCnt.get(position));
         holder.post_list_content.setTag(position);
     }
-
-
 
     @Override
     public int getItemCount() {

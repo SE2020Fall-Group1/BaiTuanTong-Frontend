@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.search_result.ui.club_search_result;
+package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,16 +11,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.BaiTuanTong_Frontend.R;
-
 import java.util.List;
 
-public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResultAdapter.ClubSearchResultViewHolder> {
+public abstract class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.ClubListViewHolder> {
     private List<String> clubName;
     private List<String> introduction;
     private Context mContext;
 
-    public ClubSearchResultAdapter(Context mContext, List<String> clubName, List<String> introduction) {
+    public ClubListAdapter(Context mContext, List<String> clubName, List<String> introduction) {
         this.mContext = mContext;
         this.clubName = clubName;
         this.introduction = introduction;
@@ -37,13 +35,13 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
         this.onItemClickListener = onItemClickListener;
     }
 
-    class ClubSearchResultViewHolder extends RecyclerView.ViewHolder {
+    class ClubListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout club_list_content;
         private ImageView club_img;
         private TextView club_name;
         private TextView club_intro;
 
-        public ClubSearchResultViewHolder(@NonNull View itemView) {
+        public ClubListViewHolder(@NonNull View itemView) {
             super(itemView);
             club_list_content = itemView.findViewById(R.id.club_list_content);
             club_img = itemView.findViewById(R.id.club_img);
@@ -53,14 +51,14 @@ public class ClubSearchResultAdapter extends RecyclerView.Adapter<ClubSearchResu
     }
 
     @Override
-    public ClubSearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ClubListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_club_list_recycler, parent, false);
-        ClubSearchResultAdapter.ClubSearchResultViewHolder holder = new ClubSearchResultAdapter.ClubSearchResultViewHolder(itemView);
+        ClubListAdapter.ClubListViewHolder holder = new ClubListAdapter.ClubListViewHolder(itemView);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ClubSearchResultAdapter.ClubSearchResultViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ClubListAdapter.ClubListViewHolder holder, int position) {
         holder.club_name.setText(clubName.get(position));
         holder.club_intro.setText(introduction.get(position));
         holder.club_intro.setTag(position);

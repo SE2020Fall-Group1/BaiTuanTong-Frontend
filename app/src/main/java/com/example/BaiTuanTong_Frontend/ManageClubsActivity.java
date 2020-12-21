@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -56,6 +57,14 @@ public class ManageClubsActivity extends AppCompatActivity {
     public List<String> introduction = new ArrayList<>();  // 社团简介
     public List<String> president = new ArrayList<>();     // 社团主席
 
+    // RecyclerView的适配器
+    public class ManageClubsAdapter extends ClubListAdapter {
+
+        public ManageClubsAdapter(Context mContext, List<String> clubName, List<String> introduction) {
+            super(mContext, clubName, introduction);
+        }
+    }
+
     public void initToolBar() {
         mNavigation.setTitle("管理的社团");
         setSupportActionBar(mNavigation);
@@ -92,14 +101,6 @@ public class ManageClubsActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // 设置点击事件
-        mAdapter.setOnItemClickListener(new ManageClubsAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                sendMessage(position);
-            }
-        });
-
         if (userId != null)
         getDataFromGet(SERVERURL + "club/query/admin?userId=" + userId);
     }
@@ -110,7 +111,7 @@ public class ManageClubsActivity extends AppCompatActivity {
      */
     public void sendMessage(int position) {
         Intent intent = new Intent(this, ClubHomeActivity.class);
-        intent.putExtra("clubId", clubId.get(position));             //社团id，目前临时用position代替
+        intent.putExtra("clubId", clubId.get(position));
         startActivity(intent);
     }
 
