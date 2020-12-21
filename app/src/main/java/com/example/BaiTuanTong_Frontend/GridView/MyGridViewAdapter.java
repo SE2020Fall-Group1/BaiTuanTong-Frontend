@@ -32,6 +32,8 @@ public class MyGridViewAdapter extends BaseAdapter {
     //    public TextView Grid_textview;
     }
 
+
+    //如果超过九个 就不显示+号了，也就没法添加新的
     @Override
     public int getCount() {
         int cnt = (myList == null) ? 1 : myList.size() + 1;

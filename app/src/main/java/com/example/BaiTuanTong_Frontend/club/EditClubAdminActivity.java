@@ -53,8 +53,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
-    private static final String LOCALURL = "http://10.0.2.2:5000/";
+    private static final String SERVERURL = "http://47.92.233.174:5000/";//服务器用 port5000
+    private static final String LOCALURL = "http://10.0.2.2:5000/";//本地测试用
     public static final int REQUEST_CODE_SUBMIT = 1;
 
 //clubID
@@ -81,7 +81,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
                             adminList.add("username：" + tmp.getString("username"));
-                            mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
+                            mMyAdapter.notifyDataSetChanged();
+                        //    mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
                             Log.e("!!!", tmp.getString("username"));
                         }
 
@@ -95,6 +96,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                  //   adminList.
                     break;
                 case POST:
+                    Log.e("POST_RES", (String) msg.obj);
                     //club_profile.setText((String)msg.obj);
                     try {
                         parseJsonPacket((String)msg.obj);
@@ -188,7 +190,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = post(url, json); //jason用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    Log.e("ADD_TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
                     msg.obj = result;
@@ -221,6 +223,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
         return true;
     }
 
+    //从此处添加社团管理员。
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -228,8 +231,21 @@ public class EditClubAdminActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_SUBMIT && resultCode == RESULT_OK)
         {
             String newAdmin = data.getStringExtra("adminName");
-            adminList.add("username：" + newAdmin);
-            mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
+//            adminList.add("username：" + newAdmin);//离线方法，测试用
+
+            //以下为okhttp方法。
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("clubId", clubID);
+             //   obj.put("userId", 4);
+                obj.put("userName", newAdmin);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            getDataFromPost(SERVERURL + "club/admin/add", obj.toString());
+            adminList.clear();
+            getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
+            mMyAdapter.notifyDataSetChanged();
         }
     }
 
@@ -258,9 +274,19 @@ public class EditClubAdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_club_admin);
 
+        //这个部分测试完成了
         adminList = getList();
-        clubID = getIntent().getIntExtra("club_id", 1);
-        Log.e("club-id",""+clubID);
+        clubID = getIntent().getIntExtra("clubId", -1);
+
+        //test: -1
+     //   clubID = -1;
+        if (clubID == -1)
+        {
+            Toast.makeText(getApplicationContext(),
+                    "社团获取出现问题，请返回上级页面！",
+                    Toast.LENGTH_LONG).show();
+        }
+        Log.e("clubId",""+clubID);
         // clubID = 1;//for test server
 
         adminListView = findViewById(R.id.recyclerView2);
