@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 
 
@@ -19,5 +18,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intentLogin = new Intent(this, LoginActivity.class);
         startActivity(intentLogin);
     }
-
 }

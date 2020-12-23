@@ -85,13 +85,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
     private boolean recycleViewInitiated = false;
+
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int GETFAIL = 3;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
-
 
     private MyAdapter mMyAdapter;
 
@@ -178,6 +178,8 @@ public class ClubHomeActivity extends AppCompatActivity {
         Log.e("clubName", clubName);
         Log.e("clubInfo", clubInfo);
     }
+
+
 
     /**
      * 初始化页面上方标题栏
@@ -361,38 +363,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    /**
-     * Okhttp的get请求
-     * @param url 向服务器请求的url
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-
-    /**
-     * Okhttp的post请求
-     * @param url 向服务器请求的url
-     * @param json 向服务器发送的json包
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(json, JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        }
-    }
 
     /**
      * 点击列表中某一项时的处理函数
