@@ -41,6 +41,8 @@
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
+        <activity android:name=".SystemAdministrator.ManagerHomePage"
+            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
         <activity
             android:name=".PostContentActivity"
             android:label="@string/title_activity_post_content"

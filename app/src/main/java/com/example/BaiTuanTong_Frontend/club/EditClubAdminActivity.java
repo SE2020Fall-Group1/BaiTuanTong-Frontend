@@ -46,6 +46,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
             = MediaType.get("text/plain; charset=utf-8");
     private RecyclerView adminListView;
     private List<String> adminList;
+    private List<Integer> adminIdList;
     private MyAdapter mMyAdapter;
     private boolean deleting;
     private Switch mySwitch;
@@ -81,6 +82,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
                             adminList.add("username：" + tmp.getString("username"));
+                            adminIdList.add(tmp.getInt("userId"));
                             mMyAdapter.notifyDataSetChanged();
                         //    mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
                             Log.e("!!!", tmp.getString("username"));
@@ -238,12 +240,15 @@ public class EditClubAdminActivity extends AppCompatActivity {
             try {
                 obj.put("clubId", clubID);
              //   obj.put("userId", 4);
-                obj.put("userName", newAdmin);
+                Log.e("newAdminName", newAdmin);
+                obj.put("username", newAdmin);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Log.e("posting json", obj.toString());
             getDataFromPost(SERVERURL + "club/admin/add", obj.toString());
             adminList.clear();
+            adminIdList.clear();
             getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
             mMyAdapter.notifyDataSetChanged();
         }
@@ -276,6 +281,10 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
         //这个部分测试完成了
         adminList = getList();
+        adminIdList = new ArrayList<>();
+        if (adminIdList == null){
+            Log.e("nullfault", "null!");
+        }
         clubID = getIntent().getIntExtra("clubId", -1);
 
         //test: -1
@@ -325,10 +334,27 @@ public class EditClubAdminActivity extends AppCompatActivity {
             public void onLongClick(int position) {
                 //长按删除一个成员
 
-                if (deleting == false)
+                if (deleting == false)//不在删除模式下，不考虑长按的作用
                     return ;
-                adminList.remove(position);
+
+                int del_admin = adminIdList.get(position);
+            //离线模式做法，直接对列表做操作
+            //   adminList.remove(position);
+            //    mMyAdapter.notifyDataSetChanged();
+                //以下为okhttp方法。
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("clubId", clubID);
+                    obj.put("userId", del_admin);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                getDataFromPost(SERVERURL + "club/admin/delete", obj.toString());
+                adminList.clear();
+                adminIdList.clear();
+                getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
                 mMyAdapter.notifyDataSetChanged();
+
             }
         });
 
