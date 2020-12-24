@@ -9,18 +9,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder> {
-    private List<String> mList;
+public abstract class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.ClubListViewHolder> {
+    private List<String> clubName;
+    private List<String> introduction;
     private Context mContext;
 
-    public FollowedClubsDisplayAdapter(Context mContext, List<String> mList) {
+    public ClubListAdapter(Context mContext, List<String> clubName, List<String> introduction) {
         this.mContext = mContext;
-        this.mList = mList;
+        this.clubName = clubName;
+        this.introduction = introduction;
     }
 
     // 下面是为点击事件添加的代码
@@ -28,21 +29,19 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
         void onClick(int position);
     }
 
-    MyAdapter.OnItemClickListener onItemClickListener;
+    OnItemClickListener onItemClickListener;
 
-
-    public void setOnItemClickListener(MyAdapter.OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
-    // 上面是为点击事件添加的代码
 
-    class FollowedClubsDisplayViewHolder extends RecyclerView.ViewHolder {
+    class ClubListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout club_list_content;
         private ImageView club_img;
         private TextView club_name;
         private TextView club_intro;
 
-        public FollowedClubsDisplayViewHolder(@NonNull View itemView) {
+        public ClubListViewHolder(@NonNull View itemView) {
             super(itemView);
             club_list_content = itemView.findViewById(R.id.club_list_content);
             club_img = itemView.findViewById(R.id.club_img);
@@ -52,19 +51,20 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
     }
 
     @Override
-    public FollowedClubsDisplayViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.followed_clubs_recycler_item, parent, false);
-        FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder holder = new FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder(itemView);
+    public ClubListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_club_list_recycler, parent, false);
+        ClubListAdapter.ClubListViewHolder holder = new ClubListAdapter.ClubListViewHolder(itemView);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FollowedClubsDisplayAdapter.FollowedClubsDisplayViewHolder holder, int position) {
-        holder.club_name.setText(mList.get(position));
-        holder.club_intro.setText("这是社团" + position + "的简介" + "");
+    public void onBindViewHolder(@NonNull ClubListAdapter.ClubListViewHolder holder, int position) {
+        holder.club_name.setText(clubName.get(position));
+        holder.club_intro.setText(introduction.get(position));
         holder.club_intro.setTag(position);
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);
+
         //自己做item点击
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,8 +74,9 @@ public class FollowedClubsDisplayAdapter extends RecyclerView.Adapter<FollowedCl
             }
         });
     }
+
     @Override
     public int getItemCount() {
-        return mList.size();
+        return clubName.size();
     }
 }

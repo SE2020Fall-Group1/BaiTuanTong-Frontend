@@ -3,44 +3,68 @@
     package="com.example.BaiTuanTong_Frontend">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/test_icon"
+        android:icon="@mipmap/ic_launcher_btt"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HelloWorld"
-        android:networkSecurityConfig="@xml/network_security_config">
-
+        android:theme="@style/Theme.HelloWorld">
+        <activity
+            android:name=".ManageClubsActivity"
+            android:label="ManageClubsActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
+        <activity
+            android:name=".search_result.SearchResultActivity"
+            android:parentActivityName=".home.HomePageActivity" />
         <activity
             android:name=".club.EditClubAdminActivity"
             android:label="EditClubAdminActivity"
-            android:parentActivityName=".club.ClubHomeActivity" />
+            android:parentActivityName=".home.HomePageActivity" />
+        <activity android:name=".GridView.ReleasePostActivity" />
         <activity
             android:name=".club.ClubHomeActivity"
-            android:parentActivityName=".FollowedClubsDisplayActivity"
             android:label="@string/title_activity_club_home"
+            android:parentActivityName=".FollowedClubsDisplayActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity
             android:name=".home.HomePageActivity"
-            android:label="@string/title_activity_home_page" />
+            android:label="@string/title_activity_home_page"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".PostPageActivity" />
         <activity
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
-        <activity android:name=".PostListDisplayActivity" />
-        <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".SystemAdministrator.ManagerHomePage"
             android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".PostContentActivity"
+            android:label="@string/title_activity_post_content"
+            android:theme="@style/Theme.HelloWorld.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.register.RegistActivity" />
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".EditPostActivity"
+            android:parentActivityName=".PostListDisplayActivity" />
+        <activity android:name=".PostListDisplayActivity" />
+        <activity android:name=".DisplayMessageActivity" />
+        <activity android:name=".ui.register.ModifyInformationActivity" />
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

@@ -7,6 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="bargrey">#FBFBFB</color>
+    <color name="backgroundgrey">#EFF3F8</color> <!--背景用的灰色 -->
     <color name="lightcyan">#E0FFFF</color> <!--亮青色 -->
     <color name="powderblue">#B0E0E6</color> <!--粉蓝色 -->
     <color name="lightsteelblue">#B0C4DE</color> <!--亮钢兰色-->
@@ -80,4 +82,7 @@
     <color name="mediumblue">#0000CD</color> <!--中兰色 -->
     <color name="darkblue">#00008B</color> <!--暗蓝色 -->
     <color name="navy">#000080</color> <!--海军色 -->
+    <color name="PekingUnivRed">#8C0000</color> <!--北大红 -->
+    <color name="holo_blue_light">#33B5E5</color>
+    <color name="black_alpha_45">#71000000</color>
 </resources>

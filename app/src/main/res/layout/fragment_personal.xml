@@ -1,47 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/personal_manage"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     tools:context=".home.ui.Personal.PersonalFragment">
 
     <LinearLayout
-        android:id="@+id/personal_manage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="194dp"
-        tools:layout_editor_absoluteY="125dp">
+        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/manage_club"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="管理社团" />
+        <ImageView
+            android:id="@+id/personal_img"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_touxiang" />
 
-        <Button
-            android:id="@+id/follow_club"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/personal_id"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="关注社团" />
-
-        <Button
-            android:id="@+id/collect_post"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="收藏动态" />
-
-        <Button
-            android:id="@+id/configuration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="设置" />
-
-        <Button
-            android:id="@+id/sign_out"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="退出登录" />
+            android:layout_weight="3"
+            android:layout_marginLeft="20dp"
+            android:text="个人用户"
+            android:textSize="25dp"
+            android:textColor="@color/black"
+            android:layout_gravity="center"/>
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/manage_club"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:text="管理社团"
+        android:textColor="@color/black"/>
+
+    <Button
+        android:id="@+id/follow_club"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
+        android:text="关注社团" />
+
+    <Button
+        android:id="@+id/collect_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
+        android:text="收藏动态" />
+    <Button
+        android:id="@+id/configuration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
+        android:text="设置" />
+
+    <Button
+        android:id="@+id/sign_out"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
+        android:text="退出登录" />
+</LinearLayout>

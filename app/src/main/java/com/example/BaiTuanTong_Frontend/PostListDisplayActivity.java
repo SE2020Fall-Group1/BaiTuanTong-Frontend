@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,9 +56,18 @@ public class PostListDisplayActivity extends AppCompatActivity {
             }
         });
     }
-
+/*
     public void sendMessage(int position) {
-        Intent intent = new Intent(this, PostPageActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
+        String message = mList.get(position);
+        intent.putExtra(PAGE_EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+*/
+
+    //稍作修改 直接进入编辑界面！
+    public void sendMessage(int position) {
+        Intent intent = new Intent(this, EditPostActivity.class);
         String message = mList.get(position);
         intent.putExtra(PAGE_EXTRA_MESSAGE, message);
         startActivity(intent);
