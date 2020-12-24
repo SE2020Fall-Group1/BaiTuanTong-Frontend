@@ -232,7 +232,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 for (int i = 0; i < jsonArray.length(); ++i) {
                     JSONObject jsonObjectClubSummary = jsonArray.getJSONObject(i);
                     adapter.addData(i, jsonObjectClubSummary.getString("clubName"),
-                            jsonObjectClubSummary.getString("president"));
+                            jsonObjectClubSummary.getString("president_name"));
                 }
                 break;
             case ADD_CLUB_POST:
