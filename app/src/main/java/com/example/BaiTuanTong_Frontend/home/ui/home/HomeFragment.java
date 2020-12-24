@@ -101,7 +101,7 @@ public class HomeFragment extends Fragment {
             getDataFromGet(SERVERURL + "post/homepage", getResult);
         }
         else if (clickedPosition != -1) {
-            String strPostId = postId.get(clickedPosition).toString();
+            String strPostId = postId.get(+clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
     }

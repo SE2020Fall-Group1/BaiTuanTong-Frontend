@@ -106,7 +106,7 @@ public class FollowedClubsDisplayActivity extends AppCompatActivity {
 
     public void sendMessage(int position) {
         Intent intent = new Intent(this, ClubHomeActivity.class);
-        intent.putExtra("club_id", clubId.get(position));
+        intent.putExtra("clubId", clubId.get(position));
         startActivity(intent);
     }
 

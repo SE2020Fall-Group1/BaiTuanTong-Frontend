@@ -7,6 +7,8 @@
 package com.example.BaiTuanTong_Frontend.club;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,9 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
-import com.example.BaiTuanTong_Frontend.MyAdapter;
-import com.example.BaiTuanTong_Frontend.PostPageActivity;
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
 import com.example.BaiTuanTong_Frontend.widget.CustomEmptyView;
 import com.google.android.material.snackbar.Snackbar;
@@ -89,13 +91,21 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int GETFAIL = 3;
+    private static final int PICTURE = 4;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
 
-    private MyAdapter mMyAdapter;
+    private PostAdapter mMyAdapter;
 
-    private List<String> postList = new ArrayList<>(); //动态列表
+    //private List<String> postList = new ArrayList<>(); //动态列表
+    public List<Integer> postId = new ArrayList<>();        // 动态ID
+    public List<String> title = new ArrayList<>();          // 动态标题
+    public List<String> PostClubName = new ArrayList<>();       // 社团名字
+    public List<String> text = new ArrayList<>();           // 动态内容
+    public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
+    public List<String> commentCnt = new ArrayList<>();     // 动态评论数
+    public List<Integer> PostClubId = new ArrayList<>();        // 社团ID
     private String clubName;
     private String clubInfo;  //社团简介
     private String clubPresident;  //社长
@@ -119,10 +129,14 @@ public class ClubHomeActivity extends AppCompatActivity {
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
                     } catch (JSONException e) {
-                        //refreshComplete();
-                        //TODO 等到前后端对接完成这里应该改成initEmptyView()
+                        initEmptyView();
                         e.printStackTrace();
                     }
+                    break;
+                case PICTURE:
+                    byte[] picture = (byte[])msg.obj;
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                    mCircleImageView.setImageBitmap(bitmap);
                     break;
                 case GETFAIL:
                     initEmptyView();
@@ -146,7 +160,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         mMyAdapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
         mIsRefreshing = false;
-        if(postList.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
+        if(postId.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
             emptyNote.setVisibility(VISIBLE);
             mRecyclerView.setVisibility(GONE);
         }
@@ -163,20 +177,19 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        /*int code = jsonObject.getInt("code");
-        if(code == 403)
-            return;*/
         clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
-        JSONArray jsonArray = jsonObject.getJSONArray("postSummary");
-        for(int i = 0; i < jsonArray.length(); i++){
-            JSONObject postObj = jsonArray.getJSONObject(i);
-            postList.add(postObj.getString("title"));
-            //todo 添加对postSummary中其他两项数据的处理
+        JSONArray postList = jsonObject.getJSONArray("postSummary");
+        for (int i = 0; i < postList.length(); i++) {
+            postId.add(postList.getJSONObject(i).getInt("postId"));
+            title.add(postList.getJSONObject(i).getString("title"));
+            PostClubName.add(postList.getJSONObject(i).getString("clubName"));
+            text.add(postList.getJSONObject(i).getString("text"));
+            likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
+            commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
+            PostClubId.add(postList.getJSONObject(i).getInt("clubId"));
         }
-        Log.e("clubName", clubName);
-        Log.e("clubInfo", clubInfo);
     }
 
     /**
@@ -189,6 +202,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
         mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
+        getPicture(SERVERURL + "static/images/2.jpg");
         //TODO 从后端获取社团图标后更新图标
     }
 
@@ -212,12 +226,19 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     protected void clearData(){
         mIsRefreshing = true;
-        postList.clear();
+        postId.clear();
+        title.clear();
+        PostClubName.clear();
+        text.clear();
+        likeCnt.clear();
+        commentCnt.clear();
+        PostClubId.clear();
     }
 
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);
+        getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     private void initDetailButton() {
@@ -238,18 +259,24 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void initRecycleView(){
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setNestedScrollingEnabled(true);
+        //mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setNestedScrollingEnabled(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mMyAdapter = new MyAdapter(this, postList);
+        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mMyAdapter);
-        mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+        /*mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
                 sendMessage(position);
+            }
+        });*/
+        mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                startPostContentActivity(position);
             }
         });
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
@@ -303,6 +330,29 @@ public class ClubHomeActivity extends AppCompatActivity {
                     Message msg = Message.obtain();
                     msg.what = GETFAIL;
                     getHandler.sendMessage(msg);
+                }
+            }
+        }.start();
+    }
+
+    private void getPicture(String url) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    byte[] result =  response.body().bytes();
+                    Message msg = Message.obtain();
+                    msg.what = PICTURE;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "get picture failed.");
+                    mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
                 }
             }
         }.start();
@@ -398,9 +448,10 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 点击列表中某一项时的处理函数
      * @param position 被点击项的序号
      */
-    public void sendMessage(int position) {
-        Intent intent = new Intent(this, PostPageActivity.class);
-        String message = postList.get(position);
+    private void startPostContentActivity(Integer position){
+        //clickedPosition = position;
+        Intent intent = new Intent(this, PostContentActivity.class);
+        intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 
