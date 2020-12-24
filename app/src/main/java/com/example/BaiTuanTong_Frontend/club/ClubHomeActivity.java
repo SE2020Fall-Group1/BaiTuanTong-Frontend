@@ -363,6 +363,37 @@ public class ClubHomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Okhttp的get请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private String get(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    /**
+     * Okhttp的post请求
+     * @param url 向服务器请求的url
+     * @param json 向服务器发送的json包
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
 
     /**
      * 点击列表中某一项时的处理函数
