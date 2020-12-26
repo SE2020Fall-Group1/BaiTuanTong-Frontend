@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -36,12 +38,30 @@ public class PersonalFragment extends Fragment {
     private TextView tv_username;
     private String username;
     private SharedPreferences shared;
+    private String userId_str;
+    private int userId;
 
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
         shared = getActivity().getSharedPreferences("share", MODE_PRIVATE);
         username = shared.getString("userName","");
+        userId_str = shared.getString("userId","");
+        if (username == ""){
+            Toast.makeText(getActivity(),
+                    "用户名获取失败，请返回上级页面！",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
+        if (userId_str == ""){
+            Toast.makeText(getActivity(),
+                    "用户ID获取失败，请返回上级页面！",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
+        Log.e("userId", userId_str);
+        userId = Integer.parseInt(userId_str);
+        Log.e("userId", "" + userId);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,

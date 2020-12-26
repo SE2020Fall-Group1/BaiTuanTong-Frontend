@@ -288,7 +288,7 @@ public class ReleasePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
-                post_title = myText.getText().toString();
+                post_title = myTitle.getText().toString();
                 post_text = myText.getText().toString();//获取两部分的输入信息。
                 if (post_text.length() == 0)
                 {
