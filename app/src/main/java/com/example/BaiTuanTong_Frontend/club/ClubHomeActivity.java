@@ -121,6 +121,8 @@ public class ClubHomeActivity extends AppCompatActivity {
     private int permission;
     private boolean isFollowed;
 
+    private String userName;
+
     /**
      * 处理get请求与post请求的回调函数
      */
@@ -136,6 +138,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
+                        Log.e("President", clubPresident);
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
                         initFollowButton();
@@ -255,13 +258,15 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_club_home);
-        bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
+        userName = shared.getString("userName", "");
+        loadData();
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_club_home);
+        bind = ButterKnife.bind(this);
 
         initRefreshLayout();
 
@@ -336,6 +341,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
+            clearData();
             loadData();
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -458,15 +464,29 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(permission == 1) {
+        //目前permission似乎有点儿问题，president和普通人一样 就很气，先特判一波儿
+        Log.e("permission", "" + permission);
+        Log.e("presidentname", "" + clubPresident);
+        Log.e("myname", "" + userName);
+        if (userName.equals(clubPresident))
+        {
+            Log.e("debug", "" + "进来了！我是president");
             followClubButton.setVisibility(GONE);
             getMenuInflater().inflate(R.menu.club_home_menu, menu);
-            menu.getItem(1).setVisible(false);
-            menu.getItem(1).setEnabled(false);
         }
-        if(permission == 2){
-            followClubButton.setVisibility(GONE);
-            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+        else
+        {
+            Log.e("debug", "" + "进来了个锤子！我不是president");
+            if (permission == 1) {
+                followClubButton.setVisibility(GONE);
+                getMenuInflater().inflate(R.menu.club_home_menu, menu);
+                menu.getItem(1).setVisible(false);
+                menu.getItem(1).setEnabled(false);
+            }
+            if (permission == 2) {
+                followClubButton.setVisibility(GONE);
+                getMenuInflater().inflate(R.menu.club_home_menu, menu);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
