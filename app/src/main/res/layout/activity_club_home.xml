@@ -27,10 +27,10 @@
 
             <com.example.BaiTuanTong_Frontend.widget.CircleImageView
                 android:id="@+id/toolbar_club_picture"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginRight="3dp"
-                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="0dp"
                 android:src="@drawable/ic_hotbitmapgg_avatar"
                 app:border_color="@color/white"
                 app:border_width="1dp" />
@@ -48,6 +48,18 @@
         </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
+
+    <Button
+        android:id="@+id/follow_club_button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:onClick="followClubButtonClickListener"
+        />
 
     <TextView
         android:id="@+id/get_club_profile"

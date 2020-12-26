@@ -7,6 +7,9 @@
 package com.example.BaiTuanTong_Frontend.club;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,9 +30,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
-import com.example.BaiTuanTong_Frontend.MyAdapter;
-import com.example.BaiTuanTong_Frontend.PostPageActivity;
+import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
 import com.example.BaiTuanTong_Frontend.widget.CustomEmptyView;
 import com.google.android.material.snackbar.Snackbar;
@@ -81,25 +85,41 @@ public class ClubHomeActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwipeRefreshLayout; //下拉刷新布局
     @BindView(R.id.empty_layout)
     CustomEmptyView mCustomEmptyView; //加载失败页面
+    @BindView(R.id.follow_club_button)
+    Button followClubButton; //关注社团按钮
+
+    private Menu mMenu;
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
     private boolean recycleViewInitiated = false;
-
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int GETFAIL = 3;
+    private static final int PICTURE = 4;
+    private static final int FOLLOW = 5;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
-    private MyAdapter mMyAdapter;
 
-    private List<String> postList = new ArrayList<>(); //动态列表
+    private PostAdapter mMyAdapter;
+
+    //private List<String> postList = new ArrayList<>(); //动态列表
+    public List<Integer> postId = new ArrayList<>();        // 动态ID
+    public List<String> title = new ArrayList<>();          // 动态标题
+    public List<String> PostClubName = new ArrayList<>();       // 社团名字
+    public List<String> text = new ArrayList<>();           // 动态内容
+    public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
+    public List<String> commentCnt = new ArrayList<>();     // 动态评论数
+    public List<Integer> PostClubId = new ArrayList<>();        // 社团ID
     private String clubName;
     private String clubInfo;  //社团简介
     private String clubPresident;  //社长
     private int clubId;
+    private String userId;
+    private int permission;
+    private boolean isFollowed;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -118,14 +138,36 @@ public class ClubHomeActivity extends AppCompatActivity {
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
+                        initFollowButton();
                     } catch (JSONException e) {
-                        //refreshComplete();
-                        //TODO 等到前后端对接完成这里应该改成initEmptyView()
+                        initEmptyView();
                         e.printStackTrace();
                     }
                     break;
+                case PICTURE:
+                    byte[] picture = (byte[])msg.obj;
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+                    mCircleImageView.setImageBitmap(bitmap);
+                    return true;
                 case GETFAIL:
                     initEmptyView();
+                    return true;
+                case FOLLOW:
+                    /*JSONObject jsonObject = new JSONObject((String)msg.obj);
+                    int code = jsonObject.getInt("code");
+                    String res = jsonObject.getString("data");
+                    if(code == 400){
+                        Log.e("FollowError", res);
+                        return true;
+                    }*/
+                    String res = (String)msg.obj;
+                    if(res.equals("follow committed")){
+                        isFollowed = true;
+                    }
+                    if(res.equals("follow cancelled")){
+                        isFollowed = false;
+                    }
+                    initFollowButton();
                     return true;
             }
             if(!recycleViewInitiated) { //无论成功与否，第一次必须初始化RecycleView
@@ -146,7 +188,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         mMyAdapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
         mIsRefreshing = false;
-        if(postList.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
+        if(postId.isEmpty()){ //如果动态列表为空,在屏幕中央显示提示信息
             emptyNote.setVisibility(VISIBLE);
             mRecyclerView.setVisibility(GONE);
         }
@@ -163,24 +205,40 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        /*int code = jsonObject.getInt("code");
-        if(code == 403)
-            return;*/
         clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
-        JSONArray jsonArray = jsonObject.getJSONArray("postSummary");
-        for(int i = 0; i < jsonArray.length(); i++){
-            JSONObject postObj = jsonArray.getJSONObject(i);
-            postList.add(postObj.getString("title"));
-            //todo 添加对postSummary中其他两项数据的处理
+        isFollowed = jsonObject.getBoolean("isFollowed");
+        //isFollowed = false;
+        JSONArray postList = jsonObject.getJSONArray("postSummary");
+        for (int i = 0; i < postList.length(); i++) {
+            postId.add(postList.getJSONObject(i).getInt("postId"));
+            title.add(postList.getJSONObject(i).getString("title"));
+            PostClubName.add(postList.getJSONObject(i).getString("clubName"));
+            text.add(postList.getJSONObject(i).getString("text"));
+            likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
+            commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
+            PostClubId.add(postList.getJSONObject(i).getInt("clubId"));
         }
-        Log.e("clubName", clubName);
-        Log.e("clubInfo", clubInfo);
     }
 
+    private void initFollowButton(){
+        if(isFollowed){
+            followClubButton.setText("已关注");
+            followClubButton.setTextColor(getResources().getColor(R.color.deepgrey));
+            followClubButton.setBackgroundColor(getResources().getColor(R.color.lightgrey));
+        }
+        else{
+            followClubButton.setText("＋ 关注");
+            followClubButton.setTextColor(getResources().getColor(R.color.white));
+            followClubButton.setBackgroundColor(getResources().getColor(R.color.cherryred));
+        }
+    }
 
-
+    public void followClubButtonClickListener(View view){
+        Log.e("Click", "follow club button clicked");
+        followClubFromPost(SERVERURL + "club/follow?" + "clubId=" + clubId + "&" + "userId=" + userId);
+    }
     /**
      * 初始化页面上方标题栏
      */
@@ -191,6 +249,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
         mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
+        getPicture(SERVERURL + "static/images/2.jpg");
         //TODO 从后端获取社团图标后更新图标
     }
 
@@ -200,9 +259,11 @@ public class ClubHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_club_home);
         bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
+        permission = getIntent().getIntExtra("permission", 0);
+        SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+        userId = shared.getString("userId", "");
 
         initRefreshLayout();
-        //initEmptyView();
 
         initDetailButton();
 
@@ -214,12 +275,19 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     protected void clearData(){
         mIsRefreshing = true;
-        postList.clear();
+        postId.clear();
+        title.clear();
+        PostClubName.clear();
+        text.clear();
+        likeCnt.clear();
+        commentCnt.clear();
+        PostClubId.clear();
     }
 
 
     protected void loadData(){
-        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);
+        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
+        getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     private void initDetailButton() {
@@ -240,18 +308,24 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void initRecycleView(){
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setNestedScrollingEnabled(true);
+        //mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setNestedScrollingEnabled(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mMyAdapter = new MyAdapter(this, postList);
+        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mMyAdapter);
-        mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+        /*mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
                 sendMessage(position);
+            }
+        });*/
+        mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                startPostContentActivity(position);
             }
         });
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
@@ -295,7 +369,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = get(url);
-                    Log.e("TAG", result);
+                    //Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -305,6 +379,48 @@ public class ClubHomeActivity extends AppCompatActivity {
                     Message msg = Message.obtain();
                     msg.what = GETFAIL;
                     getHandler.sendMessage(msg);
+                }
+            }
+        }.start();
+    }
+
+    private void getPicture(String url) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    byte[] result =  response.body().bytes();
+                    Message msg = Message.obtain();
+                    msg.what = PICTURE;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "get picture failed.");
+                }
+            }
+        }.start();
+    }
+
+    private void followClubFromPost(String url) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    String json = "{\"userId\":" + userId + ",\"clubId\":" + clubId + "}";
+                    String result = post(url, json);
+                    Log.e("follow club response", result);
+                    Message msg = Message.obtain();
+                    msg.what = FOLLOW;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "follow failed.");
                 }
             }
         }.start();
@@ -332,14 +448,35 @@ public class ClubHomeActivity extends AppCompatActivity {
         }.start();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        mMenu = menu;
+        return super.onPrepareOptionsMenu(menu);
+    }
     /**
      *初始化右上角菜单按钮
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.club_home_menu, menu);
+        if(permission == 1) {
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(1).setEnabled(false);
+        }
+        if(permission == 2){
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
+
+    /*private void hideMenu() {
+        for(int i = 0; i < mMenu.size(); i++){
+            mMenu.getItem().setVisible(false);
+            mMenu.getItem().setEnabled(false);
+        }
+    }*/
 
     /**
      *菜单中按钮被点击时的回调函数
@@ -362,6 +499,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     /**
      * Okhttp的get请求
@@ -399,9 +537,10 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 点击列表中某一项时的处理函数
      * @param position 被点击项的序号
      */
-    public void sendMessage(int position) {
-        Intent intent = new Intent(this, PostPageActivity.class);
-        String message = postList.get(position);
+    private void startPostContentActivity(Integer position){
+        //clickedPosition = position;
+        Intent intent = new Intent(this, PostContentActivity.class);
+        intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 

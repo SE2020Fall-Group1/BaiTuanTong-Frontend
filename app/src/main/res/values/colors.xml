@@ -33,6 +33,7 @@
     <color name="skyblue">#87CEEB</color> <!--天蓝色 -->
     <color name="gray">#808080</color> <!--灰色 -->
     <color name="grey">#808080</color> <!--灰色 -->
+    <color name="lightgrey">#E0E0E0</color> <!--灰色 -->
     <color name="olive">#808000</color> <!--橄榄色 -->
     <color name="purple">#800080</color> <!--紫色 -->
     <color name="maroon">#800000</color> <!--粟色 -->
@@ -48,6 +49,7 @@
     <color name="slateblue">#6A5ACD</color> <!--石蓝色 -->
     <color name="dimgray">#696969</color> <!--暗灰色 -->
     <color name="dimgrey">#696969</color> <!--暗灰色 -->
+    <color name="deepgrey">#595959</color> <!--深灰色 -->
     <color name="mediumaquamarine">#66CDAA</color> <!--中绿色 -->
     <color name="cornflowerblue">#6495ED</color> <!--菊兰色 -->
     <color name="cadetblue">#5F9EA0</color> <!--军兰色 -->
@@ -85,4 +87,5 @@
     <color name="PekingUnivRed">#8C0000</color> <!--北大红 -->
     <color name="holo_blue_light">#33B5E5</color>
     <color name="black_alpha_45">#71000000</color>
+    <color name="cherryred">#FB7299</color>
 </resources>
