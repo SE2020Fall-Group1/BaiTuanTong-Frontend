@@ -1,3 +1,8 @@
+/*
+发布动态
+目前尚未实现和图片有关的工程。
+
+ */
 package com.example.BaiTuanTong_Frontend.GridView;
 
 import androidx.annotation.NonNull;
@@ -48,6 +53,8 @@ public class ReleasePostActivity extends AppCompatActivity {
     private String post_title;
     private String post_text;
 
+    private int clubId;
+
     //以下为json和okhttp部分！
 
     public static final MediaType JSON
@@ -71,7 +78,7 @@ public class ReleasePostActivity extends AppCompatActivity {
             //super.handleMessage(msg);
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
-                case GET://know undefined
+                case GET://not used in this page
 
                     JSONObject jsonObject = null;
                     try {
@@ -94,7 +101,9 @@ public class ReleasePostActivity extends AppCompatActivity {
                     //   club_profile.setText((String)msg.obj);
                     //   adminList.
                     break;
-                case POST:
+                case POST://posting result
+                    Log.e("POST_RES", (String) msg.obj);
+                    //300:fail, 200:success
                     //club_profile.setText((String)msg.obj);
                     try {
                         parseJsonPacket((String)msg.obj);
@@ -103,7 +112,7 @@ public class ReleasePostActivity extends AppCompatActivity {
                                     "success",
                                     Toast.LENGTH_SHORT).show();
                         }
-                        else if (code == 400){
+                        else if (code == 300){
                             Toast.makeText(getApplicationContext(),
                                     data,
                                     Toast.LENGTH_SHORT).show();
@@ -187,7 +196,7 @@ public class ReleasePostActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //json用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
@@ -248,6 +257,13 @@ public class ReleasePostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_post);
+        clubId = getIntent().getIntExtra("clubId", -1);
+        if (clubId == -1)//error detected
+        {
+            Toast.makeText(getApplicationContext(),
+                    "社团获取出现问题，请返回上级页面！",
+                    Toast.LENGTH_LONG).show();
+        }
 
 //        getActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
@@ -274,6 +290,36 @@ public class ReleasePostActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
                 post_title = myText.getText().toString();
                 post_text = myText.getText().toString();//获取两部分的输入信息。
+                if (post_text.length() == 0)
+                {
+                    Toast.makeText(getApplicationContext(),
+                            "动态内容不能为空！",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (post_title.length() == 0)
+                {
+                    Toast.makeText(getApplicationContext(),
+                            "动态标题不能为空！",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //以下为okhttp方法。
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("clubId", clubId);
+                    Log.e("clubId", ""+clubId);
+                    obj.put("title", post_title);
+                    //   obj.put("userId", 4);
+                    Log.e("title", post_title);
+                    obj.put("text", post_text);
+                    Log.e("text", post_text);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("post context json", obj.toString());
+                getDataFromPost(SERVERURL + "post/release", obj.toString());
 
                 ReleasePostActivity.this.finish();
             }

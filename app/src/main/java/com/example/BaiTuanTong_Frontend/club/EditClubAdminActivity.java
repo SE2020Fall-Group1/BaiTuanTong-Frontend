@@ -131,6 +131,9 @@ public class EditClubAdminActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject(json);
         code = jsonObject.getInt("code");
         data = jsonObject.getString("data");
+        Log.e("code", ""+ code);
+        Log.e("data", data);
+
     }
 
 
@@ -349,6 +352,9 @@ public class EditClubAdminActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Toast.makeText(getApplicationContext(),
+                        "删除完成！",
+                        Toast.LENGTH_SHORT).show();
                 getDataFromPost(SERVERURL + "club/admin/delete", obj.toString());
                 adminList.clear();
                 adminIdList.clear();

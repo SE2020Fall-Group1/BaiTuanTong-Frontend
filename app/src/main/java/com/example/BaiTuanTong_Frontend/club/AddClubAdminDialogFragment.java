@@ -33,9 +33,19 @@ public class AddClubAdminDialogFragment extends DialogFragment {
         add_admin_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
+            //    Toast.makeText(view.getContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
                 //这里传递文本框的数据。
                 newAdminName = (EditText)view.findViewById(R.id.editText1);
+                if (newAdminName.length() == 0)
+                {
+                    Toast.makeText(view.getContext(),
+                            "添加的管理员名不能为空！",
+                            Toast.LENGTH_SHORT).show();
+                    return ;
+                }
+                Toast.makeText(view.getContext(),
+                        "添加请求已发送！",
+                        Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent();
                 intent.putExtra("adminName", newAdminName.getText().toString());
                 ((EditClubAdminActivity)getActivity()).onActivityResult(
