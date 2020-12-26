@@ -80,8 +80,6 @@ public class ManageClubsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_clubs);
         shared = this.getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
-        // 为了测试我需要拿到管理了社团的人的userId
-        userId = "2";
 
         Intent intent = getIntent();
 
