@@ -7,6 +7,7 @@
 package com.example.BaiTuanTong_Frontend.club;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -83,6 +85,10 @@ public class ClubHomeActivity extends AppCompatActivity {
     SwipeRefreshLayout mSwipeRefreshLayout; //下拉刷新布局
     @BindView(R.id.empty_layout)
     CustomEmptyView mCustomEmptyView; //加载失败页面
+    @BindView(R.id.follow_club_button)
+    Button followClubButton; //关注社团按钮
+
+    private Menu mMenu;
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
@@ -92,6 +98,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int POST = 2;
     private static final int GETFAIL = 3;
     private static final int PICTURE = 4;
+    private static final int FOLLOW = 5;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
@@ -110,6 +117,9 @@ public class ClubHomeActivity extends AppCompatActivity {
     private String clubInfo;  //社团简介
     private String clubPresident;  //社长
     private int clubId;
+    private String userId;
+    private int permission;
+    private boolean isFollowed;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -128,6 +138,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
+                        initFollowButton();
                     } catch (JSONException e) {
                         initEmptyView();
                         e.printStackTrace();
@@ -137,9 +148,26 @@ public class ClubHomeActivity extends AppCompatActivity {
                     byte[] picture = (byte[])msg.obj;
                     Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
                     mCircleImageView.setImageBitmap(bitmap);
-                    break;
+                    return true;
                 case GETFAIL:
                     initEmptyView();
+                    return true;
+                case FOLLOW:
+                    /*JSONObject jsonObject = new JSONObject((String)msg.obj);
+                    int code = jsonObject.getInt("code");
+                    String res = jsonObject.getString("data");
+                    if(code == 400){
+                        Log.e("FollowError", res);
+                        return true;
+                    }*/
+                    String res = (String)msg.obj;
+                    if(res.equals("follow committed")){
+                        isFollowed = true;
+                    }
+                    if(res.equals("follow cancelled")){
+                        isFollowed = false;
+                    }
+                    initFollowButton();
                     return true;
             }
             if(!recycleViewInitiated) { //无论成功与否，第一次必须初始化RecycleView
@@ -180,6 +208,8 @@ public class ClubHomeActivity extends AppCompatActivity {
         clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
+        isFollowed = jsonObject.getBoolean("isFollowed");
+        //isFollowed = false;
         JSONArray postList = jsonObject.getJSONArray("postSummary");
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
@@ -192,6 +222,23 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
     }
 
+    private void initFollowButton(){
+        if(isFollowed){
+            followClubButton.setText("已关注");
+            followClubButton.setTextColor(getResources().getColor(R.color.deepgrey));
+            followClubButton.setBackgroundColor(getResources().getColor(R.color.lightgrey));
+        }
+        else{
+            followClubButton.setText("＋ 关注");
+            followClubButton.setTextColor(getResources().getColor(R.color.white));
+            followClubButton.setBackgroundColor(getResources().getColor(R.color.cherryred));
+        }
+    }
+
+    public void followClubButtonClickListener(View view){
+        Log.e("Click", "follow club button clicked");
+        followClubFromPost(SERVERURL + "club/follow?" + "clubId=" + clubId + "&" + "userId=" + userId);
+    }
     /**
      * 初始化页面上方标题栏
      */
@@ -212,9 +259,11 @@ public class ClubHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_club_home);
         bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
+        permission = getIntent().getIntExtra("permission", 0);
+        SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+        userId = shared.getString("userId", "");
 
         initRefreshLayout();
-        //initEmptyView();
 
         initDetailButton();
 
@@ -237,7 +286,7 @@ public class ClubHomeActivity extends AppCompatActivity {
 
 
     protected void loadData(){
-        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId);
+        getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
         getPicture(SERVERURL + "static/images/2.jpg");
     }
 
@@ -320,7 +369,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = get(url);
-                    Log.e("TAG", result);
+                    //Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -352,7 +401,26 @@ public class ClubHomeActivity extends AppCompatActivity {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get picture failed.");
-                    mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
+                }
+            }
+        }.start();
+    }
+
+    private void followClubFromPost(String url) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    String json = "{\"userId\":" + userId + ",\"clubId\":" + clubId + "}";
+                    String result = post(url, json);
+                    Log.e("follow club response", result);
+                    Message msg = Message.obtain();
+                    msg.what = FOLLOW;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "follow failed.");
                 }
             }
         }.start();
@@ -380,14 +448,35 @@ public class ClubHomeActivity extends AppCompatActivity {
         }.start();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        mMenu = menu;
+        return super.onPrepareOptionsMenu(menu);
+    }
     /**
      *初始化右上角菜单按钮
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.club_home_menu, menu);
+        if(permission == 1) {
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(1).setEnabled(false);
+        }
+        if(permission == 2){
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
+
+    /*private void hideMenu() {
+        for(int i = 0; i < mMenu.size(); i++){
+            mMenu.getItem().setVisible(false);
+            mMenu.getItem().setEnabled(false);
+        }
+    }*/
 
     /**
      *菜单中按钮被点击时的回调函数

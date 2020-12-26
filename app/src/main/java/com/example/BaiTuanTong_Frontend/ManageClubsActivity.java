@@ -112,6 +112,7 @@ public class ManageClubsActivity extends AppCompatActivity {
     public void sendMessage(int position) {
         Intent intent = new Intent(this, ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
+        intent.putExtra("permission", 1);
         startActivity(intent);
     }
 

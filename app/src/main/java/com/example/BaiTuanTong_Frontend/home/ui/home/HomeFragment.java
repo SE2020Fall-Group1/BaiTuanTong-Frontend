@@ -143,6 +143,7 @@ public class HomeFragment extends Fragment {
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
+        intent.putExtra("permission", 0);
         startActivity(intent);
     }
     // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
