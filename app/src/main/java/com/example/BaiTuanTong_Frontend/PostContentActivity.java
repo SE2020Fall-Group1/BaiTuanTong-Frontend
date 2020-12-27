@@ -88,6 +88,7 @@ public class PostContentActivity extends AppCompatActivity {
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
 
                         Log.e("title",title);
+                        Log.e("like",String.valueOf(isliked));
                         //设置标题，动态内容
                         toolBarLayout.setTitle(title);
                         contentTextView.setText(content);
@@ -106,9 +107,23 @@ public class PostContentActivity extends AppCompatActivity {
                         commentListView.addHeaderView(new ViewStub(PostContentActivity.this));
                         commentAdapter = new CommentAdapter(PostContentActivity.this, commentList);
                         commentListView.setAdapter(commentAdapter);
+
+                        //点亮图标
+                        if(isliked) {
+                            Log.e("is!","yes!");
+                            PostContentActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("like", String.valueOf(isliked));
+                                    likeButton.setOnClickListener(null);
+                                    likeButton.performClick();
+                                    likeButton.setOnClickListener(new MyOnClickListener());
+                                }
+                            });
+                        }
+
                         break;
                     case likeMsg:
-
 
                         String result = (String)msg.obj;
                         if(result.equals("success"))
@@ -121,9 +136,8 @@ public class PostContentActivity extends AppCompatActivity {
                             {
                                 likeCnt--;
                             }
-                            likeButtonText.setText("点赞（"+Integer.toString(likeCnt)+"）");
+                            likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
                         }
-                        getDataFromGet(getUrl, getContentMsg);
                         break;
                 }
 
@@ -250,8 +264,6 @@ public class PostContentActivity extends AppCompatActivity {
         //申请动态内容
         getUrl = viewUrl + "?userId="+userId+"&postId="+postId;
         getDataFromGet(getUrl, getContentMsg);
-        if(isliked)
-            likeButton.performClick();
 
         //创建dialogFragment
         commentDialogFragment = new CommentDialogFragment();
