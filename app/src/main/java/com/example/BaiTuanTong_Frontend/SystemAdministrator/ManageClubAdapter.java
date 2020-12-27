@@ -82,7 +82,7 @@ public class ManageClubAdapter extends RecyclerView.Adapter<ManageClubAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.tv.setText(mClubData.get(position).getClubName() + "\n" + mClubData.get(position).getAdminName());
+        holder.tv.setText("社团名称：" + mClubData.get(position).getClubName() + "\n\n总管理员：" + mClubData.get(position).getAdminName());
 
         //自己做item点击
         if (mOnItemClickListener != null) {
