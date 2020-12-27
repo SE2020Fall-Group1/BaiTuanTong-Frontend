@@ -93,7 +93,7 @@ public class PostContentActivity extends AppCompatActivity {
                         toolBarLayout.setTitle(title);
                         contentTextView.setText(content);
                         likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
-                        commentButton.setText("点赞("+Integer.toString(commentJSONArray.length())+")");
+                        commentButton.setText("评论("+Integer.toString(commentJSONArray.length())+")");
                         commentList.clear();
                         //创建一个评论列表
                         for(int i=0;i<commentJSONArray.length();i++) {
