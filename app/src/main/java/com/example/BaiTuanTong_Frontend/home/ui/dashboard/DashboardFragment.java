@@ -110,12 +110,14 @@ public class DashboardFragment extends Fragment {
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
+        intent.putExtra("permission", 0);
         startActivity(intent);
     }
     // 跳转到动态内容界面，传递参数post_id
-    private void startPostContentActivity(Integer post_id){
+    private void startPostContentActivity(Integer position){
+        clickedPosition = position;
         Intent intent = new Intent(getActivity(),PostContentActivity.class);
-        intent.putExtra("postId", post_id);
+        intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
     // 初始化线性布局的循环视图
@@ -146,8 +148,8 @@ public class DashboardFragment extends Fragment {
     }
     // 在获得GET请求返回的数据后更新点赞数、评论数和点赞状态
     private void updatePostInfo() {
-        View view = rv_post_list.getChildAt(clickedPosition);
-        if (null != rv_post_list.getChildViewHolder(view)){
+        View view = rv_post_list.getLayoutManager().findViewByPosition(clickedPosition);
+        if (null != view && null != rv_post_list.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
                     (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
             viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));
