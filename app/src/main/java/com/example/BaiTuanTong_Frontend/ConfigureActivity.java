@@ -1,11 +1,17 @@
 package com.example.BaiTuanTong_Frontend;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,8 +19,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,9 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -38,8 +42,6 @@ import okhttp3.Response;
 
 public class ConfigureActivity extends AppCompatActivity {
 
-    public static final MediaType JSON
-            = MediaType.get("application/json; charset=utf-8");
     private ImageView imgShow = null;
     private String imgPath = null;
     private final int IMAGE_CODE = 0;
@@ -59,6 +61,7 @@ public class ConfigureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure);
+        checkStoragePermissions(this);
         imgShow = findViewById(R.id.iv_touxiang);
         btn_modify_touxiang = findViewById(R.id.btn_modify_touxiang);
         btn_modify_touxiang.setOnClickListener(new View.OnClickListener() {
@@ -69,13 +72,40 @@ public class ConfigureActivity extends AppCompatActivity {
         });
     }
 
-    private void selectImage() {
+    private static final int REQUEST_EXTERNAL_STORAGE=1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    public static void checkStoragePermissions(Activity activity) {
+        try {
+            //监测是否有写的权限
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int permission1 = ActivityCompat.checkSelfPermission(activity,
+                    Manifest.permission.READ_EXTERNAL_STORAGE);
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                //没有写的权限，去申请写的权限，或弹出对话框
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+            }
+            if (permission1 != PackageManager.PERMISSION_GRANTED) {
+                //没有读的权限，去申请写的权限，或弹出对话框
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+            }
+
+        } catch (Exception e) {
+            Log.e("exception", "read");
+            e.printStackTrace();
+        }
+    }
+        private void selectImage() {
         // TODO Auto-generated method stub
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;
         if (isKitKatO) {
+            Log.e("123","1");
             getAlbum = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         } else {
+            Log.e("123","2");
             getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
         }
         getAlbum.setType(IMAGE_TYPE);
@@ -85,6 +115,7 @@ public class ConfigureActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -99,69 +130,63 @@ public class ConfigureActivity extends AppCompatActivity {
         ContentResolver resolver = getContentResolver();
         if (requestCode == IMAGE_CODE) {
             try {
-
                 Uri originalUri = data.getData();        //获得图片的uri
-                Uri bitmapUri = originalUri;
-                imgPath = bitmapUri.getPath();
-                Log.e("uri", imgPath);
-
-                //isSelectPic = true;
+                Log.e("uri authority", originalUri.getAuthority());
+                Log.e("uri scheme:", originalUri.getScheme());
                 bm = MediaStore.Images.Media.getBitmap(resolver, originalUri);
                 //显得到bitmap图片
                 imgShow.setImageBitmap(bm);
 
+                // 处理图像，获取路径
+                handleImageOnKitKat(data);
+                Log.e("img path", imgPath);
                 // 发送给后端
-                //getDataFromPostImg(SERVERURL+"user/image/upload");
-
-                try {
-                    String img_base64 = bitmapToBase64(bm);
-                    JSONObject json = new JSONObject();
-                    SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
-                    String userId = shared.getString("userId", "");
-                    json.put("userId", userId);
-                    json.put("image", img_base64);
-                    String jsondata = json.toString();
-                    uploadImageFromPost(SERVERURL + "user/image/upload", jsondata);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                getDataFromPostImg(SERVERURL+"user/image/upload");
 
             } catch (IOException e) {
                 Log.e("TAG-->Error", e.toString());
             }
         }
     }
-
-    public static String bitmapToBase64(Bitmap bitmap) {
-
-        String result = null;
-        ByteArrayOutputStream baos = null;
-        try {
-            if (bitmap != null) {
-                baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-
-                baos.flush();
-                baos.close();
-
-                byte[] bitmapBytes = baos.toByteArray();
-                result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        //通过Uri和selection 来获取真实的图片路径
+        Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
+        if(cursor!=null){
+            Log.e("uri", uri.getPath());
+            int imagenum = cursor.getCount();
+            Log.e("imagenum", String.valueOf(imagenum));
+            if (cursor.moveToFirst()){
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (baos != null) {
-                    baos.flush();
-                    baos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            cursor.close();
         }
-        return result;
+        Log.e("path", path);
+        return path;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void handleImageOnKitKat(Intent data){
+        Log.e("handleImageOnKitKat", "handleImageOnKitKat: " );
+        Uri uri = data.getData();
+        if(DocumentsContract.isDocumentUri(this,uri)){
+            String docId = DocumentsContract.getDocumentId(uri);
+            if("com.android.providers.media.documents".equals(uri.getAuthority())){
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imgPath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())){
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
+                imgPath = getImagePath(contentUri,null);
+            }else if("content".equalsIgnoreCase(uri.getScheme())){
+                //如果是content类型的Uri，则使用普通方式处理
+                imgPath = getImagePath(uri,null);
+            }else if ("file".equalsIgnoreCase(uri.getScheme())){
+                //如果是file类型的Uri,直接获取图片路径即可
+                imgPath = uri.getPath();
+            }
+        }
+    }
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
@@ -218,8 +243,8 @@ public class ConfigureActivity extends AppCompatActivity {
                     msg.obj = result;
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
-                    IOException.printStackTrace();
-                    Log.e("post fail", IOException.toString());
+                    Log.e("TAG", "post failed.");
+                    Log.e("Exception: ", IOException.getMessage());
                 }
             }
         }.start();
@@ -250,55 +275,21 @@ public class ConfigureActivity extends AppCompatActivity {
         // 创建发送头像请求
         Log.e("path",path);
         File file = new File(path);
-        RequestBody fileBody = RequestBody.create(MEDIA_TYPE_PNG, file);
+        if (file == null)
+            Log.e("file create wrong", "sad");
+        Log.e("file name:", file.getName());
+        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)
-                .addFormDataPart("file", path, fileBody)
+                .addFormDataPart("file", file.getName(), fileBody)
                 .build();
-        //RequestBody body = RequestBody.create(json, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
-        }
-    }
-
-
-    private void uploadImageFromPost(String url, String json) {
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    String result = post(url, json); //json用于上传数据，目前不需要
-                    Message msg = Message.obtain();
-                    msg.what = POST_IMG;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
-                } catch (java.io.IOException IOException) {
-                    Log.e("Fail", "upload failed.");
-                }
-            }
-        }.start();
-    }
-
-    private String post(String url, String json) throws IOException {
-        Log.e("post", "url: " + url);
-        Log.e("post", "json: " + json);
-        RequestBody body = RequestBody.create(json, JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .addHeader("Connection", "close")
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        } catch (Exception e){
-            e.printStackTrace();
-            return e.toString();
         }
     }
 }

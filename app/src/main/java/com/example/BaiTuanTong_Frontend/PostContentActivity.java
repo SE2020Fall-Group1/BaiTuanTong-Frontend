@@ -68,6 +68,7 @@ public class PostContentActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     public static final int getContentMsg = 0;
     public static final int likeMsg = 1;
+    public static final int collectMsg = 2;
 
     //申请动态内容
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -88,10 +89,12 @@ public class PostContentActivity extends AppCompatActivity {
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
 
                         Log.e("title",title);
+                        Log.e("like",String.valueOf(isliked));
                         //设置标题，动态内容
                         toolBarLayout.setTitle(title);
                         contentTextView.setText(content);
                         likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
+                        commentButton.setText("评论("+Integer.toString(commentJSONArray.length())+")");
                         commentList.clear();
                         //创建一个评论列表
                         for(int i=0;i<commentJSONArray.length();i++) {
@@ -106,9 +109,23 @@ public class PostContentActivity extends AppCompatActivity {
                         commentListView.addHeaderView(new ViewStub(PostContentActivity.this));
                         commentAdapter = new CommentAdapter(PostContentActivity.this, commentList);
                         commentListView.setAdapter(commentAdapter);
+
+                        //点亮图标
+                        if(isliked) {
+                            Log.e("is!","yes!");
+                            PostContentActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("like", String.valueOf(isliked));
+                                    likeButton.setOnClickListener(null);
+                                    likeButton.performClick();
+                                    likeButton.setOnClickListener(new MyOnClickListener());
+                                }
+                            });
+                        }
+
                         break;
                     case likeMsg:
-
 
                         String result = (String)msg.obj;
                         if(result.equals("success"))
@@ -121,10 +138,12 @@ public class PostContentActivity extends AppCompatActivity {
                             {
                                 likeCnt--;
                             }
-                            likeButtonText.setText("点赞（"+Integer.toString(likeCnt)+"）");
+                            likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
                         }
-                        getDataFromGet(getUrl, getContentMsg);
                         break;
+                    case collectMsg:
+                        break;
+                    default:
                 }
 
             } catch (JSONException e) {
@@ -250,8 +269,6 @@ public class PostContentActivity extends AppCompatActivity {
         //申请动态内容
         getUrl = viewUrl + "?userId="+userId+"&postId="+postId;
         getDataFromGet(getUrl, getContentMsg);
-        if(isliked)
-            likeButton.performClick();
 
         //创建dialogFragment
         commentDialogFragment = new CommentDialogFragment();
@@ -261,6 +278,7 @@ public class PostContentActivity extends AppCompatActivity {
         likeButtonText.setOnClickListener(new MyOnClickListener());
         commentButton.setOnClickListener(new MyOnClickListener());
         commentButtonImage.setOnClickListener(new MyOnClickListener());
+        collectButton.setOnClickListener(new MyOnClickListener());
         collectButtonText.setOnClickListener(new MyOnClickListener());
         toolbar.setNavigationOnClickListener(new MyOnClickListener());
     }
@@ -274,14 +292,14 @@ public class PostContentActivity extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.like_button:
-                    JSONObject jsonObject = new JSONObject();
+                    JSONObject jsonObjectLike = new JSONObject();
                     try {
-                        jsonObject.put("userId", userId);
-                        jsonObject.put("postId", postId);
+                        jsonObjectLike.put("userId", userId);
+                        jsonObjectLike.put("postId", postId);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    getDataFromPost(viewUrl+"/like", jsonObject.toString(), likeMsg);
+                    getDataFromPost(viewUrl+"/like", jsonObjectLike.toString(), likeMsg);
                     break;
                 case R.id.like_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
@@ -301,6 +319,16 @@ public class PostContentActivity extends AppCompatActivity {
                             commentButton.performClick();
                         }
                     });
+                    break;
+                case R.id.collect_button:
+                    JSONObject jsonObjectCollect = new JSONObject();
+                    try {
+                        jsonObjectCollect.put("userId", userId);
+                        jsonObjectCollect.put("postId", postId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    getDataFromPost(viewUrl+"/collect", jsonObjectCollect.toString(), collectMsg);
                     break;
                 case R.id.collect_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {

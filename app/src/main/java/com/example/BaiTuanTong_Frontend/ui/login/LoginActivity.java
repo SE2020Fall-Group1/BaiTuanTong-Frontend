@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.SystemAdministrator.ManagerHomePage;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistActivity;
 import com.google.gson.Gson;
@@ -64,6 +65,10 @@ public class LoginActivity extends AppCompatActivity {
                     String msgBody = (String) msg.obj;
                     if (msgBody.equals("wrong password") || msgBody.equals("wrong username")) {
                         Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                    } else if (msgBody.equals("system administrator login")) {
+                        startManagerHomePage();
+                        String welcomeMessage = "欢迎！管理员";
+                        Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
                     } else {
                         JSONObject jsonObject = new JSONObject((String) msgBody);
                         String userId = jsonObject.getString("userId");
@@ -208,6 +213,13 @@ public class LoginActivity extends AppCompatActivity {
     // 转到HomePageActivity
     private void startHomePage(){
         Intent intent = new Intent(this, HomePageActivity.class);
+        startActivity(intent);
+        this.finish();
+    }
+
+    //转到ManageHomePage
+    private void startManagerHomePage(){
+        Intent intent = new Intent(this, ManagerHomePage.class);
         startActivity(intent);
         this.finish();
     }

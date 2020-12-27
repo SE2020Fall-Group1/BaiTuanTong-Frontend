@@ -2,4 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/add"
         android:title="添加社团"/>
+    <item android:id="@+id/logout"
+        android:title="退出登录"/>
 </menu>
