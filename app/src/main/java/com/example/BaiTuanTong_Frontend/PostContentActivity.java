@@ -68,6 +68,7 @@ public class PostContentActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     public static final int getContentMsg = 0;
     public static final int likeMsg = 1;
+    public static final int collectMsg = 2;
 
     //申请动态内容
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -140,6 +141,9 @@ public class PostContentActivity extends AppCompatActivity {
                             likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
                         }
                         break;
+                    case collectMsg:
+                        break;
+                    default:
                 }
 
             } catch (JSONException e) {
@@ -287,14 +291,14 @@ public class PostContentActivity extends AppCompatActivity {
                     finish();
                     break;
                 case R.id.like_button:
-                    JSONObject jsonObject = new JSONObject();
+                    JSONObject jsonObjectLike = new JSONObject();
                     try {
-                        jsonObject.put("userId", userId);
-                        jsonObject.put("postId", postId);
+                        jsonObjectLike.put("userId", userId);
+                        jsonObjectLike.put("postId", postId);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    getDataFromPost(viewUrl+"/like", jsonObject.toString(), likeMsg);
+                    getDataFromPost(viewUrl+"/like", jsonObjectLike.toString(), likeMsg);
                     break;
                 case R.id.like_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
@@ -314,6 +318,16 @@ public class PostContentActivity extends AppCompatActivity {
                             commentButton.performClick();
                         }
                     });
+                    break;
+                case R.id.collect_button:
+                    JSONObject jsonObjectCollect = new JSONObject();
+                    try {
+                        jsonObjectCollect.put("userId", userId);
+                        jsonObjectCollect.put("postId", postId);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    getDataFromPost(viewUrl+"/collect", jsonObjectCollect.toString(), collectMsg);
                     break;
                 case R.id.collect_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
