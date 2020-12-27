@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
+        <activity android:name=".ConfigureActivity"></activity>
         <activity
             android:name=".ManageClubsActivity"
             android:label="ManageClubsActivity"
@@ -41,8 +42,9 @@
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
-        <activity android:name=".SystemAdministrator.ManagerHomePage"
-            android:theme="@style/Theme.HelloWorld.NoActionBar"></activity>
+        <activity
+            android:name=".SystemAdministrator.ManagerHomePage"
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
         <activity
             android:name=".PostContentActivity"
             android:label="@string/title_activity_post_content"
@@ -64,7 +66,7 @@
         <activity android:name=".PostListDisplayActivity" />
         <activity android:name=".DisplayMessageActivity" />
         <activity android:name=".ui.register.ModifyInformationActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.BaiTuanTong_Frontend.ConfigureActivity;
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.ManageClubsActivity;
 import com.example.BaiTuanTong_Frontend.PostListDisplayActivity;
@@ -74,6 +75,7 @@ public class PersonalFragment extends Fragment {
         followClubButton = (Button)root.findViewById(R.id.follow_club);
         signOutButton = (Button)root.findViewById((R.id.sign_out));
         collectedPostButton = (Button)root.findViewById(R.id.collect_post);
+        configureButton = (Button)root.findViewById(R.id.configuration);
         tv_username = (TextView)root.findViewById(R.id.personal_id);
         tv_username.setText(username);
         return root;
@@ -112,6 +114,13 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PostListDisplayActivity.class);
+                startActivity(intent);
+            }
+        });
+        configureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ConfigureActivity.class);
                 startActivity(intent);
             }
         });

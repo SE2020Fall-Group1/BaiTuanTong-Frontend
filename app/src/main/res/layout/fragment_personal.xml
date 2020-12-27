@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.example.BaiTuanTong_Frontend.widget.CircleImageView
             android:id="@+id/personal_img"
             android:layout_width="0dp"
             android:layout_height="80dp"
