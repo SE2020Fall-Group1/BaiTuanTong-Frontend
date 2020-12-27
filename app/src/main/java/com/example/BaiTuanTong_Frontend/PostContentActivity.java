@@ -278,6 +278,7 @@ public class PostContentActivity extends AppCompatActivity {
         likeButtonText.setOnClickListener(new MyOnClickListener());
         commentButton.setOnClickListener(new MyOnClickListener());
         commentButtonImage.setOnClickListener(new MyOnClickListener());
+        collectButton.setOnClickListener(new MyOnClickListener());
         collectButtonText.setOnClickListener(new MyOnClickListener());
         toolbar.setNavigationOnClickListener(new MyOnClickListener());
     }
