@@ -32,6 +32,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
+import com.example.BaiTuanTong_Frontend.data.SetClubinfoDialogFragment;
 import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
 import com.example.BaiTuanTong_Frontend.widget.CustomEmptyView;
@@ -89,6 +90,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     Button followClubButton; //关注社团按钮
 
     private Menu mMenu;
+    private SetClubinfoDialogFragment setClubinfoDialogFragment;
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
@@ -99,13 +101,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GETFAIL = 3;
     private static final int PICTURE = 4;
     private static final int FOLLOW = 5;
+    private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
 
     private PostAdapter mMyAdapter;
 
-    //private List<String> postList = new ArrayList<>(); //动态列表
     public List<Integer> postId = new ArrayList<>();        // 动态ID
     public List<String> title = new ArrayList<>();          // 动态标题
     public List<String> PostClubName = new ArrayList<>();       // 社团名字
@@ -114,9 +116,9 @@ public class ClubHomeActivity extends AppCompatActivity {
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> PostClubId = new ArrayList<>();        // 社团ID
     private String clubName;
-    private String clubInfo;  //社团简介
+    public String clubInfo;  //社团简介
     private String clubPresident;  //社长
-    private int clubId;
+    public int clubId;
     private String userId;
     private int permission;
     private boolean isFollowed;
@@ -142,6 +144,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
                         initFollowButton();
+                        retry_time = 0;
                     } catch (JSONException e) {
                         initEmptyView();
                         e.printStackTrace();
@@ -149,20 +152,22 @@ public class ClubHomeActivity extends AppCompatActivity {
                     break;
                 case PICTURE:
                     byte[] picture = (byte[])msg.obj;
+                    Log.e("Picture", picture.toString() + "  Length=" + picture.length);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                    mCircleImageView.setImageBitmap(bitmap);
+                    //mCircleImageView.setImageBitmap(bitmap);
                     return true;
                 case GETFAIL:
-                    initEmptyView();
-                    return true;
-                case FOLLOW:
-                    /*JSONObject jsonObject = new JSONObject((String)msg.obj);
-                    int code = jsonObject.getInt("code");
-                    String res = jsonObject.getString("data");
-                    if(code == 400){
-                        Log.e("FollowError", res);
+                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+                        retry_time++;
+                        loadData();
                         return true;
-                    }*/
+                    }
+                    else {
+                        initEmptyView();
+                        retry_time = 0;
+                        break;
+                    }
+                case FOLLOW:
                     String res = (String)msg.obj;
                     if(res.equals("follow committed")){
                         isFollowed = true;
@@ -239,8 +244,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void followClubButtonClickListener(View view){
-        Log.e("Click", "follow club button clicked");
-        followClubFromPost(SERVERURL + "club/follow?" + "clubId=" + clubId + "&" + "userId=" + userId);
+        followClubFromPost(SERVERURL + "club/follow");
     }
     /**
      * 初始化页面上方标题栏
@@ -253,7 +257,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
         mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
         getPicture(SERVERURL + "static/images/2.jpg");
-        //TODO 从后端获取社团图标后更新图标
     }
 
     @Override
@@ -263,6 +266,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
         userName = shared.getString("userName", "");
+        setClubinfoDialogFragment = new SetClubinfoDialogFragment();
         loadData();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club_home);
@@ -313,8 +317,6 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void initRecycleView(){
-        //mRecyclerView.setHasFixedSize(true);
-        //mRecyclerView.setNestedScrollingEnabled(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -407,6 +409,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get picture failed.");
+                    /*Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    getHandler.sendMessage(msg);*/
                 }
             }
         }.start();
@@ -468,7 +473,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         Log.e("permission", "" + permission);
         Log.e("presidentname", "" + clubPresident);
         Log.e("myname", "" + userName);
-        if (userName.equals(clubPresident))
+        /*if (userName.equals(clubPresident))
         {
             Log.e("debug", "" + "进来了！我是president");
             followClubButton.setVisibility(GONE);
@@ -480,13 +485,24 @@ public class ClubHomeActivity extends AppCompatActivity {
             if (permission == 1) {
                 followClubButton.setVisibility(GONE);
                 getMenuInflater().inflate(R.menu.club_home_menu, menu);
-                menu.getItem(1).setVisible(false);
-                menu.getItem(1).setEnabled(false);
+                menu.getItem(2).setVisible(false);
+                menu.getItem(2).setEnabled(false);
             }
             if (permission == 2) {
                 followClubButton.setVisibility(GONE);
                 getMenuInflater().inflate(R.menu.club_home_menu, menu);
             }
+        }*/
+
+        if (permission == 1) {
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
+            menu.getItem(2).setVisible(false);
+            menu.getItem(2).setEnabled(false);
+        }
+        else if(permission == 2){
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -510,6 +526,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, ReleasePostActivity.class);
                 intent.putExtra("clubId", clubId);
                 startActivity(intent);
+                break;
+            case R.id.set_clubinfo_menu_item:
+                setClubinfoDialogFragment.show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.club_admin_manage_menu_item:
                 intent = new Intent(this, EditClubAdminActivity.class);
@@ -564,17 +583,13 @@ public class ClubHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private List<String> getList() {
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("动态" + i + "\n社团发布的第"+ i + "条动态" + "");
-        }
-        return list;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         bind.unbind();
+    }
+
+    public void setClubProfile(String s) {
+        clubProfile.setText(s);
     }
 }

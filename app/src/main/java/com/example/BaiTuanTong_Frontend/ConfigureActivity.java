@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import okhttp3.MediaType;
@@ -35,6 +38,8 @@ import okhttp3.Response;
 
 public class ConfigureActivity extends AppCompatActivity {
 
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
     private ImageView imgShow = null;
     private String imgPath = null;
     private final int IMAGE_CODE = 0;
@@ -106,12 +111,55 @@ public class ConfigureActivity extends AppCompatActivity {
                 imgShow.setImageBitmap(bm);
 
                 // 发送给后端
-                getDataFromPostImg(SERVERURL+"user/image/upload");
+                //getDataFromPostImg(SERVERURL+"user/image/upload");
+
+                try {
+                    String img_base64 = bitmapToBase64(bm);
+                    JSONObject json = new JSONObject();
+                    SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
+                    String userId = shared.getString("userId", "");
+                    json.put("userId", userId);
+                    json.put("image", img_base64);
+                    String jsondata = json.toString();
+                    uploadImageFromPost(SERVERURL + "user/image/upload", jsondata);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             } catch (IOException e) {
                 Log.e("TAG-->Error", e.toString());
             }
         }
+    }
+
+    public static String bitmapToBase64(Bitmap bitmap) {
+
+        String result = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            if (bitmap != null) {
+                baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+                baos.flush();
+                baos.close();
+
+                byte[] bitmapBytes = baos.toByteArray();
+                result = Base64.encodeToString(bitmapBytes, Base64.DEFAULT);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (baos != null) {
+                    baos.flush();
+                    baos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     // 处理get请求与post请求的回调函数
@@ -170,7 +218,8 @@ public class ConfigureActivity extends AppCompatActivity {
                     msg.obj = result;
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
-                    Log.e("TAG", "post failed.");
+                    IOException.printStackTrace();
+                    Log.e("post fail", IOException.toString());
                 }
             }
         }.start();
@@ -214,6 +263,42 @@ public class ConfigureActivity extends AppCompatActivity {
                 .build();
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
+        }
+    }
+
+
+    private void uploadImageFromPost(String url, String json) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    String result = post(url, json); //json用于上传数据，目前不需要
+                    Message msg = Message.obtain();
+                    msg.what = POST_IMG;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("Fail", "upload failed.");
+                }
+            }
+        }.start();
+    }
+
+    private String post(String url, String json) throws IOException {
+        Log.e("post", "url: " + url);
+        Log.e("post", "json: " + json);
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .addHeader("Connection", "close")
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        } catch (Exception e){
+            e.printStackTrace();
+            return e.toString();
         }
     }
 }

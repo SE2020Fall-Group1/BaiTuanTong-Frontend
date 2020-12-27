@@ -47,39 +47,56 @@ public class LoginActivity extends AppCompatActivity {
     private int loginResult;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private String username;
+    private final int POST = 0;
+    private final int POSTFAIL = 1;
+    private int retry_time = 0;
+    private final String baseUrl = "http://47.92.233.174:5000/";
 
     //处理异步线程发来的消息
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("handler",(String)msg.obj);
+            //Log.e("handler",(String)msg.obj);
             //super.handleMessage(msg);
-            try {
-                String msgBody = (String)msg.obj;
-                if(msgBody.equals("wrong password")||msgBody.equals("wrong username")){
-                    Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
-                }else{
-                    JSONObject jsonObject = new JSONObject((String)msgBody);
-                    String userId = jsonObject.getString("userId");
-                    Log.e("Toast", userId);
-                    //共享参数对象，用来全局共享userId
-                    SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = shared.edit();
-                    // 把userId(String)放到全局变量userId中
-                    // 取出只需调用shared.getString
-                    editor.putString("userId", userId);
-                    editor.putString("userName", username);
-                    editor.putBoolean("logged", true);
-                    editor.commit();// 提交编辑
+            if(msg.what == POST) {
+                retry_time = 0;
+                try {
+                    String msgBody = (String) msg.obj;
+                    if (msgBody.equals("wrong password") || msgBody.equals("wrong username")) {
+                        Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+                    } else {
+                        JSONObject jsonObject = new JSONObject((String) msgBody);
+                        String userId = jsonObject.getString("userId");
+                        Log.e("Toast", userId);
+                        //共享参数对象，用来全局共享userId
+                        SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = shared.edit();
+                        // 把userId(String)放到全局变量userId中
+                        // 取出只需调用shared.getString
+                        editor.putString("userId", userId);
+                        editor.putString("userName", username);
+                        editor.putBoolean("logged", true);
+                        editor.commit();// 提交编辑
 
-                    String welcomeMessage = "欢迎！" + username;
-                    Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
-                    startHomePage();
+                        String welcomeMessage = "欢迎！" + username;
+                        Toast.makeText(LoginActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
+                        startHomePage();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
                 }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-
+            }
+            else if(msg.what == POSTFAIL){
+                if(retry_time < 3) { //尝试三次，如果不行就放弃
+                    retry_time++;
+                    String json = (String)msg.obj;
+                    getDataFromPost(baseUrl+"user/login", json);
+                }
+                else {
+                    retry_time = 0;
+                }
             }
 
             return true;
@@ -169,9 +186,6 @@ public class LoginActivity extends AppCompatActivity {
                 //         passwordEditText.getText().toString());
                 OkHttpClient okHttpClient = new OkHttpClient();
 
-                String baseUrl = "http://47.92.233.174:5000/";
-
-
                 username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 HashMap<String, String> map = new HashMap<>();
@@ -223,10 +237,15 @@ public class LoginActivity extends AppCompatActivity {
                     String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("result", result);
                     Message msg = Message.obtain();
+                    msg.what = POST;
                     msg.obj = result;
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "post failed.");
+                    Message msg = Message.obtain();
+                    msg.what = POSTFAIL;
+                    msg.obj = json;
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();
