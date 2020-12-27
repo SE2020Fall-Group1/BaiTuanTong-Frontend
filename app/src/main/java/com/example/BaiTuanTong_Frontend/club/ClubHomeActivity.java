@@ -590,6 +590,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void setClubProfile(String s) {
-        clubProfile.setText(s);
+        String print = s +"\n"+"社长: "+clubPresident;
+        clubProfile.setText(print);
     }
 }
