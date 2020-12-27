@@ -171,8 +171,8 @@ public class PostSearchResultFragment extends Fragment {
 
     // 在获得GET请求返回的数据后更新点赞数、评论数和点赞状态
     private void updatePostInfo() {
-        View view = mRecyclerView.getChildAt(clickedPosition);
-        if (null != mRecyclerView.getChildViewHolder(view)){
+        View view = mRecyclerView.getLayoutManager().findViewByPosition(clickedPosition);
+        if (null != view && null != mRecyclerView.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
                     (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
             viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));

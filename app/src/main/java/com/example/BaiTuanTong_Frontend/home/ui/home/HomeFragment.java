@@ -101,7 +101,7 @@ public class HomeFragment extends Fragment {
             getDataFromGet(SERVERURL + "post/homepage", getResult);
         }
         else if (clickedPosition != -1) {
-            String strPostId = postId.get(+clickedPosition).toString();
+            String strPostId = postId.get(clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
     }
@@ -207,8 +207,8 @@ public class HomeFragment extends Fragment {
     }
     // 在获得GET请求返回的数据后更新点赞数、评论数和点赞状态
     private void updatePostInfo() {
-        View view = rv_post_list.getChildAt(clickedPosition);
-        if (null != rv_post_list.getChildViewHolder(view)){
+        View view = rv_post_list.getLayoutManager().findViewByPosition(clickedPosition);
+        if (null != view && null != rv_post_list.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
                     (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
             viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));
