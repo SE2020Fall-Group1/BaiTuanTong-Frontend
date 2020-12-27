@@ -16,16 +16,23 @@
 
         <TextView
             android:id="@+id/clubItem"
-            android:layout_width="294dp"
-            android:layout_height="match_parent"
-            android:text="yes!" />
+            android:layout_width="254dp"
+            android:layout_height="92dp"
+            android:layout_marginStart="5pt"
+            android:layout_marginLeft="5pt"
+            android:layout_marginTop="8pt"
+            android:text="yes!"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/changeAdministrator"
-            android:layout_width="87dp"
-            android:layout_height="71dp"
-            android:layout_marginStart="130pt"
-            android:layout_marginLeft="130pt"
+
+            android:layout_width="95dp"
+            android:layout_height="78dp"
+            android:layout_marginStart="122pt"
+            android:layout_marginLeft="124pt"
+            android:layout_marginTop="8pt"
+            android:textSize="16sp"
             android:text="更改总管理员" />
     </androidx.cardview.widget.CardView>
 </LinearLayout>
