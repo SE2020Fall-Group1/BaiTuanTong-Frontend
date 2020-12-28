@@ -131,7 +131,7 @@ public class HomeFragment extends Fragment {
         /*if (postId.isEmpty()){
             Log.e("msg", "empty");
 
-            //getDataFromGet(SERVERURL + "post/homepage", getResult);
+        getDataFromGet(SERVERURL + "post/homepage", getResult);
         }
         else*/ if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
@@ -196,8 +196,6 @@ public class HomeFragment extends Fragment {
         likeCnt.clear();
         commentCnt.clear();
         clubId.clear();
-        imgUrl.clear();
-        clubImg.clear();
         myAdapter.notifyItemRangeRemoved(0, size);
     }
 
@@ -307,13 +305,42 @@ public class HomeFragment extends Fragment {
 
     private void updateClubImage(Bitmap bm, int position) {
         clubImg.set(position, bm);
-        View view = rv_post_list.getLayoutManager().findViewByPosition(position);
+        myAdapter = new HomeFragmentAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
+        rv_post_list.setAdapter(myAdapter);
+
+        // 下面是为点击事件添加的代码
+        myAdapter.setOnItemClickListener(new HomeFragmentAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                switch (view.getId()) {
+                    case R.id.post_clubName:
+                    case R.id.club_img:
+                        startClubHomeActivity(position); break;
+                    default: startPostContentActivity(position);
+                }
+            }
+        });
+        /*View view = rv_post_list.getLayoutManager().findViewByPosition(position);
+        Log.e("position", position + "");
+        if (view == null)Log.e("null", position + "");
         if (null != view && null != rv_post_list.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
                     (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
             viewHolder.club_img.setImageBitmap(bm);
-        }
+        }*/
     }
+    /*//View加载完成时回调
+    rv_post_list.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
+            .OnGlobalLayoutListener() {
+        @Override
+        public void onGlobalLayout() {
+            View view = layoutManager.findViewByPosition(3);
+
+            //OnGlobalLayoutListener可能会被多次触发
+            //所以完成了需求后需要移除OnGlobalLayoutListener
+            recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+    });*/
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override

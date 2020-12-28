@@ -173,7 +173,7 @@ public class FollowedPostFragment extends Fragment {
 
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
-        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
+        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
         rv_post_list.setAdapter(myAdapter);
 
         if (clubImg.isEmpty()) {
@@ -215,12 +215,28 @@ public class FollowedPostFragment extends Fragment {
 
     private void updateClubImage(Bitmap bm, int position) {
         clubImg.set(position, bm);
-        View view = rv_post_list.getLayoutManager().findViewByPosition(position);
+        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
+        rv_post_list.setAdapter(myAdapter);
+
+        // 下面是为点击事件添加的代码
+        myAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                switch (view.getId()) {
+                    case R.id.post_clubName:
+                    case R.id.club_img:
+                        startClubHomeActivity(position); break;
+                    default: startPostContentActivity(position);
+                }
+            }
+        });
+        /*View view = rv_post_list.getLayoutManager().findViewByPosition(position);
         if (null != view && null != rv_post_list.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
                     (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
             viewHolder.club_img.setImageBitmap(bm);
-        }
+            viewHolder.club_img.invalidate();
+        }*/
     }
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
