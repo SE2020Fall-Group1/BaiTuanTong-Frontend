@@ -171,11 +171,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                     break;
-                case PICTURE:
-                    byte[] picture = (byte[])msg.obj;
-                    Log.e("Picture", picture.toString() + "  Length=" + picture.length);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                    mCircleImageView.setImageBitmap(bitmap);
+                case GET_IMG:
                     return true;
                 case GETFAIL:
                     if(retry_time < 3) { //尝试三次，如果不行就放弃
@@ -300,7 +296,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         initToolBar();
         Log.e("club path:", clubImgPath);
         getTouxiang();
-        getPicture(SERVERURL+"/club/image/download?clubId="+ clubId, GET);
+        getPicture(SERVERURL+"club/image/download?clubId="+ clubId, GET_URL);
     }
     // 从本地文件读取头像，没有的话直接返回，imgShow会显示默认的头像
     // 默认的头像地址是/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
@@ -465,6 +461,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
                         if (bitmap == null)
                             Log.e("null bitmap", "123");
+                        mCircleImageView.setImageBitmap(bitmap);
                         Log.e("touxiang stores in ",clubImgPath);
                         File imgfile=new File(clubImgPath);
                         imgfile.createNewFile();
