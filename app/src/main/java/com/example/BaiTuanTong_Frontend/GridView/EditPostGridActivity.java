@@ -1,8 +1,3 @@
-/*
-发布动态
-目前尚未实现和图片有关的工程。
-
- */
 package com.example.BaiTuanTong_Frontend.GridView;
 
 import androidx.annotation.NonNull;
@@ -10,15 +5,13 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -26,15 +19,11 @@ import android.widget.Toast;
 
 import com.example.BaiTuanTong_Frontend.R;
 
-import com.bumptech.glide.Glide;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -42,19 +31,22 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ReleasePostActivity extends AppCompatActivity {
+public class EditPostGridActivity extends AppCompatActivity {
 
     private GridView gridView;
     private Context mContext;
     private ArrayList<String> mPicList = new ArrayList<>();
     private MyGridViewAdapter myGridViewAdapter;
     private Button myButton;
-    private EditText myTitle;
-    private EditText myText;
     private String post_title;
     private String post_text;
 
-    private int clubId;
+    private int postId;
+
+    private EditText postText;
+    private EditText postTitle;
+
+    private String userId;
 
     //以下为json和okhttp部分！
 
@@ -79,23 +71,32 @@ public class ReleasePostActivity extends AppCompatActivity {
             //super.handleMessage(msg);
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
-                case GET://not used in this page
+                case GET:// used in this page,for get the post context.
 
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject((String) msg.obj);
+                        Log.e("TAG_GET", (String)msg.obj);
+                        post_text = jsonObject.getString("content");
+                        post_title = jsonObject.getString("title");
+                        Log.e("post_text", post_text);
+                        Log.e("post_title", post_title);
+                        postText.setText(post_text);
+                        postTitle.setText(post_title);
+                        /*
                         JSONArray jsonArray = jsonObject.getJSONArray("adminSummary");
                         for (int i = 0; i < jsonArray.length(); ++i)
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
-                        //   adminList.add("username：" + tmp.getString("username"));
-                        //   mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
+                            //   adminList.add("username：" + tmp.getString("username"));
+                            //   mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
                             Log.e("!!!", tmp.getString("username"));
                         }
 
                         //    Log.e("!!!", jsonObjString);
 
                         //    List<PurchaseOrder> purchaseOrders = (List<PurchaseOrder>) JSONArray.parseArray(jsonObjString, PurchaseOrder.class);
+                        */
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -151,7 +152,7 @@ public class ReleasePostActivity extends AppCompatActivity {
                 .url(url)
                 .build();
         Response response = client.newCall(request).execute();
-        return response.body().string();
+       return response.body().string();
     }
 
     private void getDataFromGet(String url) {
@@ -161,7 +162,7 @@ public class ReleasePostActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = get(url);
-                    Log.e("TAG", result);
+                    Log.e("result", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -210,62 +211,49 @@ public class ReleasePostActivity extends AppCompatActivity {
         }.start();
     }
 
-    private void viewPluImg(int pos){
-        Toast.makeText(this, "click a pic", Toast.LENGTH_SHORT).show();
-    }
-    private void selectPic(int maxTotal) {
-        Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
-     //   PictureSelector.create(this, maxTotal);
-    }
-
-    private void initGridView()
+    //获取动态内容，填充到text里面
+    void getOriginPost()
     {
-        myGridViewAdapter = new MyGridViewAdapter(mContext, mPicList);
-        gridView.setAdapter(myGridViewAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                if (position == parent.getChildCount() - 1) {
-                    //如果“增加按钮形状的”图片的位置是最后一张，且添加了的图片的数量不超过9张，才能点击
-                    //这个位置就是“加号”的位置。
-                    if (mPicList.size() == 9) {
-                        //最多添加5张图片
-                        viewPluImg(position);
-                    } else {
-                        //添加凭证图片
-                        selectPic(9 - mPicList.size());
-                    }
-                } else {
-                    viewPluImg(position);
-                }
-            }
-        });
+        Log.e("debug", "I'm coming to get the post!");
+        Log.e("userId",""+userId);
+        Log.e("postId", ""+postId);
+        getDataFromGet(SERVERURL + "post/view?" + "userId=" + userId + "&" + "postId=" + postId);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
+            case R.id.delete_post_button:
+               Toast.makeText(getApplicationContext(),
+                        "点击了删除动态按钮",
+                        Toast.LENGTH_SHORT).show();
+
+         //       dialogFragment.show(getSupportFragmentManager(), "add_Admin");
+                break;
+
+
             case android.R.id.home:
                 this.finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)//添加右上角三个点儿
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.edit_post_menu, menu);
+        //这里是调用menu文件夹中的main.xml，在登陆界面label右上角的三角里显示其他功能
+
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_release_post);
-        this.setTitle("发布动态");
-        clubId = getIntent().getIntExtra("clubId", -1);
-        if (clubId == -1)//error detected
-        {
-            Toast.makeText(getApplicationContext(),
-                    "社团获取出现问题，请返回上级页面！",
-                    Toast.LENGTH_LONG).show();
-        }
+        setContentView(R.layout.activity_edit_post_grid);
+        this.setTitle("编辑动态");
 
 //        getActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
@@ -274,73 +262,26 @@ public class ReleasePostActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-//        myOnClickListener = new MyOnClickListener();
+        postText = (EditText)findViewById(R.id.EditPostText);
+        postTitle = (EditText)findViewById(R.id.EditPostTitle);
 
-        mContext = this;
-        gridView = (GridView)findViewById(R.id.Gridview1);
-     //   gridView.setAdapter(myGridViewAdapter);
-        initGridView();
-     //   gridView.setAdapter(new MyGridViewAdapter(ReleasePostActivity.this));
-
-        //点击提交按钮，目前只支持传回的动态内容为文字和标题。
-        myTitle = (EditText)findViewById(R.id.EditPostTitle);//title
-        myText = (EditText)findViewById(R.id.EditPostText);//text
-        myButton = (Button) findViewById(R.id.Submit_button);
-        myButton.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
-                post_title = myTitle.getText().toString();
-                post_text = myText.getText().toString();//获取两部分的输入信息。
-                if (post_text.length() == 0)
-                {
-                    Toast.makeText(getApplicationContext(),
-                            "动态内容不能为空！",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (post_title.length() == 0)
-                {
-                    Toast.makeText(getApplicationContext(),
-                            "动态标题不能为空！",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                //以下为okhttp方法。
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put("clubId", clubId);
-                    Log.e("clubId", ""+clubId);
-                    obj.put("title", post_title);
-                    //   obj.put("userId", 4);
-                    Log.e("title", post_title);
-                    obj.put("text", post_text);
-                    Log.e("text", post_text);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.e("post context json", obj.toString());
-                getDataFromPost(SERVERURL + "post/release", obj.toString());
-
-                ReleasePostActivity.this.finish();
-            }
-        });
-
-
-    }
-
-
-    // 处理选择的照片的地址
- /*   private void refreshAdapter(List<LocalMedia> picList) {
-        for (LocalMedia localMedia : picList) {
-            //被压缩后的图片路径
-            if (localMedia.isCompressed()) {
-                String compressPath = localMedia.getCompressPath(); //压缩后的图片路径
-                mPicList.add(compressPath); //把图片添加到将要上传的图片数组中
-                myGridViewAdapter.notifyDataSetChanged();
-            }
+        postId = getIntent().getIntExtra("postId", -1);
+        if (postId == -1)
+        {
+            Toast.makeText(getApplicationContext(),
+                    "获取动态id失败，请返回上级页面！",
+                    Toast.LENGTH_LONG).show();
         }
+
+        SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
+        userId = shared.getString("userId", "");
+
+        Log.e("userId", ""+userId);
+
+
+        getOriginPost();
+
     }
-*/
+
+
 }

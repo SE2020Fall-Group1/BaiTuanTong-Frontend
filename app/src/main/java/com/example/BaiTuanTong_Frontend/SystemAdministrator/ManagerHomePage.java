@@ -3,6 +3,8 @@ package com.example.BaiTuanTong_Frontend.SystemAdministrator;
 import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditClubDialogFragment.CreateClubListener;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditAdminDialogFragment.ChangeAdminListener;
+import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
+import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -56,7 +59,8 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
     private static final int ADD_CLUB_POST = 2;
     private static final int DELETE_CLUB_POST = 3;
     private static final int CHANGE_PRESIDENT_POST = 4;
-    private static final String SERVERURL = "http://47.92.233.174:80/";
+    private static final int LOGOUT_POST = 5;
+    private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
     private static final String TESTURL = "http://api.m.mtime.cn/PageSubArea/TrailerList.api";
     private static final String CURRENTURL = SERVERURL;
@@ -173,6 +177,25 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
         }.start();
     }
 
+    private void logoutPost(String url) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    String result = post(url, "");
+                    Log.e("TAG", result);
+                    Message msg = Message.obtain();
+                    msg.what = LOGOUT_POST;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "post failed.");
+                }
+            }
+        }.start();
+    }
+
     /**
      * 处理get请求与post请求的回调函数
      */
@@ -211,6 +234,14 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                         e.printStackTrace();
                     }
                     break;
+                case LOGOUT_POST:
+                    try {
+                        Log.e("LOGOUT2", msg.obj.toString());
+                        parseJsonPacket((String)msg.obj, LOGOUT_POST);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -232,7 +263,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 for (int i = 0; i < jsonArray.length(); ++i) {
                     JSONObject jsonObjectClubSummary = jsonArray.getJSONObject(i);
                     adapter.addData(i, jsonObjectClubSummary.getString("clubName"),
-                            jsonObjectClubSummary.getString("president_name"));
+                            jsonObjectClubSummary.getString("president"));
                 }
                 break;
             case ADD_CLUB_POST:
@@ -280,6 +311,22 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                     case "success":
                         adapter.changeAdmin(jsonObject3.getInt("position"), jsonObject3.getString("president"));
                         Toast.makeText(this, "修改成功", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        break;
+                }
+            case LOGOUT_POST:
+                // JSONObject jsonObject4 = new JSONObject(json);
+                String data4 = json.toString();
+                Log.e("LOGOUT1", data4);
+                switch (data4) {
+                    case "invalid operation":
+                        // Toast.makeText(this, "你不具有管理员权限", Toast.LENGTH_LONG).show();
+                        // break;
+                    case "success":
+                        Intent intent2 = new Intent(this, LoginActivity.class);
+                        startActivity(intent2);
+                        this.finish();
                         break;
                     default:
                         break;
@@ -341,6 +388,11 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 editClubDialog.show(getFragmentManager(), "EditClubDialog");
                 // adapter.addData(1);
                 break;
+            case R.id.logout:
+                logoutPost(CURRENTURL+"systemAdmin/logout");
+                break;
+            default:
+                break;
         }
         return true;
     }
@@ -381,8 +433,8 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                         // Toast.makeText(ManagerHomePage.this, position + " button click", Toast.LENGTH_SHORT).show();
                         break;
                     default:
-                        Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
-                        Log.e("Click", position + " click");
+                        // Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
+                        // Log.e("Click", position + " click");
                         break;
                 }
 

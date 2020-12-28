@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.PostListAdapter;
@@ -41,13 +42,18 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class HomeFragment extends Fragment {
-
-    private Context mContext;
+    //private Context mContext;
     private View mView;
     // recyclerview
     private RecyclerView rv_post_list;
+    private boolean recycleViewInitiated = false;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private boolean mIsRefreshing = false; //是否正在刷新
+    private int retry_time = 0;
     private PostAdapter myAdapter;
     private MyListener ac;
 
@@ -61,6 +67,7 @@ public class HomeFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
+    private static final int GETFAIL = 3;
     private static final int getResult = 0;
     private static final int getPostInfo = 1;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
@@ -78,13 +85,17 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mContext = getActivity();
+        Log.e("TAG", "onCreateView");
+        //mContext = getActivity();
         mView = inflater.inflate(R.layout.fragment_home, container, false);
+        rv_post_list = (RecyclerView)mView.findViewById(R.id.rv_post_list);
+        mSwipeRefreshLayout = mView.findViewById(R.id.swipe_refresh_layout_homepage);
         SharedPreferences shared = getActivity().getSharedPreferences("share",  MODE_PRIVATE);
         userId = shared.getString("userId", "");
         setHasOptionsMenu(true);
+        initRefreshLayout();
         // 初始RecyclerView
-        initRecyclerLinear();
+        //initRecyclerLinear();
         return mView;
     }
     @Override
@@ -96,11 +107,12 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.e("msg", "onResume");
-        if (postId.isEmpty()){
+        /*if (postId.isEmpty()){
             Log.e("msg", "empty");
-            getDataFromGet(SERVERURL + "post/homepage", getResult);
+
+            //getDataFromGet(SERVERURL + "post/homepage", getResult);
         }
-        else if (clickedPosition != -1) {
+        else*/ if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
@@ -139,6 +151,39 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+    protected void initRefreshLayout() {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.holo_blue_light);
+        mSwipeRefreshLayout.post(() -> {
+            mSwipeRefreshLayout.setRefreshing(true);
+            mIsRefreshing = true;
+            loadData();
+        });
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            clearData();
+            loadData();
+        });
+    }
+
+    protected void clearData(){
+        mIsRefreshing = true;
+        int size = postId.size();
+        postId.clear();
+        title.clear();
+        clubName.clear();
+        text.clear();
+        likeCnt.clear();
+        commentCnt.clear();
+        clubId.clear();
+        myAdapter.notifyItemRangeRemoved(0, size);
+    }
+
+
+    protected void loadData(){
+        getDataFromGet(SERVERURL + "post/homepage", getResult);
+    }
+
+
     // 跳转到社团主页，传递参数position（该动态在列表中的位置）
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
@@ -155,15 +200,17 @@ public class HomeFragment extends Fragment {
     }
     // 初始化线性布局的循环视图
     private void initRecyclerLinear() {
-        rv_post_list = (RecyclerView)mView.findViewById(R.id.rv_post_list);
+
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
-        Log.e("init rv","1");
+        //Log.e("init rv","1");
+        updateView();
         //myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
         //rv_post_list.setAdapter(myAdapter);
         //rv_post_list.setItemAnimator(new DefaultItemAnimator());
         // 通过url传输数据
         // getDataFromGet(SERVERURL + "post/homepage", );
+        rv_post_list.setOnTouchListener((v, event) -> mIsRefreshing);
     }
     // 提示框，未实现
     private void doSearch(String text) {
@@ -197,8 +244,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemClick(View view, int position) {
                 switch (view.getId()) {
-                    case R.id.post_clubName: startClubHomeActivity(position); break;
-                    case R.id.club_img: startClubHomeActivity(position); break;
+                    case R.id.post_clubName:
+                    case R.id.club_img:
+                        startClubHomeActivity(position); break;
                     default: startPostContentActivity(position);
                 }
             }
@@ -222,31 +270,50 @@ public class HomeFragment extends Fragment {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case getResult:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForView((String)msg.obj);
-                        updateView();
+                        //updateView();
+                        retry_time = 0;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case getPostInfo:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForInfo((String)msg.obj);
                         updatePostInfo();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
+                case GETFAIL:
+                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+                        retry_time++;
+                        loadData();
+                        return true;
+                    }
+                    else {
+                        retry_time = 0;
+                        break;
+                    }
                 default: return false;
             }
+            if(!recycleViewInitiated) { //无论成功与否，第一次必须初始化RecycleView
+                initRecyclerLinear();
+                recycleViewInitiated = true;
+            }
+            refreshComplete();
             return true;
         }
     });
+
+    private void refreshComplete() {
+        myAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
+        mIsRefreshing = false;
+    }
 
     /**
      * 解析get返回的json包
@@ -300,6 +367,9 @@ public class HomeFragment extends Fragment {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
+                    Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();

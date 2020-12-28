@@ -48,14 +48,18 @@ public class ManageClubsActivity extends AppCompatActivity {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
+    private static final int GETFAIL = 3;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+    private int retry_time = 0;
 
     // 从后端拿来的数据
     public List<Integer> clubId = new ArrayList<>();       // 社团ID
     public List<String> clubName = new ArrayList<>();      // 社团名字
     public List<String> introduction = new ArrayList<>();  // 社团简介
     public List<String> president = new ArrayList<>();     // 社团主席
+
+    private String userName;
 
     // RecyclerView的适配器
     public class ManageClubsAdapter extends ClubListAdapter {
@@ -80,8 +84,9 @@ public class ManageClubsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_clubs);
         shared = this.getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
+        userName = shared.getString("userName", "");
         // 为了测试我需要拿到管理了社团的人的userId
-    //    userId = "2";
+        //userId = "2";
 
         Intent intent = getIntent();
 
@@ -102,7 +107,7 @@ public class ManageClubsActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         if (userId != null)
-        getDataFromGet(SERVERURL + "club/query/admin?userId=" + userId);
+            getDataFromGet(SERVERURL + "club/query/admin?userId=" + userId);
     }
 
     /**
@@ -112,7 +117,10 @@ public class ManageClubsActivity extends AppCompatActivity {
     public void sendMessage(int position) {
         Intent intent = new Intent(this, ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
-        intent.putExtra("permission", 1);
+        if(president.get(position).equals(userName))
+            intent.putExtra("permission", 2);
+        else
+            intent.putExtra("permission", 1);
         startActivity(intent);
     }
 
@@ -134,14 +142,23 @@ public class ManageClubsActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
+                    retry_time = 0;
                     try {
                         parseJsonPacket((String)msg.obj);
                         updateView();
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    break;
+                case GETFAIL:
+                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+                        retry_time++;
+                        getDataFromGet(SERVERURL + "club/query/followed?userId=" + userId);
+                    }
+                    else {
+                        retry_time = 0;
                     }
                     break;
                 case POST:
@@ -184,6 +201,9 @@ public class ManageClubsActivity extends AppCompatActivity {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
+                    Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();

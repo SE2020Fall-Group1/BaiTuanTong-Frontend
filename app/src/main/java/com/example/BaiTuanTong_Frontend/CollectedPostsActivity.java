@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.home.ui.dashboard;
+package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,22 +7,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.BaiTuanTong_Frontend.PostContentActivity;
-import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
-import com.example.BaiTuanTong_Frontend.home.ui.home.HomeFragment;
-import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
-import com.example.BaiTuanTong_Frontend.PostListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,17 +32,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static android.content.Context.MODE_PRIVATE;
+public class CollectedPostsActivity extends AppCompatActivity {
 
-public class DashboardFragment extends Fragment {
-    private Context mContext;
-    private View mView;
-    // recyclerview
-    private RecyclerView rv_post_list;
-    private PostAdapter myAdapter;
-    private HomeFragment.MyListener ac;
+    private Toolbar mNavigation;
+    private RecyclerView mRecyclerView;
+    private CollectedPostsAdapter mAdapter;
 
-    public String userId;
+    private String userId;
+    private SharedPreferences shared;
 
     // 与后端通信
     public static final MediaType JSON
@@ -62,6 +53,8 @@ public class DashboardFragment extends Fragment {
     private static final int getPostInfo = 1;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+    private int retry_time = 0;
+
     // 从后端拿来的数据
     public List<Integer> postId = new ArrayList<>();        // 动态ID
     public List<String> title = new ArrayList<>();          // 动态标题
@@ -73,68 +66,90 @@ public class DashboardFragment extends Fragment {
 
     private int clickedPosition = -1;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        mContext = getActivity();
-        mView = inflater.inflate(R.layout.fragment_home, container, false);
-        SharedPreferences shared = getActivity().getSharedPreferences("share",  MODE_PRIVATE);
+    // RecyclerView的适配器
+    public class CollectedPostsAdapter extends PostListAdapter {
+
+        public CollectedPostsAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt);
+        }
+
+        class CollectedPostsViewHolder extends PostListAdapter.PostListViewHolder {
+            public CollectedPostsViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+                super(itemView, onItemClickListener);
+            }
+        }
+    }
+
+    public void initToolBar() {
+        mNavigation.setTitle("收藏的动态");
+        setSupportActionBar(mNavigation);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_collected_posts);
+
+        shared = this.getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
-        setHasOptionsMenu(true);
-        // 初始RecyclerView
-        initRecyclerLinear();
-        return mView;
+
+        Intent intent = getIntent();
+
+        mNavigation = findViewById(R.id.collected_posts_title);
+        initToolBar();
+        mNavigation.setNavigationOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                setResult(3);
+                finish();
+            }
+        });
+
+        // 设置布局管理器
+        mRecyclerView = this.findViewById(R.id.collected_posts_list);
+        mAdapter = new CollectedPostsAdapter(this, title, clubName, text, likeCnt, commentCnt);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        if (userId != null)
+            getDataFromGet(SERVERURL + "post/collection?userId=" + userId, getResult);
     }
-    @Override
-    public void onAttach(Context context){
-        super.onAttach(context);
-        ac = (HomeFragment.MyListener)getActivity();
-    }
-    @Override
+
     public void onResume() {
         super.onResume();
         Log.e("msg", "onResume");
-        if (postId.isEmpty()){
-            Log.e("msg", "empty");
-            getDataFromGet(SERVERURL + "post/followed?userId="+userId, getResult);
-        }
-        else if (clickedPosition != -1) {
+        if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
     }
-    // 实现一个接口，搜索框给SearchResultActivity传输搜索字符串info
-    public interface MyListener{
-        public void sendContent(String info);//发送给SearchResultActivity
-    }
+
     // 跳转到社团主页，传递参数position（该动态再列表中的位置）
     private void startClubHomeActivity(Integer position) {
-        Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+        Intent intent = new Intent(this, ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
-        intent.putExtra("permission", 0);
         startActivity(intent);
     }
-    // 跳转到动态内容界面，传递参数post_id
-    private void startPostContentActivity(Integer position){
+
+    // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
+    private void startPostContentActivity(Integer position) {
         clickedPosition = position;
-        Intent intent = new Intent(getActivity(),PostContentActivity.class);
+        Intent intent = new Intent(this, PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
         startActivity(intent);
-    }
-    // 初始化线性布局的循环视图
-    private void initRecyclerLinear() {
-        rv_post_list = (RecyclerView)mView.findViewById(R.id.rv_post_list);
-        LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        rv_post_list.setLayoutManager(manager);
-        Log.e("init rv","1");
     }
 
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
-        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
-        rv_post_list.setAdapter(myAdapter);
+        mAdapter = new CollectedPostsAdapter(this, title, clubName, text, likeCnt, commentCnt);
+        mRecyclerView.setAdapter(mAdapter);
 
         // 下面是为点击事件添加的代码
-        myAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new CollectedPostsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 switch (view.getId()) {
@@ -144,14 +159,16 @@ public class DashboardFragment extends Fragment {
                 }
             }
         });
-        // mView.invalidate();
+        Log.e("msg", "invalidate");
+        //mView.invalidate();
     }
+
     // 在获得GET请求返回的数据后更新点赞数、评论数和点赞状态
     private void updatePostInfo() {
-        View view = rv_post_list.getLayoutManager().findViewByPosition(clickedPosition);
-        if (null != view && null != rv_post_list.getChildViewHolder(view)){
+        View view = mRecyclerView.getLayoutManager().findViewByPosition(clickedPosition);
+        if (null != view && null != mRecyclerView.getChildViewHolder(view)){
             PostListAdapter.PostListViewHolder viewHolder =
-                    (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
+                    (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
             viewHolder.post_likeCnt.setText(likeCnt.get(clickedPosition));
             viewHolder.post_commentCnt.setText(commentCnt.get(clickedPosition));
             //viewHolder.post_likeCnt.invalidate();
@@ -159,15 +176,15 @@ public class DashboardFragment extends Fragment {
         }
         clickedPosition = -1;
     }
+
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
+            //Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case getResult:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForView((String)msg.obj);
                         updateView();
                     } catch (JSONException e) {
@@ -176,21 +193,21 @@ public class DashboardFragment extends Fragment {
                     break;
                 case getPostInfo:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForInfo((String)msg.obj);
                         updatePostInfo();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
-                default: return false;
+                default:
+                    return false;
             }
             return true;
         }
     });
 
     /**
-     * 解析get返回的json包
+     * 解析为了更新整个列表而get返回的json包
      * @param json get返回的json包
      * @throws JSONException 解析出错
      */
@@ -198,9 +215,6 @@ public class DashboardFragment extends Fragment {
         JSONObject jsonObject = new JSONObject(json);
 
         JSONArray postList = jsonObject.getJSONArray("postSummary");
-        if (postList.length()==0){
-            Toast.makeText(getActivity().getBaseContext(), "你关注的社团未发布动态！", Toast.LENGTH_SHORT).show();
-        }
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
             title.add(postList.getJSONObject(i).getString("title"));
@@ -211,6 +225,7 @@ public class DashboardFragment extends Fragment {
             clubId.add(postList.getJSONObject(i).getInt("clubId"));
         }
     }
+
     /**
      * 解析为了更新动态信息而get返回的json包
      * @param json get返回的json包
@@ -236,7 +251,7 @@ public class DashboardFragment extends Fragment {
                 try {
                     Log.e("URL", url);
                     String result = get(url);
-                    Log.e("TAG", result);
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = what;
                     msg.obj = result;
@@ -255,8 +270,8 @@ public class DashboardFragment extends Fragment {
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //jason用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    String result = post(url, json); //json用于上传数据，目前不需要
+                    Log.e("RES", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
                     msg.obj = result;

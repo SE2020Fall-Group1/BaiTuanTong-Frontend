@@ -7,14 +7,13 @@
     android:orientation="horizontal"
     android:gravity="left">
 
-    <ImageView
+    <com.example.BaiTuanTong_Frontend.widget.CircleImageView
         android:id="@+id/comment_user_name"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="10dp"
-        android:scaleType="fitCenter"
         android:src="@raw/smile" />
 
     <LinearLayout

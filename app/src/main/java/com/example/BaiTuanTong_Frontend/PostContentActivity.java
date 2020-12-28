@@ -66,6 +66,7 @@ public class PostContentActivity extends AppCompatActivity {
     private int likeCnt;
     private boolean isliked;
     private int clubId;
+    private boolean isCollected;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -90,6 +91,7 @@ public class PostContentActivity extends AppCompatActivity {
                         isliked = jsonObject.getBoolean("isLiked");
                         likeCnt = jsonObject.getInt("likeCnt");
                         clubId = jsonObject.getInt("clubId");
+                        isCollected = jsonObject.getBoolean("isCollected");
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
 
                         Log.e("title",title);
@@ -124,6 +126,18 @@ public class PostContentActivity extends AppCompatActivity {
                                     likeButton.setOnClickListener(null);
                                     likeButton.performClick();
                                     likeButton.setOnClickListener(new MyOnClickListener());
+                                }
+                            });
+                        }
+
+                        if(isCollected) {
+                            PostContentActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("collect", String.valueOf(isCollected));
+                                    collectButton.setOnClickListener(null);
+                                    collectButton.performClick();
+                                    collectButton.setOnClickListener(new MyOnClickListener());
                                 }
                             });
                         }

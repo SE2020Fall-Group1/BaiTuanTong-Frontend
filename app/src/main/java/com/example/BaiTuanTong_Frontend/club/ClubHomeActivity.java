@@ -24,11 +24,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
+import com.example.BaiTuanTong_Frontend.EditPostActivity;
+import com.example.BaiTuanTong_Frontend.GridView.EditPostGridActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
@@ -88,7 +89,8 @@ public class ClubHomeActivity extends AppCompatActivity {
     @BindView(R.id.follow_club_button)
     Button followClubButton; //关注社团按钮
 
-    private Menu mMenu;
+    private SetClubinfoDialogFragment setClubinfoDialogFragment;
+    private SetClubImageDialogFragment setClubImageDialogFragment;
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
@@ -99,13 +101,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GETFAIL = 3;
     private static final int PICTURE = 4;
     private static final int FOLLOW = 5;
+    private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
 
     private PostAdapter mMyAdapter;
 
-    //private List<String> postList = new ArrayList<>(); //动态列表
     public List<Integer> postId = new ArrayList<>();        // 动态ID
     public List<String> title = new ArrayList<>();          // 动态标题
     public List<String> PostClubName = new ArrayList<>();       // 社团名字
@@ -114,12 +116,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> PostClubId = new ArrayList<>();        // 社团ID
     private String clubName;
-    private String clubInfo;  //社团简介
+    public String clubInfo;  //社团简介
     private String clubPresident;  //社长
-    private int clubId;
+    public int clubId;
     private String userId;
     private int permission;
     private boolean isFollowed;
+    public Bitmap clubImageBitmap;
 
     private String userName;
 
@@ -129,7 +132,6 @@ public class ClubHomeActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            //Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
                 case POST:
@@ -138,10 +140,10 @@ public class ClubHomeActivity extends AppCompatActivity {
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
-                        Log.e("President", clubPresident);
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
                         initFollowButton();
+                        retry_time = 0;
                     } catch (JSONException e) {
                         initEmptyView();
                         e.printStackTrace();
@@ -149,20 +151,22 @@ public class ClubHomeActivity extends AppCompatActivity {
                     break;
                 case PICTURE:
                     byte[] picture = (byte[])msg.obj;
+                    Log.e("Picture", picture.toString() + "  Length=" + picture.length);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
                     mCircleImageView.setImageBitmap(bitmap);
                     return true;
                 case GETFAIL:
-                    initEmptyView();
-                    return true;
-                case FOLLOW:
-                    /*JSONObject jsonObject = new JSONObject((String)msg.obj);
-                    int code = jsonObject.getInt("code");
-                    String res = jsonObject.getString("data");
-                    if(code == 400){
-                        Log.e("FollowError", res);
+                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+                        retry_time++;
+                        loadData();
                         return true;
-                    }*/
+                    }
+                    else {
+                        initEmptyView();
+                        retry_time = 0;
+                        break;
+                    }
+                case FOLLOW:
                     String res = (String)msg.obj;
                     if(res.equals("follow committed")){
                         isFollowed = true;
@@ -186,7 +190,6 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 刷新完成，更新动态列表
      */
     private void refreshComplete() {
-        Log.e("Re", "refreshComplete");
         hideEmptyView();
         mMyAdapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
@@ -212,7 +215,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
         isFollowed = jsonObject.getBoolean("isFollowed");
-        //isFollowed = false;
         JSONArray postList = jsonObject.getJSONArray("postSummary");
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
@@ -239,8 +241,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void followClubButtonClickListener(View view){
-        Log.e("Click", "follow club button clicked");
-        followClubFromPost(SERVERURL + "club/follow?" + "clubId=" + clubId + "&" + "userId=" + userId);
+        followClubFromPost(SERVERURL + "club/follow");
     }
     /**
      * 初始化页面上方标题栏
@@ -251,22 +252,21 @@ public class ClubHomeActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
-        mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
-        getPicture(SERVERURL + "static/images/2.jpg");
-        //TODO 从后端获取社团图标后更新图标
+        //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_club_home);
+        bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
         userName = shared.getString("userName", "");
-        loadData();
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_club_home);
-        bind = ButterKnife.bind(this);
+        setClubinfoDialogFragment = new SetClubinfoDialogFragment();
+        setClubImageDialogFragment = new SetClubImageDialogFragment();
 
         initRefreshLayout();
 
@@ -280,6 +280,7 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     protected void clearData(){
         mIsRefreshing = true;
+        int size = postId.size();
         postId.clear();
         title.clear();
         PostClubName.clear();
@@ -287,12 +288,14 @@ public class ClubHomeActivity extends AppCompatActivity {
         likeCnt.clear();
         commentCnt.clear();
         PostClubId.clear();
+        if(mMyAdapter != null)
+            mMyAdapter.notifyItemRangeRemoved(0, size);
     }
 
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
-        getPicture(SERVERURL + "static/images/2.jpg");
+        //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     private void initDetailButton() {
@@ -313,24 +316,25 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     public void initRecycleView(){
-        //mRecyclerView.setHasFixedSize(true);
-        //mRecyclerView.setNestedScrollingEnabled(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mMyAdapter);
-        /*mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                sendMessage(position);
-            }
-        });*/
         mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 startPostContentActivity(position);
+            }
+        });
+        mMyAdapter.setOnItemLongClickListener(new PostAdapter.OnItemLongClickListener() {
+            @Override
+            public void onLongClick(int position) {
+                Log.e("click", "long click received.");
+                if(permission == 0)
+                    return;
+                startEditPostActivity(position);
             }
         });
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
@@ -341,7 +345,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
-            clearData();
             loadData();
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -375,7 +378,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = get(url);
-                    //Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -407,6 +409,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get picture failed.");
+                    /*Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    getHandler.sendMessage(msg);*/
                 }
             }
         }.start();
@@ -453,40 +458,20 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         }.start();
     }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
-        mMenu = menu;
-        return super.onPrepareOptionsMenu(menu);
-    }
     /**
      *初始化右上角菜单按钮
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //目前permission似乎有点儿问题，president和普通人一样 就很气，先特判一波儿
-        Log.e("permission", "" + permission);
-        Log.e("presidentname", "" + clubPresident);
-        Log.e("myname", "" + userName);
-        if (userName.equals(clubPresident))
-        {
-            Log.e("debug", "" + "进来了！我是president");
+        if (permission == 1) {
             followClubButton.setVisibility(GONE);
             getMenuInflater().inflate(R.menu.club_home_menu, menu);
+            menu.getItem(3).setVisible(false);
+            menu.getItem(3).setEnabled(false);
         }
-        else
-        {
-            Log.e("debug", "" + "进来了个锤子！我不是president");
-            if (permission == 1) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-                menu.getItem(1).setVisible(false);
-                menu.getItem(1).setEnabled(false);
-            }
-            if (permission == 2) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-            }
+        else if(permission == 2){
+            followClubButton.setVisibility(GONE);
+            getMenuInflater().inflate(R.menu.club_home_menu, menu);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -510,6 +495,12 @@ public class ClubHomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, ReleasePostActivity.class);
                 intent.putExtra("clubId", clubId);
                 startActivity(intent);
+                break;
+            case R.id.set_clubinfo_menu_item:
+                setClubinfoDialogFragment.show(getSupportFragmentManager(),"dialog");
+                break;
+            case R.id.set_clubimage_menu_item:
+                setClubImageDialogFragment.show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.club_admin_manage_menu_item:
                 intent = new Intent(this, EditClubAdminActivity.class);
@@ -564,17 +555,24 @@ public class ClubHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private List<String> getList() {
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("动态" + i + "\n社团发布的第"+ i + "条动态" + "");
-        }
-        return list;
+    private void startEditPostActivity(int position){
+        Intent intent = new Intent(this, EditPostGridActivity.class);
+        intent.putExtra("postId", postId.get(position));
+        startActivity(intent);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         bind.unbind();
+    }
+
+    public void setClubProfile(String s) {
+        String print = s +"\n"+"社长: "+clubPresident;
+        clubProfile.setText(print);
+    }
+
+    public void setClubImage(Bitmap bm){
+        mCircleImageView.setImageBitmap(bm);
     }
 }
