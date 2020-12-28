@@ -68,21 +68,23 @@ public class ConfigureActivity extends AppCompatActivity {
     private static final String SERVERURL = "http://47.92.233.174:5000";
     private static String userId_str = null;
 
-    // 本地存储头像路径
+    // 本地存储头像路径，在安卓手机里
     private String txPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure);
+        // 检查读写权限
         checkStoragePermissions(this);
         // userId参数放在这里设置
         SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
         userId_str = shared.getString("userId", "");
-        // 头像路径
+
+        // 头像路径，即/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
         txPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/touxiang.jpg";
         imgShow = findViewById(R.id.iv_touxiang);
-        // 首先尝试从本地路径获取头像
+        // 首先尝试从本地路径获取头像，没有的话使用默认的“照相机”icon
         getTouxiang();
         // 从后端刷新头像
         getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
@@ -122,11 +124,14 @@ public class ConfigureActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    // 从本地文件读取头像
+    // 从本地文件读取头像，没有的话直接返回，imgShow会显示默认的头像
+    // 默认的头像地址是/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
+    // 该地址是APP的私有存储空间
     private void getTouxiang() {
         Bitmap bitmap = null;
         try{
             File file = new File(txPath);
+            // 本地没有保存的头像
             if (file.length() == 0) {
                 Log.e("no touxiang picture: ", "local touxiang picture is null");
                 return;
@@ -141,7 +146,8 @@ public class ConfigureActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    // 选择新头像
+
+    // 打开图片管理器，选择新头像
     private void selectImage() {
         // TODO Auto-generated method stub
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
@@ -157,7 +163,7 @@ public class ConfigureActivity extends AppCompatActivity {
 
 
     }
-
+    // 选择头像后返回时执行
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -190,6 +196,7 @@ public class ConfigureActivity extends AppCompatActivity {
             }
         }
     }
+    // 通过uri获得图片本机路径，该方法适用于Android4.4以上
     private String getImagePath(Uri uri, String selection) {
         String path = null;
         //通过Uri和selection 来获取真实的图片路径
@@ -202,7 +209,6 @@ public class ConfigureActivity extends AppCompatActivity {
         }
         return path;
     }
-
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void handleImageOnKitKat(Intent data){
         Log.e("handleImageOnKitKat", "handleImageOnKitKat: " );
@@ -257,6 +263,7 @@ public class ConfigureActivity extends AppCompatActivity {
                 try {
                     Log.e("URL", url);
                     if (what == GET) {
+                        // 请求一个图片的url
                         String result = get(url);
                         Log.e("TAG", result);
                         Message msg = Message.obtain();
@@ -265,6 +272,7 @@ public class ConfigureActivity extends AppCompatActivity {
                         getHandler.sendMessage(msg);
                     }
                     else if (what == GET_IMG) {
+                        // 获得图片url后请求图片
                         InputStream inputStream = getImg(url);
                         //将输入流数据转化为Bitmap位图数据
                         Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
@@ -291,7 +299,7 @@ public class ConfigureActivity extends AppCompatActivity {
         }.start();
     }
 
-    // 使用postImg获取数据
+    // 使用postImg上传修改的头像
     private void getDataFromPostImg(String url) {
         new Thread(){
             @Override
@@ -330,7 +338,7 @@ public class ConfigureActivity extends AppCompatActivity {
     }
 
     /**
-     * Okhttp的post请求
+     * Okhttp的postImg请求
      * @param url 向服务器请求的url
      * @param path 图像路径
      * @return 服务器返回的字符串
