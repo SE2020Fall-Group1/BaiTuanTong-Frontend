@@ -7,6 +7,10 @@
         android:title="发布动态"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/set_clubinfo_menu_item"
+        android:title="修改社团简介"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/club_admin_manage_menu_item"
