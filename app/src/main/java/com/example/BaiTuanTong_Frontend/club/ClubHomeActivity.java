@@ -101,6 +101,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GETFAIL = 3;
     private static final int PICTURE = 4;
     private static final int FOLLOW = 5;
+    private static final int DELETE_POST = 101;
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
@@ -139,6 +140,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                         String message = (String)msg.obj;
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
+                        Log.e("Post num", "" + postId.size());
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
@@ -485,7 +487,6 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     /**
      *菜单中按钮被点击时的回调函数
-     * 目前用来测试okhttp
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -558,7 +559,18 @@ public class ClubHomeActivity extends AppCompatActivity {
     private void startEditPostActivity(int position){
         Intent intent = new Intent(this, EditPostGridActivity.class);
         intent.putExtra("postId", postId.get(position));
-        startActivity(intent);
+        startActivityForResult(intent, DELETE_POST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e("re", "resultCode="+resultCode+"requestCode="+requestCode);
+        if(requestCode == DELETE_POST){
+            mSwipeRefreshLayout.setRefreshing(true);
+            clearData();
+            loadData();
+        }
     }
 
     @Override
