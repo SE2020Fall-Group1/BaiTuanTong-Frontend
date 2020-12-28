@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -41,6 +42,16 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
         this.mOnItemClickListener = onItemClickListener;
     }
 
+    public interface OnItemLongClickListener {
+        void onLongClick(int position);
+    }
+
+    PostListAdapter.OnItemLongClickListener onItemLongClickListener;
+
+    public void setOnItemLongClickListener(PostListAdapter.OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
     public class PostListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout post_list_content;
         private ImageView club_img;
@@ -49,6 +60,7 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
         private TextView post_text;
         public TextView post_likeCnt;
         public TextView post_commentCnt;
+        public CardView post_card;
 
         public PostListViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
@@ -59,6 +71,7 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
             post_text = itemView.findViewById(R.id.post_text);
             post_likeCnt = itemView.findViewById(R.id.post_likeCnt);
             post_commentCnt = itemView.findViewById(R.id.post_commentCnt);
+            post_card = itemView.findViewById(R.id.card_view);
 
             // 设置内部点击事件
             club_img.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +105,20 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
                             onItemClickListener.onItemClick(view, position);
                         }
                     }
+                }
+            });
+
+            post_list_content.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (onItemLongClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            onItemLongClickListener.onLongClick(position);
+                        }
+                    }
+                    //返回false会在长按结束后继续点击
+                    return true;
                 }
             });
         }
