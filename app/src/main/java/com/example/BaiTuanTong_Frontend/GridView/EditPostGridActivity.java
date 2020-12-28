@@ -116,6 +116,7 @@ public class EditPostGridActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     "success",
                                     Toast.LENGTH_SHORT).show();
+                            finish();   //如果成功就直接返回
                         }
                         else if (code == 300){
                             Toast.makeText(getApplicationContext(),
