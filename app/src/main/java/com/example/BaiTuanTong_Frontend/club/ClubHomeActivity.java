@@ -24,17 +24,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
 import com.example.BaiTuanTong_Frontend.EditPostActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
-import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
-import com.example.BaiTuanTong_Frontend.data.SetClubinfoDialogFragment;
 import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
 import com.example.BaiTuanTong_Frontend.widget.CustomEmptyView;
@@ -92,6 +89,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     Button followClubButton; //关注社团按钮
 
     private SetClubinfoDialogFragment setClubinfoDialogFragment;
+    private SetClubImageDialogFragment setClubImageDialogFragment;
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
@@ -123,6 +121,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private String userId;
     private int permission;
     private boolean isFollowed;
+    public Bitmap clubImageBitmap;
 
     private String userName;
 
@@ -266,6 +265,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         userId = shared.getString("userId", "");
         userName = shared.getString("userName", "");
         setClubinfoDialogFragment = new SetClubinfoDialogFragment();
+        setClubImageDialogFragment = new SetClubImageDialogFragment();
 
         initRefreshLayout();
 
@@ -462,36 +462,11 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //目前permission似乎有点儿问题，president和普通人一样 就很气，先特判一波儿
-        //Log.e("permission", "" + permission);
-        //Log.e("presidentname", "" + clubPresident);
-        //Log.e("myname", "" + userName);
-        /*if (userName.equals(clubPresident))
-        {
-            Log.e("debug", "" + "进来了！我是president");
-            followClubButton.setVisibility(GONE);
-            getMenuInflater().inflate(R.menu.club_home_menu, menu);
-        }
-        else
-        {
-            Log.e("debug", "" + "进来了个锤子！我不是president");
-            if (permission == 1) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-                menu.getItem(2).setVisible(false);
-                menu.getItem(2).setEnabled(false);
-            }
-            if (permission == 2) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-            }
-        }*/
-
         if (permission == 1) {
             followClubButton.setVisibility(GONE);
             getMenuInflater().inflate(R.menu.club_home_menu, menu);
-            menu.getItem(2).setVisible(false);
-            menu.getItem(2).setEnabled(false);
+            menu.getItem(3).setVisible(false);
+            menu.getItem(3).setEnabled(false);
         }
         else if(permission == 2){
             followClubButton.setVisibility(GONE);
@@ -522,6 +497,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                 break;
             case R.id.set_clubinfo_menu_item:
                 setClubinfoDialogFragment.show(getSupportFragmentManager(),"dialog");
+                break;
+            case R.id.set_clubimage_menu_item:
+                setClubImageDialogFragment.show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.club_admin_manage_menu_item:
                 intent = new Intent(this, EditClubAdminActivity.class);
@@ -591,5 +569,9 @@ public class ClubHomeActivity extends AppCompatActivity {
     public void setClubProfile(String s) {
         String print = s +"\n"+"社长: "+clubPresident;
         clubProfile.setText(print);
+    }
+
+    public void setClubImage(Bitmap bm){
+        mCircleImageView.setImageBitmap(bm);
     }
 }
