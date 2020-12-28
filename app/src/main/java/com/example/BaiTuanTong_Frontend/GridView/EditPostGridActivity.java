@@ -199,7 +199,7 @@ public class EditPostGridActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = post(url, json); //json用于上传数据，目前不需要
-                    Log.e("TAG", result);
+                    Log.e("POST_RESULT", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
                     msg.obj = result;
@@ -220,14 +220,35 @@ public class EditPostGridActivity extends AppCompatActivity {
         getDataFromGet(SERVERURL + "post/view?" + "userId=" + userId + "&" + "postId=" + postId);
     }
 
+
+    void deletePost()
+    {
+        //以下为okhttp方法。
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("postId", postId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        getDataFromPost(SERVERURL + "post/delete", obj.toString());
+        Toast.makeText(getApplicationContext(),
+                "删除完成！",
+                Toast.LENGTH_SHORT).show();
+//        if(code == 200)
+            EditPostGridActivity.this.finish();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
             case R.id.delete_post_button:
-               Toast.makeText(getApplicationContext(),
+             /*  Toast.makeText(getApplicationContext(),
                         "点击了删除动态按钮",
                         Toast.LENGTH_SHORT).show();
+               */
+
+                deletePost();
 
          //       dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;

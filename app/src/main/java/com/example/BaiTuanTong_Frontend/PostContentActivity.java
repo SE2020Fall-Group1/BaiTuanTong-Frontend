@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.BaiTuanTong_Frontend.adapter.CommentAdapter;
+import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 import com.example.BaiTuanTong_Frontend.data.Comment;
 import com.example.BaiTuanTong_Frontend.data.CommentDialogFragment;
 import com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll;
@@ -54,6 +55,7 @@ public class PostContentActivity extends AppCompatActivity {
     private CommentDialogFragment commentDialogFragment;
     private CollapsingToolbarLayout toolBarLayout;
     private Toolbar toolbar;
+    private FloatingActionButton clubHeadButton;
     private TextView contentTextView;
     private List<Comment> commentList = new ArrayList<Comment>();
     public String userId;
@@ -63,6 +65,7 @@ public class PostContentActivity extends AppCompatActivity {
     public String getUrl;
     private int likeCnt;
     private boolean isliked;
+    private int clubId;
     private boolean isCollected;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -87,6 +90,7 @@ public class PostContentActivity extends AppCompatActivity {
                         String clubName = jsonObject.getString("clubName");
                         isliked = jsonObject.getBoolean("isLiked");
                         likeCnt = jsonObject.getInt("likeCnt");
+                        clubId = jsonObject.getInt("clubId");
                         isCollected = jsonObject.getBoolean("isCollected");
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
 
@@ -169,6 +173,12 @@ public class PostContentActivity extends AppCompatActivity {
         }
     });
 
+    private  void startClubHomeActivity(){
+        Intent intentClub = new Intent(this, ClubHomeActivity.class);
+        intentClub.putExtra("userId", userId);
+        intentClub.putExtra("clubId",clubId);
+        startActivity(intentClub);
+    }
     //从post获取数据
     private void getDataFromPost(String url, String json, int what) {
         //Log.e("TAG", "Start getDataFromGet()");
@@ -260,13 +270,7 @@ public class PostContentActivity extends AppCompatActivity {
         collectButtonText = (TextView)findViewById(R.id.collect_button_text);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fab.setOnClickListener(new MyOnClickListener());
 
         toolBarLayout.setTitle(" ");
         contentTextView.setText("");
@@ -352,6 +356,7 @@ public class PostContentActivity extends AppCompatActivity {
                         }
                     });
                     break;
+                case R.id.fab:
                 default:
                     Toast.makeText(PostContentActivity.this, "not implemented", Toast.LENGTH_SHORT);
             }
