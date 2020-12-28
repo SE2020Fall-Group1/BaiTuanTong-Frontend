@@ -82,7 +82,13 @@ public class ConfigureActivity extends AppCompatActivity {
         // 头像路径
         txPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/touxiang.jpg";
         imgShow = findViewById(R.id.iv_touxiang);
+        // 首先尝试从本地路径获取头像
+        getTouxiang();
+        // 从后端刷新头像
+        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+
         btn_modify_touxiang = findViewById(R.id.btn_modify_touxiang);
+
         btn_modify_touxiang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,16 +97,6 @@ public class ConfigureActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.e("123","onresume");
-        // 首先尝试从本地路径获取头像
-        getTouxiang();
-        // 从后端刷新头像
-        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
-
-    }
     // 检查读写权限
     private static final int REQUEST_EXTERNAL_STORAGE=1;
     private static String[] PERMISSIONS_STORAGE = {
