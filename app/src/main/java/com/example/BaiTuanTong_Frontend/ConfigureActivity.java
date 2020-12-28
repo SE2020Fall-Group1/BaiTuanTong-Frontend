@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +68,8 @@ public class ConfigureActivity extends AppCompatActivity {
     private static final int GET_IMG = 4;
     private static final String SERVERURL = "http://47.92.233.174:5000";
     private static String userId_str = null;
+    private static String userName;
+    private TextView tv_username;
 
     // 本地存储头像路径，在安卓手机里
     private String txPath;
@@ -80,9 +83,11 @@ public class ConfigureActivity extends AppCompatActivity {
         // userId参数放在这里设置
         SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
         userId_str = shared.getString("userId", "");
-
+        userName = shared.getString("userName","");
         // 头像路径，即/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
         txPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/touxiang.jpg";
+        tv_username = findViewById(R.id.tv_userName);
+        tv_username.setText(userName);
         imgShow = findViewById(R.id.iv_touxiang);
         // 首先尝试从本地路径获取头像，没有的话使用默认的“照相机”icon
         getTouxiang();

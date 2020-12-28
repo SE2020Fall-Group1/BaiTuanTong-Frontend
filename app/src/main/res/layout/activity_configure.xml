@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/personal_manage"
+    android:id="@+id/user_profile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context=".ConfigureActivity">
+
     <com.example.BaiTuanTong_Frontend.widget.CircleImageView
         android:id="@+id/iv_touxiang"
         android:layout_width="150dp"
@@ -14,7 +15,14 @@
         android:layout_marginTop="100dp"
         android:src="@drawable/icon_touxiang"
         tools:srcCompat="@tools:sample/avatars" />
-
+    <TextView
+        android:id="@+id/tv_userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="用户名"
+        android:textSize="20sp"/>
     <Button
         android:id="@+id/btn_modify_touxiang"
         android:layout_width="wrap_content"
