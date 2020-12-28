@@ -172,6 +172,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                     }
                     break;
                 case GET_IMG:
+                    mCircleImageView.setImageBitmap((Bitmap)msg.obj);
                     return true;
                 case GETFAIL:
                     if(retry_time < 3) { //尝试三次，如果不行就放弃
@@ -461,7 +462,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                         Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
                         if (bitmap == null)
                             Log.e("null bitmap", "123");
-                        mCircleImageView.setImageBitmap(bitmap);
                         Log.e("touxiang stores in ",clubImgPath);
                         File imgfile=new File(clubImgPath);
                         imgfile.createNewFile();
