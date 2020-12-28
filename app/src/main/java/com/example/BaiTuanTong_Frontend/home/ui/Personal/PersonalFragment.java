@@ -243,7 +243,7 @@ public class PersonalFragment extends Fragment {
                     if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("no user image"))
                         Toast.makeText(getActivity().getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
                     else
-                        getDataFromGet(SERVERURL + (String) msg.obj, GET_IMG);
+                        getDataFromGet(SERVERURL + "/static/images/" +(String) msg.obj, GET_IMG);
                     break;
                 case GET_IMG:
                     touxiang.setImageBitmap((Bitmap) msg.obj);
