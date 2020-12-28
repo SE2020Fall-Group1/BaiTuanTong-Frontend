@@ -184,19 +184,30 @@ public class ReleasePostActivity extends AppCompatActivity {
      * @throws IOException 请求出错
      */
     private String post(String url) throws IOException {
-        Log.e("path", picPathList.get(0));
-        File file = new File(picPathList.get(0));
-        if (file == null)
-            Log.e("file create wrong", "sad");
-        Log.e("file name:", file.getName());
-        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
-        RequestBody body = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("clubId", Integer.toString(clubId))
-                .addFormDataPart("title", post_title)
-                .addFormDataPart("text", post_text)
-                .addFormDataPart("image", file.getName(), fileBody)
-                .build();
+        RequestBody body;
+        if (picPathList.size() > 0) {
+            Log.e("path", picPathList.get(0));
+            File file = new File(picPathList.get(0));
+            if (file == null)
+                Log.e("file create wrong", "sad");
+            Log.e("file name:", file.getName());
+            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+            body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("clubId", Integer.toString(clubId))
+                    .addFormDataPart("title", post_title)
+                    .addFormDataPart("text", post_text)
+                    .addFormDataPart("image", file.getName(), fileBody)
+                    .build();
+        }
+        else {
+            body = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("clubId", Integer.toString(clubId))
+                    .addFormDataPart("title", post_title)
+                    .addFormDataPart("text", post_text)
+                    .build();
+        }
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
