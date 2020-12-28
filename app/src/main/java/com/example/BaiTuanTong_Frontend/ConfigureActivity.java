@@ -1,15 +1,5 @@
 package com.example.BaiTuanTong_Frontend;
 
-<<<<<<< Updated upstream
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-
-=======
->>>>>>> Stashed changes
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -37,7 +27,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedInputStream;
