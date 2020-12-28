@@ -463,31 +463,6 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //目前permission似乎有点儿问题，president和普通人一样 就很气，先特判一波儿
-        //Log.e("permission", "" + permission);
-        //Log.e("presidentname", "" + clubPresident);
-        //Log.e("myname", "" + userName);
-        /*if (userName.equals(clubPresident))
-        {
-            Log.e("debug", "" + "进来了！我是president");
-            followClubButton.setVisibility(GONE);
-            getMenuInflater().inflate(R.menu.club_home_menu, menu);
-        }
-        else
-        {
-            Log.e("debug", "" + "进来了个锤子！我不是president");
-            if (permission == 1) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-                menu.getItem(2).setVisible(false);
-                menu.getItem(2).setEnabled(false);
-            }
-            if (permission == 2) {
-                followClubButton.setVisibility(GONE);
-                getMenuInflater().inflate(R.menu.club_home_menu, menu);
-            }
-        }*/
-
         if (permission == 1) {
             followClubButton.setVisibility(GONE);
             getMenuInflater().inflate(R.menu.club_home_menu, menu);
