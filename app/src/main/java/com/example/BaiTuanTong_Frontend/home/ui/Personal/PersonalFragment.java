@@ -150,6 +150,8 @@ public class PersonalFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = shared.edit();
+                editor.remove("userId");
+                editor.remove("userName");
                 editor.remove("logged");
                 editor.commit();
                 getActivity().finish();
