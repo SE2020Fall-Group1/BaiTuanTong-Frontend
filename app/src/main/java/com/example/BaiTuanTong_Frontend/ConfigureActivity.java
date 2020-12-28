@@ -14,9 +14,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
@@ -25,14 +27,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -44,10 +54,9 @@ public class ConfigureActivity extends AppCompatActivity {
 
     private ImageView imgShow = null;
     private String imgPath = null;
-    private final int IMAGE_CODE = 0;
-    Uri bitmapUri = null;
-    private final String IMAGE_TYPE = "image/*";
     private Button btn_modify_touxiang;
+    private final int IMAGE_CODE = 0;
+    private final String IMAGE_TYPE = "image/*";
 
     // 与后端通信部分
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
@@ -55,13 +64,23 @@ public class ConfigureActivity extends AppCompatActivity {
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int POST_IMG = 3;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final int GET_IMG = 4;
+    private static final String SERVERURL = "http://47.92.233.174:5000";
+    private static String userId_str = null;
+
+    // 本地存储头像路径
+    private String txPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure);
         checkStoragePermissions(this);
+        // userId参数放在这里设置
+        SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
+        userId_str = shared.getString("userId", "");
+        // 头像路径
+        txPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/touxiang.jpg";
         imgShow = findViewById(R.id.iv_touxiang);
         btn_modify_touxiang = findViewById(R.id.btn_modify_touxiang);
         btn_modify_touxiang.setOnClickListener(new View.OnClickListener() {
@@ -72,6 +91,16 @@ public class ConfigureActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 首先尝试从本地路径获取头像
+        getTouxiang();
+        // 从后端刷新头像
+        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+
+    }
+    // 检查读写权限
     private static final int REQUEST_EXTERNAL_STORAGE=1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -93,19 +122,31 @@ public class ConfigureActivity extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            Log.e("exception", "read");
             e.printStackTrace();
         }
     }
-        private void selectImage() {
+    // 从本地文件读取头像
+    private void getTouxiang() {
+        Bitmap bitmap = null;
+        try{
+            // 根据指定文件路径构建缓存输入流对象
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(txPath));
+            // 从缓存输入流中解码位图数据
+            bitmap = BitmapFactory.decodeStream(bis);
+            bis.close();
+            imgShow.setImageBitmap(bitmap);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    // 选择新头像
+    private void selectImage() {
         // TODO Auto-generated method stub
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;
         if (isKitKatO) {
-            Log.e("123","1");
             getAlbum = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         } else {
-            Log.e("123","2");
             getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
         }
         getAlbum.setType(IMAGE_TYPE);
@@ -131,8 +172,7 @@ public class ConfigureActivity extends AppCompatActivity {
         if (requestCode == IMAGE_CODE) {
             try {
                 Uri originalUri = data.getData();        //获得图片的uri
-                Log.e("uri authority", originalUri.getAuthority());
-                Log.e("uri scheme:", originalUri.getScheme());
+
                 bm = MediaStore.Images.Media.getBitmap(resolver, originalUri);
                 //显得到bitmap图片
                 imgShow.setImageBitmap(bm);
@@ -141,7 +181,7 @@ public class ConfigureActivity extends AppCompatActivity {
                 handleImageOnKitKat(data);
                 Log.e("img path", imgPath);
                 // 发送给后端
-                getDataFromPostImg(SERVERURL+"user/image/upload");
+                getDataFromPostImg(SERVERURL+"/user/image/upload");
 
             } catch (IOException e) {
                 Log.e("TAG-->Error", e.toString());
@@ -153,15 +193,11 @@ public class ConfigureActivity extends AppCompatActivity {
         //通过Uri和selection 来获取真实的图片路径
         Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
         if(cursor!=null){
-            Log.e("uri", uri.getPath());
-            int imagenum = cursor.getCount();
-            Log.e("imagenum", String.valueOf(imagenum));
             if (cursor.moveToFirst()){
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             }
             cursor.close();
         }
-        Log.e("path", path);
         return path;
     }
 
@@ -191,10 +227,18 @@ public class ConfigureActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case POST_IMG:
-
+                    Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+                    break;
+                case GET:
+                    if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("invalid userId"))
+                        Toast.makeText(getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
+                    else
+                        getDataFromGet(SERVERURL + (String) msg.obj, GET_IMG);
+                    break;
+                case GET_IMG:
+                    imgShow.setImageBitmap((Bitmap) msg.obj);
                     break;
                 default: return false;
             }
@@ -210,14 +254,36 @@ public class ConfigureActivity extends AppCompatActivity {
                 super.run();
                 try {
                     Log.e("URL", url);
-                    String result = get(url);
-                    Log.e("TAG", result);
-                    Message msg = Message.obtain();
-                    msg.what = what;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
+                    if (what == GET) {
+                        String result = get(url);
+                        Log.e("TAG", result);
+                        Message msg = Message.obtain();
+                        msg.what = what;
+                        msg.obj = result;
+                        getHandler.sendMessage(msg);
+                    }
+                    else if (what == GET_IMG) {
+                        InputStream inputStream = getImg(url);
+                        //将输入流数据转化为Bitmap位图数据
+                        Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
+                        Log.e("touxiang stores in ",txPath);
+                        File file=new File(txPath);
+                        file.createNewFile();
+                        //创建文件输出流对象用来向文件中写入数据
+                        FileOutputStream out=new FileOutputStream(file);
+                        //将bitmap存储为jpg格式的图片
+                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+                        //刷新文件流
+                        out.flush();
+                        out.close();
+                        Message msg=Message.obtain();
+                        msg.what = what;
+                        msg.obj = bitmap;
+                        getHandler.sendMessage(msg);
+                    }
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
+                    Log.e("IOException", IOException.toString());
                 }
             }
         }.start();
@@ -230,13 +296,10 @@ public class ConfigureActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 try {
-                    // userId参数放在这里设置
-                    SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
-                    String userId = shared.getString("userId", "");
                     Log.e("url", url);
-                    Log.e("userId",userId);
+                    Log.e("userId",userId_str);
                     Log.e("imgPath", imgPath);
-                    String result = postImg(url, userId, imgPath); //jason用于上传数据，目前不需要
+                    String result = postImg(url, userId_str, imgPath); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST_IMG;
@@ -291,5 +354,19 @@ public class ConfigureActivity extends AppCompatActivity {
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
+    }
+    /**
+     * Okhttp的getImg请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private InputStream getImg(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        //将响应数据转化为输入流数据
+        return response.body().byteStream();
     }
 }
