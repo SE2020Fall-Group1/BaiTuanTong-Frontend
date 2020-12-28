@@ -16,7 +16,7 @@
         android:paddingTop="10dp"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.example.BaiTuanTong_Frontend.widget.CircleImageView
             android:id="@+id/club_img"
             android:layout_width="45dp"
             android:layout_height="45dp"

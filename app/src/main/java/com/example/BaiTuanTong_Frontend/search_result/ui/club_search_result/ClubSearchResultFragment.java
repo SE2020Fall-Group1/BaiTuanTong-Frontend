@@ -2,6 +2,8 @@ package com.example.BaiTuanTong_Frontend.search_result.ui.club_search_result;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +52,7 @@ public class ClubSearchResultFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
+    private static final int getImg = 3;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
 
@@ -57,6 +61,8 @@ public class ClubSearchResultFragment extends Fragment {
     public List<String> clubName = new ArrayList<>();      // 社团名字
     public List<String> introduction = new ArrayList<>();  // 社团简介
     public List<String> president = new ArrayList<>();     // 社团主席
+    public List<String> imgUrl = new ArrayList<>();         // 社团头像URL
+    public List<Bitmap> clubImg = new ArrayList<>();        // 社团头像
 
     // RecyclerView的适配器
     public class ClubSearchResultAdapter extends ClubListAdapter {
@@ -96,7 +102,7 @@ public class ClubSearchResultFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (clubId.isEmpty())
-            getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"));
+            getDataFromGet(SERVERURL + "club/search?keyword=" + getArguments().getString("searchText"), GET);
     }
 
     // 跳转到社团主页，传递参数position（该动态再列表中的位置）
@@ -111,6 +117,15 @@ public class ClubSearchResultFragment extends Fragment {
         mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction);
         mRecyclerView.setAdapter(mClubSearchResultAdapter);
 
+        if (clubImg.isEmpty()) {
+            for (int i = 0; i < imgUrl.size(); i++)
+                clubImg.add(null);
+        }
+        // 通过url获得图片
+        for (int i = 0; i < imgUrl.size(); i++) {
+            getDataFromGet(SERVERURL + "static/images/tiny/" + imgUrl.get(i), getImg + i);
+        }
+
         // 下面是为点击事件添加的代码
         mClubSearchResultAdapter.setOnItemClickListener(new ClubSearchResultAdapter.OnItemClickListener() {
             @Override
@@ -121,22 +136,32 @@ public class ClubSearchResultFragment extends Fragment {
         mView.invalidate();
     }
 
+    private void updateClubImage(Bitmap bm, int position) {
+        clubImg.set(position, bm);
+        View view = mRecyclerView.getLayoutManager().findViewByPosition(position);
+        if (null != view && null != mRecyclerView.getChildViewHolder(view)){
+            ClubListAdapter.ClubListViewHolder viewHolder =
+                    (ClubListAdapter.ClubListViewHolder) mRecyclerView.getChildViewHolder(view);
+            viewHolder.club_img.setImageBitmap(bm);
+        }
+    }
+
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
-            switch (msg.what){
-                case GET:
-                    try {
-                        parseJsonPacket((String)msg.obj);
-                        updateView();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case POST:
-                    break;
+            if (msg.what == GET)
+                Log.e("TAG", (String)msg.obj);
+            try {
+                if (msg.what == GET) {
+                    parseJsonPacket((String) msg.obj);
+                    updateView();
+                } else if (msg.what >= getImg) {
+                    int position = msg.what - getImg;
+                    updateClubImage((Bitmap) msg.obj, position);
+                }
+            } catch (JSONException e) {
+                    e.printStackTrace();
             }
             return true;
         }
@@ -156,23 +181,35 @@ public class ClubSearchResultFragment extends Fragment {
             clubName.add(clubList.getJSONObject(i).getString("clubName"));
             introduction.add(clubList.getJSONObject(i).getString("introduction"));
             president.add(clubList.getJSONObject(i).getString("president"));
+            imgUrl.add(clubList.getJSONObject(i).getString("clubImage"));
         }
     }
 
     // 使用get获取数据
-    private void getDataFromGet(String url) {
+    private void getDataFromGet(String url, int what) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
+                Message msg;
                 try {
-                    Log.e("URL", url);
-                    String result = get(url);
-                    Log.e("RES", result);
-                    Message msg = Message.obtain();
-                    msg.what = GET;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
+                    if (what == GET) {
+                        Log.e("URL", url);
+                        String result = get(url);
+                        Log.e("RES", result);
+                        msg = Message.obtain();
+                        msg.what = GET;
+                        msg.obj = result;
+                        getHandler.sendMessage(msg);
+                    } else if (what >= getImg) {
+                        InputStream inputStream = getImg(url);
+                        //将输入流数据转化为Bitmap位图数据
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        msg = Message.obtain();
+                        msg.what = what;
+                        msg.obj = bitmap;
+                        getHandler.sendMessage(msg);
+                    }
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
                 }
@@ -230,5 +267,20 @@ public class ClubSearchResultFragment extends Fragment {
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
+    }
+
+    /**
+     * Okhttp的getImg请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private InputStream getImg(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        //将响应数据转化为输入流数据
+        return response.body().byteStream();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +21,28 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
     private List<String> text;          // 动态内容
     private List<String> likeCnt;       // 点赞数
     private List<String> commentCnt;    // 评论数
+    private List<Bitmap> clubImg;       // 社团图片
     private Context mContext;
 
-    public PostListAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+    public PostListAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text,
+                           List<String> likeCnt, List<String> commentCnt) {
         this.mContext = mContext;
         this.title = title;
         this.clubName = clubName;
         this.text = text;
         this.likeCnt = likeCnt;
+        this.clubImg = null;
+        this.commentCnt = commentCnt;
+    }
+
+    public PostListAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text,
+                           List<String> likeCnt, List<String> commentCnt, List<Bitmap> clubImg) {
+        this.mContext = mContext;
+        this.title = title;
+        this.clubName = clubName;
+        this.text = text;
+        this.likeCnt = likeCnt;
+        this.clubImg = clubImg;
         this.commentCnt = commentCnt;
     }
 
@@ -54,7 +69,7 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
 
     public class PostListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout post_list_content;
-        private ImageView club_img;
+        public ImageView club_img;
         private TextView post_title;
         private TextView post_clubName;
         private TextView post_text;
@@ -140,6 +155,9 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
         holder.post_likeCnt.setText(likeCnt.get(position));
         holder.post_commentCnt.setText(commentCnt.get(position));
         holder.post_list_content.setTag(position);
+        if (clubImg != null) {
+            holder.club_img.setImageBitmap(clubImg.get(position));
+        }
     }
 
     @Override

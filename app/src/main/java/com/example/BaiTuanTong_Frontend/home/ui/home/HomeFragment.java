@@ -3,6 +3,8 @@ package com.example.BaiTuanTong_Frontend.home.ui.home;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +45,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 public class HomeFragment extends Fragment {
     //private Context mContext;
@@ -54,7 +55,7 @@ public class HomeFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean mIsRefreshing = false; //是否正在刷新
     private int retry_time = 0;
-    private PostAdapter myAdapter;
+    private HomeFragmentAdapter myAdapter;
     private MyListener ac;
 
     public String userId;
@@ -67,9 +68,10 @@ public class HomeFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
-    private static final int GETFAIL = 3;
+    private static final int GETFAIL = -1;
     private static final int getResult = 0;
     private static final int getPostInfo = 1;
+    private static final int getImg = 3;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
     // 从后端拿来的数据
@@ -80,8 +82,27 @@ public class HomeFragment extends Fragment {
     public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> clubId = new ArrayList<>();        // 社团ID
+    public List<String> imgUrl = new ArrayList<>();         // 社团头像URL
+    public List<Bitmap> clubImg = new ArrayList<>();        // 社团头像
 
     private int clickedPosition = -1;
+
+    public static class HomeFragmentAdapter extends PostListAdapter {
+
+        public HomeFragmentAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt);
+        }
+
+        public HomeFragmentAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt, List<Bitmap> bm) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt, bm);
+        }
+
+        class HomeFragmentViewHolder extends PostListAdapter.PostListViewHolder {
+            public HomeFragmentViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+                super(itemView, onItemClickListener);
+            }
+        }
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -175,6 +196,8 @@ public class HomeFragment extends Fragment {
         likeCnt.clear();
         commentCnt.clear();
         clubId.clear();
+        imgUrl.clear();
+        clubImg.clear();
         myAdapter.notifyItemRangeRemoved(0, size);
     }
 
@@ -199,7 +222,7 @@ public class HomeFragment extends Fragment {
         startActivity(intent);
     }
     // 初始化线性布局的循环视图
-    private void initRecyclerLinear() {
+    private void initRecyclerLinear() throws IOException {
 
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
@@ -211,6 +234,12 @@ public class HomeFragment extends Fragment {
         // 通过url传输数据
         // getDataFromGet(SERVERURL + "post/homepage", );
         rv_post_list.setOnTouchListener((v, event) -> mIsRefreshing);
+
+
+        /*// 通过url获得图片
+        for (int i = 0; i < imgUrl.size(); i++) {
+            getDataFromGet(SERVERURL + "static/images/tiny/" + imgUrl.get(i), getImg + i);
+        }*/
     }
     // 提示框，未实现
     private void doSearch(String text) {
@@ -236,11 +265,20 @@ public class HomeFragment extends Fragment {
     }
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
-        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
+        myAdapter = new HomeFragmentAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
         rv_post_list.setAdapter(myAdapter);
 
+        if (clubImg.isEmpty()) {
+            for (int i = 0; i < imgUrl.size(); i++)
+                clubImg.add(null);
+        }
+        // 通过url获得图片
+        for (int i = 0; i < imgUrl.size(); i++) {
+            getDataFromGet(SERVERURL + "static/images/tiny/" + imgUrl.get(i), getImg + i);
+        }
+
         // 下面是为点击事件添加的代码
-        myAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+        myAdapter.setOnItemClickListener(new HomeFragmentAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 switch (view.getId()) {
@@ -266,45 +304,60 @@ public class HomeFragment extends Fragment {
         }
         clickedPosition = -1;
     }
+
+    private void updateClubImage(Bitmap bm, int position) {
+        clubImg.set(position, bm);
+        View view = rv_post_list.getLayoutManager().findViewByPosition(position);
+        if (null != view && null != rv_post_list.getChildViewHolder(view)){
+            PostListAdapter.PostListViewHolder viewHolder =
+                    (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
+            viewHolder.club_img.setImageBitmap(bm);
+        }
+    }
     // 处理get请求与post请求的回调函数
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            switch (msg.what){
-                case getResult:
-                    try {
-                        parseJsonPacketForView((String)msg.obj);
-                        //updateView();
-                        retry_time = 0;
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case getPostInfo:
-                    try {
-                        parseJsonPacketForInfo((String)msg.obj);
-                        updatePostInfo();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case GETFAIL:
-                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+            try {
+                if (msg.what == getResult) {
+                    parseJsonPacketForView((String) msg.obj);
+                    //updateView();
+                    retry_time = 0;
+                } else if (msg.what == getPostInfo) {
+                    parseJsonPacketForInfo((String) msg.obj);
+                    updatePostInfo();
+                } else if (msg.what >= getImg) {
+                    int position = msg.what - getImg;
+                    updateClubImage((Bitmap) msg.obj, position);
+                } else if (msg.what == GETFAIL) {
+                    if (retry_time < 3) { //尝试三次，如果不行就放弃
                         retry_time++;
                         loadData();
                         return true;
-                    }
-                    else {
+                    } else {
                         retry_time = 0;
-                        break;
                     }
-                default: return false;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
             if(!recycleViewInitiated) { //无论成功与否，第一次必须初始化RecycleView
-                initRecyclerLinear();
+                try {
+                    initRecyclerLinear();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 recycleViewInitiated = true;
+            } else {
+                //updateView();
+                /*try {
+                    initRecyclerLinear();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
             }
-            refreshComplete();
+                refreshComplete();
             return true;
         }
     });
@@ -332,6 +385,7 @@ public class HomeFragment extends Fragment {
             likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
             commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
             clubId.add(postList.getJSONObject(i).getInt("clubId"));
+            imgUrl.add(postList.getJSONObject(i).getString("clubImage"));
         }
     }
 
@@ -357,17 +411,29 @@ public class HomeFragment extends Fragment {
             @Override
             public void run() {
                 super.run();
+                Message msg;
                 try {
-                    Log.e("URL", url);
-                    String result = get(url);
-                    Log.e("TAG", result);
-                    Message msg = Message.obtain();
-                    msg.what = what;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
+                    if (what == getResult || what == getPostInfo) {
+                        Log.e("URL", url);
+                        String result = get(url);
+                        Log.e("TAG", result);
+                        msg = Message.obtain();
+                        msg.what = what;
+                        msg.obj = result;
+                        getHandler.sendMessage(msg);
+                    }
+                    else if (what >= getImg) {
+                        InputStream inputStream = getImg(url);
+                        //将输入流数据转化为Bitmap位图数据
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        msg = Message.obtain();
+                        msg.what = what;
+                        msg.obj = bitmap;
+                        getHandler.sendMessage(msg);
+                    }
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
-                    Message msg = Message.obtain();
+                    msg = Message.obtain();
                     msg.what = GETFAIL;
                     getHandler.sendMessage(msg);
                 }
@@ -425,5 +491,20 @@ public class HomeFragment extends Fragment {
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
+    }
+
+    /**
+     * Okhttp的getImg请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private InputStream getImg(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        //将响应数据转化为输入流数据
+        return response.body().byteStream();
     }
 }
