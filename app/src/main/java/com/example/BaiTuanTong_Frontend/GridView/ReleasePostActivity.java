@@ -6,14 +6,23 @@
 package com.example.BaiTuanTong_Frontend.GridView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,11 +41,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -46,14 +58,18 @@ public class ReleasePostActivity extends AppCompatActivity {
 
     private GridView gridView;
     private Context mContext;
-    private ArrayList<String> mPicList = new ArrayList<>();
+    private ArrayList<Uri> mPicList = new ArrayList<>();
+    // 图片路径数组，路径可以直接用于传输给后端
+    private ArrayList<String> picPathList = new ArrayList<>();
+
     private MyGridViewAdapter myGridViewAdapter;
     private Button myButton;
     private EditText myTitle;
     private EditText myText;
     private String post_title;
     private String post_text;
-
+    // 最多发布图片数
+    private final int MAX_IMG_NUM = 1;
     private int clubId;
 
     //以下为json和okhttp部分！
@@ -71,6 +87,9 @@ public class ReleasePostActivity extends AppCompatActivity {
 
     private int code;
     private String data;
+    // 为了添加图片：
+    private final int IMAGE_CODE = 0;
+    private final String IMAGE_TYPE = "image/*";
 
     //在线测试 处理get和post
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -104,23 +123,8 @@ public class ReleasePostActivity extends AppCompatActivity {
                     break;
                 case POST://posting result
                     Log.e("POST_RES", (String) msg.obj);
-                    //300:fail, 200:success
-                    //club_profile.setText((String)msg.obj);
-                    try {
-                        parseJsonPacket((String)msg.obj);
-                        if (code == 200){
-                            Toast.makeText(getApplicationContext(),
-                                    "success",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (code == 300){
-                            Toast.makeText(getApplicationContext(),
-                                    data,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
+
                     break;
             }
             return true;
@@ -176,12 +180,23 @@ public class ReleasePostActivity extends AppCompatActivity {
     /**
      * Okhttp的post请求
      * @param url 向服务器请求的url
-     * @param json 向服务器发送的json包
      * @return 服务器返回的字符串
      * @throws IOException 请求出错
      */
-    private String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(json, JSON);
+    private String post(String url) throws IOException {
+        Log.e("path", picPathList.get(0));
+        File file = new File(picPathList.get(0));
+        if (file == null)
+            Log.e("file create wrong", "sad");
+        Log.e("file name:", file.getName());
+        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("clubId", Integer.toString(clubId))
+                .addFormDataPart("title", post_title)
+                .addFormDataPart("text", post_text)
+                .addFormDataPart("image", file.getName(), fileBody)
+                .build();
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
@@ -191,13 +206,13 @@ public class ReleasePostActivity extends AppCompatActivity {
         }
     }
 
-    private void getDataFromPost(String url, String json) {
+    private void getDataFromPost(String url) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, json); //json用于上传数据，目前不需要
+                    String result = post(url); //json用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
@@ -216,11 +231,84 @@ public class ReleasePostActivity extends AppCompatActivity {
     private void selectPic(int maxTotal) {
         Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
      //   PictureSelector.create(this, maxTotal);
-    }
+        // TODO Auto-generated method stub
+        boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        Intent getAlbum;
+        if (isKitKatO) {
+            getAlbum = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        } else {
+            getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
+        }
+        getAlbum.setType(IMAGE_TYPE);
 
+        startActivityForResult(getAlbum, IMAGE_CODE);
+    }
+    // 选择头像后返回时执行
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+
+            Log.e("TAG->onresult", "ActivityResult resultCode error");
+
+            return;
+
+        }
+        ContentResolver resolver = getContentResolver();
+        if (requestCode == IMAGE_CODE) {
+            //获得图片的uri，可以解析出bitmap类型的图像
+            Uri originalUri = data.getData();
+            mPicList.add(originalUri);
+
+            // 处理图像，获取路径，并且储存在picPathList中
+            handleImageOnKitKat(data);
+        }
+        Log.e("picnum", Integer.toString(mPicList.size()));
+        myGridViewAdapter = new MyGridViewAdapter(mContext, mPicList, picPathList);
+        gridView.setAdapter(myGridViewAdapter);
+    }
+    // 通过uri获得图片本机路径，该方法适用于Android4.4以上
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        //通过Uri和selection 来获取真实的图片路径
+        Cursor cursor = getContentResolver().query(uri,null,selection,null,null);
+        if(cursor!=null){
+            if (cursor.moveToFirst()){
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+        return path;
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void handleImageOnKitKat(Intent data){
+        Log.e("handleImageOnKitKat", "handleImageOnKitKat: " );
+        Uri uri = data.getData();
+        String imgPath = null;
+        if(DocumentsContract.isDocumentUri(this,uri)){
+            String docId = DocumentsContract.getDocumentId(uri);
+            if("com.android.providers.media.documents".equals(uri.getAuthority())){
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imgPath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())){
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"),Long.valueOf(docId));
+                imgPath = getImagePath(contentUri,null);
+            }else if("content".equalsIgnoreCase(uri.getScheme())){
+                //如果是content类型的Uri，则使用普通方式处理
+                imgPath = getImagePath(uri,null);
+            }else if ("file".equalsIgnoreCase(uri.getScheme())){
+                //如果是file类型的Uri,直接获取图片路径即可
+                imgPath = uri.getPath();
+            }
+            // 添加文件的路径到picPathList，该路径是传给后端用
+            picPathList.add(imgPath);
+        }
+    }
     private void initGridView()
     {
-        myGridViewAdapter = new MyGridViewAdapter(mContext, mPicList);
+        myGridViewAdapter = new MyGridViewAdapter(mContext, mPicList, picPathList);
         gridView.setAdapter(myGridViewAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -229,12 +317,12 @@ public class ReleasePostActivity extends AppCompatActivity {
                 if (position == parent.getChildCount() - 1) {
                     //如果“增加按钮形状的”图片的位置是最后一张，且添加了的图片的数量不超过9张，才能点击
                     //这个位置就是“加号”的位置。
-                    if (mPicList.size() == 9) {
+                    if (mPicList.size() == MAX_IMG_NUM) {
                         //最多添加5张图片
                         viewPluImg(position);
                     } else {
                         //添加凭证图片
-                        selectPic(9 - mPicList.size());
+                        selectPic(MAX_IMG_NUM - mPicList.size());
                     }
                 } else {
                     viewPluImg(position);
@@ -307,21 +395,8 @@ public class ReleasePostActivity extends AppCompatActivity {
                     return;
                 }
 
-                //以下为okhttp方法。
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put("clubId", clubId);
-                    Log.e("clubId", ""+clubId);
-                    obj.put("title", post_title);
-                    //   obj.put("userId", 4);
-                    Log.e("title", post_title);
-                    obj.put("text", post_text);
-                    Log.e("text", post_text);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.e("post context json", obj.toString());
-                getDataFromPost(SERVERURL + "post/release", obj.toString());
+                // 新的post方法，不是JSON了
+                getDataFromPost(SERVERURL + "post/release");
 
                 ReleasePostActivity.this.finish();
             }
