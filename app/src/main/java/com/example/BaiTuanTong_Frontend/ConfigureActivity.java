@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -191,10 +192,13 @@ public class ConfigureActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case POST_IMG:
-
+                    String result = (String)msg.obj;
+                    if(result.equals("success")) {
+                        Toast.makeText(getApplicationContext(), "头像上传成功", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                     break;
                 default: return false;
             }

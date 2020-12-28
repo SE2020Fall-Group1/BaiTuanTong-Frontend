@@ -142,7 +142,6 @@ public class ManageClubsActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
                     retry_time = 0;
