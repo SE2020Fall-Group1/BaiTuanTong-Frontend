@@ -49,7 +49,10 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="right|bottom"
-        app:srcCompat="@android:drawable/ic_menu_camera" />
+        app:srcCompat="@drawable/post_content_pic"
+        app:maxImageSize="50dp"
+        android:backgroundTint="@color/white"
+        android:scaleType="center"/>
 
     <LinearLayout
         android:layout_height="45dp"
