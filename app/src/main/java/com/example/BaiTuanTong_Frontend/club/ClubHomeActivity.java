@@ -28,12 +28,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.BaiTuanTong_Frontend.EditPostActivity;
 import com.example.BaiTuanTong_Frontend.GridView.EditPostGridActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
+import com.example.BaiTuanTong_Frontend.PostListAdapter;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.ui.home.PostAdapter;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
@@ -54,14 +54,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -173,6 +172,15 @@ public class ClubHomeActivity extends AppCompatActivity {
                     break;
                 case GET_IMG:
                     mCircleImageView.setImageBitmap((Bitmap)msg.obj);
+
+                    for (int i = 0; i < postId.size(); i++) {
+                        View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
+                        if (null != view && null != mRecyclerView.getChildViewHolder(view)){
+                            PostListAdapter.PostListViewHolder viewHolder =
+                                    (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
+                            viewHolder.club_img.setImageBitmap((Bitmap)msg.obj);
+                        }
+                    }
                     return true;
                 case GETFAIL:
                     if(retry_time < 3) { //尝试三次，如果不行就放弃
@@ -318,6 +326,14 @@ public class ClubHomeActivity extends AppCompatActivity {
             bitmap = BitmapFactory.decodeStream(bis);
             bis.close();
             mCircleImageView.setImageBitmap(bitmap);
+            for (int i = 0; i < postId.size(); i++) {
+                View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
+                if (null != view && null != mRecyclerView.getChildViewHolder(view)){
+                    PostListAdapter.PostListViewHolder viewHolder =
+                            (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
+                    viewHolder.club_img.setImageBitmap(bitmap);
+                }
+            }
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -342,6 +358,7 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
+        getPicture(SERVERURL+"club/image/download?clubId="+ clubId, GET_URL);
         //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
@@ -666,5 +683,13 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     public void setClubImage(Bitmap bm){
         mCircleImageView.setImageBitmap(bm);
+        for (int i = 0; i < postId.size(); i++) {
+            View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
+            if (null != view && null != mRecyclerView.getChildViewHolder(view)){
+                PostListAdapter.PostListViewHolder viewHolder =
+                        (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
+                viewHolder.club_img.setImageBitmap(bm);
+            }
+        }
     }
 }
