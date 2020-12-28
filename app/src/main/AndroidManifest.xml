@@ -13,11 +13,12 @@
         android:icon="@mipmap/ic_launcher_btt"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HelloWorld"
-        android:requestLegacyExternalStorage = "true">
-        <activity android:name=".ConfigureActivity"></activity>
+        android:theme="@style/Theme.HelloWorld">
+        <activity android:name=".GridView.EditPostGridActivity"></activity>
+        <activity android:name=".ConfigureActivity" />
         <activity
             android:name=".ManageClubsActivity"
             android:label="ManageClubsActivity"

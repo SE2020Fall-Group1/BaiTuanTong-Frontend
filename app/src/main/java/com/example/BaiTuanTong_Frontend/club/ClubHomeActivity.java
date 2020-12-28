@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
 import com.example.BaiTuanTong_Frontend.EditPostActivity;
+import com.example.BaiTuanTong_Frontend.GridView.EditPostGridActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
 import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
@@ -577,8 +578,8 @@ public class ClubHomeActivity extends AppCompatActivity {
     }
 
     private void startEditPostActivity(int position){
-        Intent intent = new Intent(this, EditPostActivity.class);
-        //intent.putExtra("postId", postId.get(position));
+        Intent intent = new Intent(this, EditPostGridActivity.class);
+        intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 
