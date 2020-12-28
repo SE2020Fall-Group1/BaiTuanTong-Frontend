@@ -16,7 +16,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
@@ -75,16 +74,10 @@ public class SetClubImageDialogFragment extends DialogFragment {
     private Bitmap temp_bitmap;
 
     private final OkHttpClient client = new OkHttpClient();
-    private static final int GET = 1;
-    private static final int POST = 2;
     private static final int POST_IMG = 3;
-    private static final int GET_IMG = 4;
-    private static final int POST_FAIL = 5;
+    private static final int POST_FAIL = 4;
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000";
-
-    // 本地存储头像路径，在安卓手机里
-    private String clubImgPath;
 
     @Nullable
     @Override
@@ -104,11 +97,6 @@ public class SetClubImageDialogFragment extends DialogFragment {
         if(clubHomeActivity.clubImageBitmap != null){
             clubImage.setImageBitmap(clubHomeActivity.clubImageBitmap);
         }
-        // 头像路径，即/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
-        clubImgPath = getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "club_" + clubId + ".jpg";
-        Log.e("club path:", clubImgPath);
-        getTouxiang();
-        getDataFromGet(SERVERURL+"/club/image/download?clubId="+ clubId, GET);
         return view;
     }
 
@@ -134,29 +122,7 @@ public class SetClubImageDialogFragment extends DialogFragment {
             e.printStackTrace();
         }
     }
-    // 从本地文件读取头像，没有的话直接返回，imgShow会显示默认的头像
-    // 默认的头像地址是/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
-    // 该地址是APP的私有存储空间
-    private void getTouxiang() {
-        Bitmap bitmap = null;
-        try{
-            File file = new File(clubImgPath);
-            // 本地没有保存的头像
-            if (file.length() == 0) {
-                Log.e("no touxiang picture: ", "local touxiang picture is null");
-                return;
-            }
-            Log.e("get touxiang from local", clubImgPath);
-            // 根据指定文件路径构建缓存输入流对象，文件不存在则会出现一个异常
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(clubImgPath));
-            // 从缓存输入流中解码位图数据
-            bitmap = BitmapFactory.decodeStream(bis);
-            bis.close();
-            clubImage.setImageBitmap(bitmap);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+
     private void selectImage() {
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;
@@ -184,8 +150,7 @@ public class SetClubImageDialogFragment extends DialogFragment {
                 Uri originalUri = data.getData();        //获得图片的uri
 
                 temp_bitmap = MediaStore.Images.Media.getBitmap(resolver, originalUri);
-                // 直接显示，不用等待后端请求
-                clubImage.setImageBitmap(temp_bitmap);
+
                 // 处理图像，获取路径
                 handleImageOnKitKat(data);
                 Log.e("img path", imgPath);
@@ -260,59 +225,11 @@ public class SetClubImageDialogFragment extends DialogFragment {
                     retry_time = 0;
                     return false;
                 }
-            } else if(msg.what == GET) {
-                if (((String) msg.obj).contains("invalid clubId") ||((String) msg.obj).contains("no club image"))
-                    Toast.makeText(getActivity().getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
-                else
-                    getDataFromGet(SERVERURL + "/static/images/" + (String) msg.obj, GET_IMG);
             }
             return true;
         }
     });
-    // 使用get获取数据
-    private void getDataFromGet(String url, int what) {
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    Log.e("URL", url);
-                    if (what == GET) {
-                        // 请求一个图片的url
-                        String result = get(url);
-                        Log.e("TAG", result);
-                        Message msg = Message.obtain();
-                        msg.what = what;
-                        msg.obj = result;
-                        getHandler.sendMessage(msg);
-                    }
-                    else if (what == GET_IMG) {
-                        // 获得图片url后请求图片
-                        InputStream inputStream = getImg(url);
-                        //将输入流数据转化为Bitmap位图数据
-                        Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
-                        Log.e("touxiang stores in ",clubImgPath);
-                        File file=new File(clubImgPath);
-                        file.createNewFile();
-                        //创建文件输出流对象用来向文件中写入数据
-                        FileOutputStream out=new FileOutputStream(file);
-                        //将bitmap存储为jpg格式的图片
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
-                        //刷新文件流
-                        out.flush();
-                        out.close();
-                        Message msg=Message.obtain();
-                        msg.what = what;
-                        msg.obj = bitmap;
-                        getHandler.sendMessage(msg);
-                    }
-                } catch (java.io.IOException IOException) {
-                    Log.e("TAG", "get failed.");
-                    Log.e("IOException", IOException.toString());
-                }
-            }
-        }.start();
-    }
+
     // 使用postImg获取数据
     private void getDataFromPostImg(String url) {
         new Thread(){
@@ -361,32 +278,5 @@ public class SetClubImageDialogFragment extends DialogFragment {
         try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
-    }
-    /**
-     * Okhttp的get请求
-     * @param url 向服务器请求的url
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-    /**
-     * Okhttp的getImg请求
-     * @param url 向服务器请求的url
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private InputStream getImg(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        //将响应数据转化为输入流数据
-        return response.body().byteStream();
     }
 }

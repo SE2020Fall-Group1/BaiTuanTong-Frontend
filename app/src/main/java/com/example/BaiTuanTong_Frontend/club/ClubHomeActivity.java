@@ -111,6 +111,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GET_IMG = 6;
     private static final int GET_URL = 7;
     private static final int DELETE_POST = 101;
+    private static final int EDIT_POST = 102;
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
@@ -633,7 +634,6 @@ public class ClubHomeActivity extends AppCompatActivity {
      * @param position 被点击项的序号
      */
     private void startPostContentActivity(Integer position){
-        //clickedPosition = position;
         Intent intent = new Intent(this, PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
         startActivity(intent);
@@ -642,14 +642,14 @@ public class ClubHomeActivity extends AppCompatActivity {
     private void startEditPostActivity(int position){
         Intent intent = new Intent(this, EditPostGridActivity.class);
         intent.putExtra("postId", postId.get(position));
-        startActivityForResult(intent, DELETE_POST);
+        startActivityForResult(intent, EDIT_POST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("re", "resultCode="+resultCode+"requestCode="+requestCode);
-        if(requestCode == DELETE_POST){
+        if(requestCode == DELETE_POST || requestCode == EDIT_POST){
             mSwipeRefreshLayout.setRefreshing(true);
             clearData();
             loadData();
