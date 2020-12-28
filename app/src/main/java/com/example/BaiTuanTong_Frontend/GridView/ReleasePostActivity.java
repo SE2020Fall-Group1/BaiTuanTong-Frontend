@@ -77,7 +77,7 @@ public class ReleasePostActivity extends AppCompatActivity {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             //super.handleMessage(msg);
-            Log.e("TAG", (String)msg.obj);
+            Log.e("msgTAG", (String)msg.obj);
             switch (msg.what){
                 case GET://not used in this page
 
@@ -289,20 +289,20 @@ public class ReleasePostActivity extends AppCompatActivity {
         myButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getApplicationContext(), "submitting", Toast.LENGTH_SHORT).show();
                 post_title = myTitle.getText().toString();
                 post_text = myText.getText().toString();//获取两部分的输入信息。
-                if (post_text.length() == 0)
-                {
-                    Toast.makeText(getApplicationContext(),
-                            "动态内容不能为空！",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 if (post_title.length() == 0)
                 {
                     Toast.makeText(getApplicationContext(),
                             "动态标题不能为空！",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (post_text.length() == 0)
+                {
+                    Toast.makeText(getApplicationContext(),
+                            "动态内容不能为空！",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -323,7 +323,21 @@ public class ReleasePostActivity extends AppCompatActivity {
                 Log.e("post context json", obj.toString());
                 getDataFromPost(SERVERURL + "post/release", obj.toString());
 
-                ReleasePostActivity.this.finish();
+
+//                Log.e("code", ""+code);
+//                Log.e("data", data);
+                if (code == 200)
+                    ReleasePostActivity.this.finish();
+               else
+                {
+
+                    if (data == null)
+                        data = "null";
+                    Toast.makeText(getApplicationContext(),
+                            data,
+                            Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
