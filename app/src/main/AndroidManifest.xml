@@ -17,7 +17,15 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
+<<<<<<< Updated upstream
         <activity android:name=".GridView.EditPostGridActivity"></activity>
+=======
+        <activity
+            android:name=".CollectedPostsActivity"
+            android:label="CollectedPostsActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar" />
+>>>>>>> Stashed changes
         <activity android:name=".ConfigureActivity" />
         <activity
             android:name=".ManageClubsActivity"
@@ -41,7 +49,6 @@
             android:name=".home.HomePageActivity"
             android:label="@string/title_activity_home_page"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".PostPageActivity" />
         <activity
             android:name=".FollowedClubsDisplayActivity"
             android:parentActivityName=".home.HomePageActivity"

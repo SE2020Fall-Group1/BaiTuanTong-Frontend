@@ -1,4 +1,4 @@
-package com.example.BaiTuanTong_Frontend.search_result.ui.post_search_result;
+package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,19 +7,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.BaiTuanTong_Frontend.PostContentActivity;
-import com.example.BaiTuanTong_Frontend.PostListAdapter;
-import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 
 import org.json.JSONArray;
@@ -36,15 +32,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static android.content.Context.MODE_PRIVATE;
+public class CollectedPostsActivity extends AppCompatActivity {
 
-public class PostSearchResultFragment extends Fragment {
-
-    private View mView;
+    private Toolbar mNavigation;
     private RecyclerView mRecyclerView;
-    private PostSearchResultAdapter mPostSearchResultAdapter;
+    private CollectedPostsAdapter mAdapter;
 
-    public String userId;
+    private String userId;
+    private SharedPreferences shared;
 
     // 与后端通信
     public static final MediaType JSON
@@ -54,10 +49,11 @@ public class PostSearchResultFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int POST = 2;
-    private static final int getSearchResult = 0;
+    private static final int getResult = 0;
     private static final int getPostInfo = 1;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
+    private int retry_time = 0;
 
     // 从后端拿来的数据
     public List<Integer> postId = new ArrayList<>();        // 动态ID
@@ -68,65 +64,65 @@ public class PostSearchResultFragment extends Fragment {
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> clubId = new ArrayList<>();        // 社团ID
 
-    /**
-     * 用户点击的动态的ID
-     * 由此页面点入某一条动态后，若从该动态回退到此页面，需要刷新该动态对应搜索结果列表项的点赞评论数
-     * 为此，在startActivity()调用前设置clickedPosition为对应列表位置
-     * 当回退时调用此Fragment的onResume()查询clickedPosition，若不是默认值-1则更新对应动态信息
-     * 最后将clickedPosition重新设置为默认值防止其他情况onResume()被调用时进行信息更新
-     */
     private int clickedPosition = -1;
 
     // RecyclerView的适配器
-    public class PostSearchResultAdapter extends PostListAdapter {
+    public class CollectedPostsAdapter extends PostListAdapter {
 
-        public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+        public CollectedPostsAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
             super(mContext, title, clubName, text, likeCnt, commentCnt);
         }
 
-        class PostSearchResultViewHolder extends PostListAdapter.PostListViewHolder {
-            public PostSearchResultViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+        class CollectedPostsViewHolder extends PostListAdapter.PostListViewHolder {
+            public CollectedPostsViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
                 super(itemView, onItemClickListener);
             }
         }
     }
 
-    @Nullable
+    public void initToolBar() {
+        mNavigation.setTitle("收藏的动态");
+        setSupportActionBar(mNavigation);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        SharedPreferences shared = getActivity().getSharedPreferences("share",  MODE_PRIVATE);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_collected_posts);
+
+        shared = this.getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
 
-        mView = inflater.inflate(R.layout.fragment_post_search_result, container, false);
-        mRecyclerView = (RecyclerView) mView.findViewById((R.id.post_search_result_recyclerView));
+        Intent intent = getIntent();
 
-        mPostSearchResultAdapter = new PostSearchResultAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
-        mRecyclerView.setAdapter(mPostSearchResultAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mNavigation = findViewById(R.id.collected_posts_title);
+        initToolBar();
+        mNavigation.setNavigationOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                setResult(3);
+                finish();
+            }
+        });
 
-        return mView;
+        // 设置布局管理器
+        mRecyclerView = this.findViewById(R.id.collected_posts_list);
+        mAdapter = new CollectedPostsAdapter(this, title, clubName, text, likeCnt, commentCnt);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        if (userId != null)
+            getDataFromGet(SERVERURL + "post/collection?userId=" + userId, getResult);
     }
 
-    public static PostSearchResultFragment newInstance(String text, int item) {
-        Bundle bundle = new Bundle();
-        bundle.putString("searchText", text);
-        bundle.putInt("item", item);
-
-        PostSearchResultFragment fragment = new PostSearchResultFragment();
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         Log.e("msg", "onResume");
-        if (postId.isEmpty()){
-            Log.e("msg", "empty");
-            getDataFromGet(SERVERURL + "post/search?keyword=" + getArguments().getString("searchText"), getSearchResult);
-        }
-        else if (clickedPosition != -1) {
+        if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
@@ -134,7 +130,7 @@ public class PostSearchResultFragment extends Fragment {
 
     // 跳转到社团主页，传递参数position（该动态再列表中的位置）
     private void startClubHomeActivity(Integer position) {
-        Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
+        Intent intent = new Intent(this, ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
         startActivity(intent);
     }
@@ -142,18 +138,18 @@ public class PostSearchResultFragment extends Fragment {
     // 跳转到动态内容界面，传递参数position（该动态在列表中的位置）
     private void startPostContentActivity(Integer position) {
         clickedPosition = position;
-        Intent intent = new Intent(getActivity(), PostContentActivity.class);
+        Intent intent = new Intent(this, PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
-        mPostSearchResultAdapter = new PostSearchResultAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
-        mRecyclerView.setAdapter(mPostSearchResultAdapter);
+        mAdapter = new CollectedPostsAdapter(this, title, clubName, text, likeCnt, commentCnt);
+        mRecyclerView.setAdapter(mAdapter);
 
         // 下面是为点击事件添加的代码
-        mPostSearchResultAdapter.setOnItemClickListener(new PostSearchResultAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new CollectedPostsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 switch (view.getId()) {
@@ -185,11 +181,10 @@ public class PostSearchResultFragment extends Fragment {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            Log.e("TAG", (String)msg.obj);
+            //Log.e("TAG", (String)msg.obj);
             switch (msg.what){
-                case getSearchResult:
+                case getResult:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForView((String)msg.obj);
                         updateView();
                     } catch (JSONException e) {
@@ -198,14 +193,14 @@ public class PostSearchResultFragment extends Fragment {
                     break;
                 case getPostInfo:
                     try {
-                        Log.e("msg", "startParsing");
                         parseJsonPacketForInfo((String)msg.obj);
                         updatePostInfo();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
-                default: return false;
+                default:
+                    return false;
             }
             return true;
         }
