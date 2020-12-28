@@ -61,8 +61,8 @@ public class EditPostGridActivity extends AppCompatActivity {
     private static final String LOCALURL = "http://10.0.2.2:5000/";//本地测试用
     public static final int REQUEST_CODE_SUBMIT = 1;
 
-    private int code;
-    private String data;
+    private int post_code;
+    private String post_data;
 
     //在线测试 处理get和post
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -105,20 +105,24 @@ public class EditPostGridActivity extends AppCompatActivity {
                     break;
                 case POST://posting result
                     Log.e("POST_RES", (String) msg.obj);
+                    Toast.makeText(getApplicationContext(),
+                           (String) msg.obj,
+                           Toast.LENGTH_SHORT).show();
                     //300:fail, 200:success
                     //club_profile.setText((String)msg.obj);
-                    try {
+                   try {
                         parseJsonPacket((String)msg.obj);
-                        if (code == 200){
+                 /*        if (code == 200){
                             Toast.makeText(getApplicationContext(),
                                     "success",
                                     Toast.LENGTH_SHORT).show();
+                            finish();   //如果成功就直接返回
                         }
                         else if (code == 300){
                             Toast.makeText(getApplicationContext(),
                                     data,
                                     Toast.LENGTH_SHORT).show();
-                        }
+                        }*/
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -136,8 +140,8 @@ public class EditPostGridActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        code = jsonObject.getInt("code");
-        data = jsonObject.getString("data");
+//        code = jsonObject.getInt("code");
+ //       data = jsonObject.getString("data");
     }
 
 
@@ -188,6 +192,9 @@ public class EditPostGridActivity extends AppCompatActivity {
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
+            Log.e("r_code", ""+response.code());
+            post_code = response.code();
+            Log.e("r_code_post", ""+post_code);
             return response.body().string();
         }
     }
@@ -207,6 +214,15 @@ public class EditPostGridActivity extends AppCompatActivity {
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "post failed.");
                 }
+/*                Toast.makeText(getApplicationContext(),
+                        "删除完成！",
+                        Toast.LENGTH_SHORT).show();
+
+ */
+                Log.e("post_code", ""+post_code);
+                if(post_code == 200)
+                    EditPostGridActivity.this.finish();
+
             }
         }.start();
     }
@@ -231,11 +247,6 @@ public class EditPostGridActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         getDataFromPost(SERVERURL + "post/delete", obj.toString());
-        Toast.makeText(getApplicationContext(),
-                "删除完成！",
-                Toast.LENGTH_SHORT).show();
-//        if(code == 200)
-            EditPostGridActivity.this.finish();
     }
 
     @Override

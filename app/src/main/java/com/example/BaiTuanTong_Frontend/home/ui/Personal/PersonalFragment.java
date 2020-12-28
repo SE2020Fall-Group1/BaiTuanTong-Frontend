@@ -36,9 +36,13 @@ import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,12 +50,15 @@ import java.io.InputStream;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class PersonalFragment extends Fragment {
 
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
     private PersonalViewModel personalViewModel;
     private Button manageClubButton;
     private Button followClubButton;
@@ -72,6 +79,7 @@ public class PersonalFragment extends Fragment {
     private static final int POST = 2;
     private static final int POST_IMG = 3;
     private static final int GET_IMG = 4;
+    private static final int LOG_OUT = 5;
     private static final String SERVERURL = "http://47.92.233.174:5000";
 
     @Override
@@ -149,14 +157,13 @@ public class PersonalFragment extends Fragment {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = shared.edit();
-                editor.remove("userId");
-                editor.remove("userName");
-                editor.remove("logged");
-                editor.commit();
-                getActivity().finish();
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("userId", userId);
+                    logOutFromPost(SERVERURL + "/user/logout", jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
         collectedPostButton.setOnClickListener(new View.OnClickListener() {
@@ -173,6 +180,17 @@ public class PersonalFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    private void performExit() {
+        SharedPreferences.Editor editor = shared.edit();
+        editor.remove("userId");
+        editor.remove("userName");
+        editor.remove("logged");
+        editor.commit();
+        getActivity().finish();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -248,6 +266,9 @@ public class PersonalFragment extends Fragment {
                 case GET_IMG:
                     touxiang.setImageBitmap((Bitmap) msg.obj);
                     break;
+                case LOG_OUT:
+                    performExit();
+                    break;
                 default: return false;
             }
             return true;
@@ -275,15 +296,19 @@ public class PersonalFragment extends Fragment {
                         //将输入流数据转化为Bitmap位图数据
                         Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
                         Log.e("touxiang stores in ",txPath);
-                        File file=new File(txPath);
+                        File file = new File(txPath);
                         file.createNewFile();
                         //创建文件输出流对象用来向文件中写入数据
-                        FileOutputStream out=new FileOutputStream(file);
-                        //将bitmap存储为jpg格式的图片
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
-                        //刷新文件流
-                        out.flush();
-                        out.close();
+                        try {
+                            FileOutputStream out = new FileOutputStream(file);
+                            //将bitmap存储为jpg格式的图片
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                            //刷新文件流
+                            out.flush();
+                            out.close();
+                        } catch (Exception e){
+                            Log.e("File error", e.toString());
+                        }
                         Message msg=Message.obtain();
                         msg.what = what;
                         msg.obj = bitmap;
@@ -295,6 +320,37 @@ public class PersonalFragment extends Fragment {
                 }
             }
         }.start();
+    }
+
+    private void logOutFromPost(String url, String json) {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    Log.e("json", json);
+                    String result = post(url, json); //json用于上传数据，目前不需要
+                    Log.e("TAG", result);
+                    Message msg = Message.obtain();
+                    msg.what = LOG_OUT;
+                    msg.obj = result;
+                    getHandler.sendMessage(msg);
+                } catch (java.io.IOException IOException) {
+                    Log.e("TAG", "log out failed.");
+                }
+            }
+        }.start();
+    }
+
+    private String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
+        }
     }
 
     /**

@@ -99,21 +99,9 @@ public class EditClubAdminActivity extends AppCompatActivity {
                 case POST:
                     Log.e("POST_RES", (String) msg.obj);
                     //club_profile.setText((String)msg.obj);
-                    try {
-                        parseJsonPacket((String)msg.obj);
-                        if (code == 200){
-                            Toast.makeText(getApplicationContext(),
-                                    "success",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (code == 400){
-                            Toast.makeText(getApplicationContext(),
-                                    data,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    Toast.makeText(getApplicationContext(),
+                            (String)msg.obj,
+                            Toast.LENGTH_SHORT).show();
                     break;
             }
             return true;
@@ -127,11 +115,11 @@ public class EditClubAdminActivity extends AppCompatActivity {
      * @throws JSONException 解析出错
      */
     private void parseJsonPacket(String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-        code = jsonObject.getInt("code");
+     /*     JSONObject jsonObject = new JSONObject(json);
+      code = jsonObject.getInt("code");
         data = jsonObject.getString("data");
         Log.e("code", ""+ code);
-        Log.e("data", data);
+        Log.e("data", data);*/
 
     }
 
@@ -227,6 +215,14 @@ public class EditClubAdminActivity extends AppCompatActivity {
         return true;
     }
 
+    public void refresh()
+    {
+        adminList.clear();
+        adminIdList.clear();
+        getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
+        mMyAdapter.notifyDataSetChanged();
+    }
+
     //从此处添加社团管理员。
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -238,7 +234,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
 //            adminList.add("username：" + newAdmin);//离线方法，测试用
 
             //以下为okhttp方法。
-            JSONObject obj = new JSONObject();
+        /*    JSONObject obj = new JSONObject();
             try {
                 obj.put("clubId", clubID);
              //   obj.put("userId", 4);
@@ -249,10 +245,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
             }
             Log.e("posting json", obj.toString());
             getDataFromPost(SERVERURL + "club/admin/add", obj.toString());
-            adminList.clear();
-            adminIdList.clear();
-            getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
-            mMyAdapter.notifyDataSetChanged();
+            */
+        //    refresh();
         }
     }
 
@@ -265,6 +259,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         "点击了添加成员按钮",
                         Toast.LENGTH_SHORT).show();
                         */
+
                 dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;
 
@@ -317,7 +312,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
         adminListView.invalidate();
 
-        getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
+        refresh();
 
 
 
@@ -353,14 +348,14 @@ public class EditClubAdminActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                /*
                 Toast.makeText(getApplicationContext(),
                         "删除完成！",
                         Toast.LENGTH_SHORT).show();
+
+                 */
                 getDataFromPost(SERVERURL + "club/admin/delete", obj.toString());
-                adminList.clear();
-                adminIdList.clear();
-                getDataFromGet(SERVERURL + "club/admin?clubId=" + Integer.toString(clubID));
-                mMyAdapter.notifyDataSetChanged();
+                refresh();
 
             }
         });
