@@ -29,7 +29,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout ;
 
+import com.example.BaiTuanTong_Frontend.EditPostActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
+import com.example.BaiTuanTong_Frontend.MyAdapter;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.data.SetClubinfoDialogFragment;
@@ -89,7 +91,6 @@ public class ClubHomeActivity extends AppCompatActivity {
     @BindView(R.id.follow_club_button)
     Button followClubButton; //关注社团按钮
 
-    private Menu mMenu;
     private SetClubinfoDialogFragment setClubinfoDialogFragment;
 
     private boolean extended = false;    //当前文本框是否展开
@@ -131,7 +132,6 @@ public class ClubHomeActivity extends AppCompatActivity {
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            //Log.e("TAG", (String)msg.obj);
             switch (msg.what){
                 case GET:
                 case POST:
@@ -140,7 +140,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
-                        Log.e("President", clubPresident);
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
                         initFollowButton();
@@ -154,7 +153,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                     byte[] picture = (byte[])msg.obj;
                     Log.e("Picture", picture.toString() + "  Length=" + picture.length);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                    //mCircleImageView.setImageBitmap(bitmap);
+                    mCircleImageView.setImageBitmap(bitmap);
                     return true;
                 case GETFAIL:
                     if(retry_time < 3) { //尝试三次，如果不行就放弃
@@ -191,7 +190,6 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 刷新完成，更新动态列表
      */
     private void refreshComplete() {
-        Log.e("Re", "refreshComplete");
         hideEmptyView();
         mMyAdapter.notifyDataSetChanged();
         mSwipeRefreshLayout.setRefreshing(false);
@@ -217,7 +215,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         clubInfo = jsonObject.getString("introduction");
         clubPresident = jsonObject.getString("president");
         isFollowed = jsonObject.getBoolean("isFollowed");
-        //isFollowed = false;
         JSONArray postList = jsonObject.getJSONArray("postSummary");
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
@@ -255,22 +252,20 @@ public class ClubHomeActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
-        mCircleImageView.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
-        getPicture(SERVERURL + "static/images/2.jpg");
+        //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_club_home);
+        bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
         userName = shared.getString("userName", "");
         setClubinfoDialogFragment = new SetClubinfoDialogFragment();
-        loadData();
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_club_home);
-        bind = ButterKnife.bind(this);
 
         initRefreshLayout();
 
@@ -284,6 +279,7 @@ public class ClubHomeActivity extends AppCompatActivity {
      */
     protected void clearData(){
         mIsRefreshing = true;
+        int size = postId.size();
         postId.clear();
         title.clear();
         PostClubName.clear();
@@ -291,12 +287,14 @@ public class ClubHomeActivity extends AppCompatActivity {
         likeCnt.clear();
         commentCnt.clear();
         PostClubId.clear();
+        if(mMyAdapter != null)
+            mMyAdapter.notifyItemRangeRemoved(0, size);
     }
 
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
-        getPicture(SERVERURL + "static/images/2.jpg");
+        //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     private void initDetailButton() {
@@ -323,16 +321,19 @@ public class ClubHomeActivity extends AppCompatActivity {
         //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mMyAdapter);
-        /*mMyAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                sendMessage(position);
-            }
-        });*/
         mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 startPostContentActivity(position);
+            }
+        });
+        mMyAdapter.setOnItemLongClickListener(new PostAdapter.OnItemLongClickListener() {
+            @Override
+            public void onLongClick(int position) {
+                Log.e("click", "long click received.");
+                if(permission == 0)
+                    return;
+                startEditPostActivity(position);
             }
         });
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
@@ -343,7 +344,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
-            clearData();
             loadData();
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -377,7 +377,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                 super.run();
                 try {
                     String result = get(url);
-                    //Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
                     msg.obj = result;
@@ -458,21 +457,15 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         }.start();
     }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
-        mMenu = menu;
-        return super.onPrepareOptionsMenu(menu);
-    }
     /**
      *初始化右上角菜单按钮
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //目前permission似乎有点儿问题，president和普通人一样 就很气，先特判一波儿
-        Log.e("permission", "" + permission);
-        Log.e("presidentname", "" + clubPresident);
-        Log.e("myname", "" + userName);
+        //Log.e("permission", "" + permission);
+        //Log.e("presidentname", "" + clubPresident);
+        //Log.e("myname", "" + userName);
         /*if (userName.equals(clubPresident))
         {
             Log.e("debug", "" + "进来了！我是president");
@@ -580,6 +573,12 @@ public class ClubHomeActivity extends AppCompatActivity {
         //clickedPosition = position;
         Intent intent = new Intent(this, PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
+        startActivity(intent);
+    }
+
+    private void startEditPostActivity(int position){
+        Intent intent = new Intent(this, EditPostActivity.class);
+        //intent.putExtra("postId", postId.get(position));
         startActivity(intent);
     }
 
