@@ -23,7 +23,11 @@
             android:label="CollectedPostsActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
-        <activity android:name=".ConfigureActivity" />
+        <activity
+            android:name=".ConfigureActivity"
+            android:label="ConfigureActivity"
+            android:parentActivityName=".home.HomePageActivity"
+            android:theme="@style/Theme.HelloWorld.NoActionBar"/>
         <activity
             android:name=".ManageClubsActivity"
             android:label="ManageClubsActivity"

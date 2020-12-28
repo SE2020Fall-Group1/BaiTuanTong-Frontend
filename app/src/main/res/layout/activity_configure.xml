@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/user_profile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context=".ConfigureActivity">
-
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/configuration_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title="设置"
+        android:theme="?attr/actionBarTheme" />
     <com.example.BaiTuanTong_Frontend.widget.CircleImageView
         android:id="@+id/iv_touxiang"
         android:layout_width="150dp"
@@ -30,4 +40,4 @@
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
         android:text="修改头像" />
-</LinearLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

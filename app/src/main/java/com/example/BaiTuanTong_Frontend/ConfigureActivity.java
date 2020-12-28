@@ -2,7 +2,9 @@ package com.example.BaiTuanTong_Frontend;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -70,6 +72,7 @@ public class ConfigureActivity extends AppCompatActivity {
     private static String userId_str = null;
     private static String userName;
     private TextView tv_username;
+    private Toolbar mNavigation;
 
     // 本地存储头像路径，在安卓手机里
     private String txPath;
@@ -89,6 +92,16 @@ public class ConfigureActivity extends AppCompatActivity {
         tv_username = findViewById(R.id.tv_userName);
         tv_username.setText(userName);
         imgShow = findViewById(R.id.iv_touxiang);
+
+        mNavigation = findViewById(R.id.configuration_title);
+        initToolBar();
+        mNavigation.setNavigationOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                setResult(3);
+                finish();
+            }
+        });
         // 首先尝试从本地路径获取头像，没有的话使用默认的“照相机”icon
         getTouxiang();
         // 从后端刷新头像
@@ -103,7 +116,14 @@ public class ConfigureActivity extends AppCompatActivity {
             }
         });
     }
-
+    public void initToolBar() {
+        mNavigation.setTitle("设置");
+        setSupportActionBar(mNavigation);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
     // 检查读写权限
     private static final int REQUEST_EXTERNAL_STORAGE=1;
     private static String[] PERMISSIONS_STORAGE = {
