@@ -415,7 +415,7 @@ public class ReleasePostActivity extends AppCompatActivity {
 
 //                Log.e("code", ""+code);
 //                Log.e("data", data);
-                if (code == 200)
+       /*         if (code == 200)
                     ReleasePostActivity.this.finish();
                else
                 {
@@ -426,7 +426,7 @@ public class ReleasePostActivity extends AppCompatActivity {
                             data,
                             Toast.LENGTH_SHORT).show();
                 }
-
+*/
             }
         });
 
