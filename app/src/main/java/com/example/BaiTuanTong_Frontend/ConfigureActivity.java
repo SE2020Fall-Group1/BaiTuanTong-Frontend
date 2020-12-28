@@ -1,5 +1,6 @@
 package com.example.BaiTuanTong_Frontend;
 
+<<<<<<< Updated upstream
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
@@ -7,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
+=======
+>>>>>>> Stashed changes
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -32,10 +35,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -44,8 +47,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -334,7 +335,7 @@ public class ConfigureActivity extends AppCompatActivity {
                     Log.e("url", url);
                     Log.e("userId",userId_str);
                     Log.e("imgPath", imgPath);
-                    String result = postImg(url, userId_str, imgPath); //jason用于上传数据，目前不需要
+                    String result = postImg(url, userId_str, imgPath);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = POST_IMG;

@@ -35,9 +35,9 @@ public abstract class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapt
         this.onItemClickListener = onItemClickListener;
     }
 
-    class ClubListViewHolder extends RecyclerView.ViewHolder {
+    public class ClubListViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout club_list_content;
-        private ImageView club_img;
+        public ImageView club_img;
         private TextView club_name;
         private TextView club_intro;
 
