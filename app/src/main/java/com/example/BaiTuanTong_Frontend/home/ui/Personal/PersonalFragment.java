@@ -124,7 +124,12 @@ public class PersonalFragment extends Fragment {
         getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
         return root;
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 从后端刷新头像
+        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) { //如果点击关注社团按钮，就跳转到关注社团页面
         super.onActivityCreated(savedInstanceState);
@@ -213,6 +218,11 @@ public class PersonalFragment extends Fragment {
     private void getTouxiang() {
         Bitmap bitmap = null;
         try{
+            File file = new File(txPath);
+            if (file.length() == 0) {
+                Log.e("no touxiang picture: ", "local touxiang picture is null");
+                return;
+            }
             // 根据指定文件路径构建缓存输入流对象
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(txPath));
             // 从缓存输入流中解码位图数据
@@ -230,7 +240,7 @@ public class PersonalFragment extends Fragment {
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
                 case GET:
-                    if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("invalid userId"))
+                    if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("no user image"))
                         Toast.makeText(getActivity().getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
                     else
                         getDataFromGet(SERVERURL + (String) msg.obj, GET_IMG);

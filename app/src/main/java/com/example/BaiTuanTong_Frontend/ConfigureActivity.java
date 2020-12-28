@@ -94,6 +94,7 @@ public class ConfigureActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        Log.e("123","onresume");
         // 首先尝试从本地路径获取头像
         getTouxiang();
         // 从后端刷新头像
@@ -129,7 +130,12 @@ public class ConfigureActivity extends AppCompatActivity {
     private void getTouxiang() {
         Bitmap bitmap = null;
         try{
-            // 根据指定文件路径构建缓存输入流对象
+            File file = new File(txPath);
+            if (file.length() == 0) {
+                Log.e("no touxiang picture: ", "local touxiang picture is null");
+                return;
+            }
+            // 根据指定文件路径构建缓存输入流对象，文件不存在则会出现一个异常
             BufferedInputStream bis = new BufferedInputStream(new FileInputStream(txPath));
             // 从缓存输入流中解码位图数据
             bitmap = BitmapFactory.decodeStream(bis);
@@ -232,7 +238,7 @@ public class ConfigureActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
                     break;
                 case GET:
-                    if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("invalid userId"))
+                    if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("no user image"))
                         Toast.makeText(getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
                     else
                         getDataFromGet(SERVERURL + (String) msg.obj, GET_IMG);
