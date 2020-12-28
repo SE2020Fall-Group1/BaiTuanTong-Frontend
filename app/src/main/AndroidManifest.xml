@@ -17,15 +17,12 @@
         android:roundIcon="@mipmap/test_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HelloWorld">
-<<<<<<< Updated upstream
         <activity android:name=".GridView.EditPostGridActivity"></activity>
-=======
         <activity
             android:name=".CollectedPostsActivity"
             android:label="CollectedPostsActivity"
             android:parentActivityName=".home.HomePageActivity"
             android:theme="@style/Theme.HelloWorld.NoActionBar" />
->>>>>>> Stashed changes
         <activity android:name=".ConfigureActivity" />
         <activity
             android:name=".ManageClubsActivity"
