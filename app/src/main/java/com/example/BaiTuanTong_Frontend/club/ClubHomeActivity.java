@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -42,7 +44,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +108,8 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int GETFAIL = 3;
     private static final int PICTURE = 4;
     private static final int FOLLOW = 5;
+    private static final int GET_IMG = 6;
+    private static final int GET_URL = 7;
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
     private static final String LOCALURL = "http://10.0.2.2:5000/";
@@ -125,6 +134,8 @@ public class ClubHomeActivity extends AppCompatActivity {
     public Bitmap clubImageBitmap;
 
     private String userName;
+    // 本地存储头像路径，在安卓手机里
+    private String clubImgPath;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -133,6 +144,14 @@ public class ClubHomeActivity extends AppCompatActivity {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
+                case GET_URL:
+                    if (((String) msg.obj).contains("invalid clubId") ||((String) msg.obj).contains("no club image"))
+                        Toast.makeText(getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
+                    else {
+                        Log.e("msg", (String)msg.obj);
+                        getPicture(SERVERURL + "static/images/" + (String) msg.obj, GET_IMG);
+                    }
+                    break;
                 case GET:
                 case POST:
                     try {
@@ -265,16 +284,44 @@ public class ClubHomeActivity extends AppCompatActivity {
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
         userName = shared.getString("userName", "");
+        // 头像路径，即/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
+        clubImgPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "club_" + clubId + ".jpg";
         setClubinfoDialogFragment = new SetClubinfoDialogFragment();
         setClubImageDialogFragment = new SetClubImageDialogFragment();
+
 
         initRefreshLayout();
 
         initDetailButton();
 
         initToolBar();
+        Log.e("club path:", clubImgPath);
+        getTouxiang();
+        getPicture(SERVERURL+"/club/image/download?clubId="+ clubId, GET);
     }
-
+    // 从本地文件读取头像，没有的话直接返回，imgShow会显示默认的头像
+    // 默认的头像地址是/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
+    // 该地址是APP的私有存储空间
+    private void getTouxiang() {
+        Bitmap bitmap = null;
+        try{
+            File file = new File(clubImgPath);
+            // 本地没有保存的头像
+            if (file.length() == 0) {
+                Log.e("no touxiang picture: ", "local touxiang picture is null");
+                return;
+            }
+            Log.e("get touxiang from local", clubImgPath);
+            // 根据指定文件路径构建缓存输入流对象，文件不存在则会出现一个异常
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(clubImgPath));
+            // 从缓存输入流中解码位图数据
+            bitmap = BitmapFactory.decodeStream(bis);
+            bis.close();
+            mCircleImageView.setImageBitmap(bitmap);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     /**
      * 开始刷新前先清除信息，目前只清除动态列表，因为一般来说社团名称与简介不会发生变化
      */
@@ -392,21 +439,44 @@ public class ClubHomeActivity extends AppCompatActivity {
         }.start();
     }
 
-    private void getPicture(String url) {
+    private void getPicture(String url, int what) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    byte[] result =  response.body().bytes();
-                    Message msg = Message.obtain();
-                    msg.what = PICTURE;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
+                    Log.e("URL", url);
+                    if (what == GET_URL) {
+                        // 请求一个图片的url
+                        String result = get(url);
+                        Log.e("TAG", result);
+                        Message msg = Message.obtain();
+                        msg.what = what;
+                        msg.obj = result;
+                        getHandler.sendMessage(msg);
+                    }
+                    else if (what == GET_IMG) {
+                        // 获得图片url后请求图片
+                        InputStream inputStream = getImg(url);
+                        //将输入流数据转化为Bitmap位图数据
+                        Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null)
+                            Log.e("null bitmap", "123");
+                        Log.e("touxiang stores in ",clubImgPath);
+                        File imgfile=new File(clubImgPath);
+                        imgfile.createNewFile();
+                        //创建文件输出流对象用来向文件中写入数据
+                        FileOutputStream out=new FileOutputStream(imgfile);
+                        //将bitmap存储为jpg格式的图片
+                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+                        //刷新文件流
+                        out.flush();
+                        out.close();
+                        Message msg=Message.obtain();
+                        msg.what = what;
+                        msg.obj = bitmap;
+                        getHandler.sendMessage(msg);
+                    }
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get picture failed.");
                     /*Message msg = Message.obtain();
@@ -543,7 +613,20 @@ public class ClubHomeActivity extends AppCompatActivity {
             return response.body().string();
         }
     }
-
+    /**
+     * Okhttp的getImg请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    private InputStream getImg(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = client.newCall(request).execute();
+        //将响应数据转化为输入流数据
+        return response.body().byteStream();
+    }
     /**
      * 点击列表中某一项时的处理函数
      * @param position 被点击项的序号
