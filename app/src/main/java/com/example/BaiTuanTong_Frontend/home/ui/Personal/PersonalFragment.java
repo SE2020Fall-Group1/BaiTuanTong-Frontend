@@ -28,10 +28,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.BaiTuanTong_Frontend.CollectedPostsActivity;
 import com.example.BaiTuanTong_Frontend.ConfigureActivity;
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
 import com.example.BaiTuanTong_Frontend.ManageClubsActivity;
-import com.example.BaiTuanTong_Frontend.PostListDisplayActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
@@ -44,10 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -164,7 +162,7 @@ public class PersonalFragment extends Fragment {
         collectedPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), PostListDisplayActivity.class);
+                Intent intent = new Intent(getActivity(), CollectedPostsActivity.class);
                 startActivity(intent);
             }
         });
