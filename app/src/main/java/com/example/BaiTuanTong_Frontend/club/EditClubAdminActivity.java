@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -261,7 +260,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId())
         {
-            case R.id.add_club_admin:
+            case R.id.delete_post_button:
             /*    Toast.makeText(getApplicationContext(),
                         "点击了添加成员按钮",
                         Toast.LENGTH_SHORT).show();
@@ -281,6 +280,8 @@ public class EditClubAdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_club_admin);
+
+        this.setTitle("管理社团管理员");
 
         //这个部分测试完成了
         adminList = getList();

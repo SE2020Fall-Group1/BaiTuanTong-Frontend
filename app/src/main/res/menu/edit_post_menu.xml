@@ -3,7 +3,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-    android:id="@+id/delete_post_button"
-        android:title="添加社团管理员" />
+        android:id="@+id/delete_post_button"
+        android:title="删除这条动态" />
 
 </menu>

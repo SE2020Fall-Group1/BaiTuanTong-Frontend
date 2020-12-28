@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend.GridView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -9,6 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -16,7 +19,6 @@ import android.widget.Toast;
 
 import com.example.BaiTuanTong_Frontend.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -219,10 +221,46 @@ public class EditPostGridActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.delete_post_button:
+               Toast.makeText(getApplicationContext(),
+                        "点击了删除动态按钮",
+                        Toast.LENGTH_SHORT).show();
+
+         //       dialogFragment.show(getSupportFragmentManager(), "add_Admin");
+                break;
+
+
+            case android.R.id.home:
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)//添加右上角三个点儿
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.edit_post_menu, menu);
+        //这里是调用menu文件夹中的main.xml，在登陆界面label右上角的三角里显示其他功能
+
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_post_grid);
         this.setTitle("编辑动态");
+
+//        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         postText = (EditText)findViewById(R.id.EditPostText);
         postTitle = (EditText)findViewById(R.id.EditPostTitle);

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -257,6 +258,7 @@ public class ReleasePostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_post);
+        this.setTitle("发布动态");
         clubId = getIntent().getIntExtra("clubId", -1);
         if (clubId == -1)//error detected
         {
