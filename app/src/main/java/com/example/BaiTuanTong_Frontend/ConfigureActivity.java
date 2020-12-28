@@ -282,7 +282,7 @@ public class ConfigureActivity extends AppCompatActivity {
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)
-                .addFormDataPart("file", file.getName(), fileBody)
+                .addFormDataPart("image", file.getName(), fileBody)
                 .build();
         Request request = new Request.Builder()
                 .url(url)
