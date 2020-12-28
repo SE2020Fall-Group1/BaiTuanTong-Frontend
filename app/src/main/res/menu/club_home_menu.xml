@@ -13,6 +13,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/set_clubimage_menu_item"
+        android:title="更换社团头像"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/club_admin_manage_menu_item"
         android:title="管理社团"
         app:showAsAction="never" />
