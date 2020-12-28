@@ -137,12 +137,12 @@ public class ReleasePostActivity extends AppCompatActivity {
      * @param json post返回的json包
      * @throws JSONException 解析出错
      */
-    private void parseJsonPacket(String json) throws JSONException {
+ /*     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-        code = jsonObject.getInt("code");
+      code = jsonObject.getInt("code");
         data = jsonObject.getString("data");
     }
-
+*/
 
     /**
      * Okhttp的get请求
@@ -213,6 +213,7 @@ public class ReleasePostActivity extends AppCompatActivity {
                 .post(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
+            code = response.code();
             return response.body().string();
         }
     }
@@ -232,6 +233,8 @@ public class ReleasePostActivity extends AppCompatActivity {
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "post failed.");
                 }
+                if (code == 200)
+                    ReleasePostActivity.this.finish();
             }
         }.start();
     }
