@@ -146,6 +146,8 @@ public class PostContentActivity extends AppCompatActivity {
                             Log.e("url","any");
                             imageUrlList.add(imageUrl);
                         }
+                        if(imageUrlJSONArray.length()!=0)
+                            contentImageView.setImageDrawable(getResources().getDrawable(R.drawable.post_content_pic));
                         //申请图片
                         Log.e("img","get img");
                         getImgFromUrl();

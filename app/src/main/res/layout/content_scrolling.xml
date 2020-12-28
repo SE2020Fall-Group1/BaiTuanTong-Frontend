@@ -56,7 +56,6 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:scaleType="fitStart"
-                android:src="@drawable/post_content_pic"
                 android:layout_margin="16dp"/>
 
         </LinearLayout>
