@@ -180,6 +180,8 @@ public class ClubHomeActivity extends AppCompatActivity {
                             getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
                     }
                     else {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        mIsRefreshing = false;
                         initEmptyView();
                         retry_time = 0;
                     }

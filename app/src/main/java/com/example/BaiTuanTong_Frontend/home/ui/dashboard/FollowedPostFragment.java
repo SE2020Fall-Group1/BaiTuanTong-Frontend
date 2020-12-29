@@ -182,8 +182,8 @@ public class FollowedPostFragment extends Fragment {
         myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
         rv_post_list.setAdapter(myAdapter);
 
-        if (clubImg.isEmpty()) {
-            for (int i = 0; i < imgUrl.size(); i++)
+        if (clubImg.size() < imgUrl.size()) {
+            for (int i = clubImg.size(); i < imgUrl.size(); i++)
                 clubImg.add(null);
         }
         // 通过url获得图片
@@ -220,6 +220,9 @@ public class FollowedPostFragment extends Fragment {
     }
 
     private void updateClubImage(Bitmap bm, int position) {
+        while (position >= clubImg.size()){
+            clubImg.add(null);
+        }
         clubImg.set(position, bm);
         myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
         rv_post_list.setAdapter(myAdapter);
@@ -260,7 +263,7 @@ public class FollowedPostFragment extends Fragment {
                     int position = msg.what - getImg;
                     updateClubImage((Bitmap) msg.obj, position);
                 } else if (msg.what == GETFAIL) {
-                    if (retry_time < 3) { //尝试三次，如果不行就放弃
+                    if (retry_time < 10) {
                         retry_time++;
                         loadData();
                         return true;

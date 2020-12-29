@@ -2,6 +2,7 @@ package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -156,6 +157,11 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
         holder.post_commentCnt.setText(commentCnt.get(position));
         holder.post_list_content.setTag(position);
         if (clubImg != null) {
+            //Log.e("BoundCheck", "sizeofclubImg="+clubImg.size()+"position="+position);
+            while (position >= clubImg.size()){  //为了避免数组越界崩溃临时处理
+                clubImg.add(null);
+            }
+            //TODO 等图片加载问题解决后可以删除这里的处理
             holder.club_img.setImageBitmap(clubImg.get(position));
         }
     }
