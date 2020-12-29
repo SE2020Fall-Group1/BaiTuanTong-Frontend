@@ -282,7 +282,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
         clubImageUrl = getIntent().getStringExtra("imageUrl");
-        byte[] bis = getIntent().getByteArrayExtra("pictures");
+        byte[] bis = getIntent().getByteArrayExtra("picture");
         if(bis != null) {
             clubImageBitmap = BitmapFactory.decodeByteArray(bis, 0, bis.length);
             mCircleImageView.setImageBitmap(clubImageBitmap);
