@@ -282,9 +282,11 @@ public class ClubHomeActivity extends AppCompatActivity {
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
         clubImageUrl = getIntent().getStringExtra("imageUrl");
-        byte[] bis = getIntent().getByteArrayExtra("picture");
-        clubImageBitmap = BitmapFactory.decodeByteArray(bis, 0, bis.length);
-        mCircleImageView.setImageBitmap(clubImageBitmap);
+        byte[] bis = getIntent().getByteArrayExtra("pictures");
+        if(bis != null) {
+            clubImageBitmap = BitmapFactory.decodeByteArray(bis, 0, bis.length);
+            mCircleImageView.setImageBitmap(clubImageBitmap);
+        }
 
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
@@ -367,7 +369,8 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
-            getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
+            //getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
+            loadData();
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             clearData();
