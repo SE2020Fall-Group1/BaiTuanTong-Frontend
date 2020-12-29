@@ -11,7 +11,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="320dp"
         android:fitsSystemWindows="true"
         android:theme="@style/Theme.HelloWorld.AppBarOverlay">
 
@@ -25,10 +25,11 @@
             app:toolbarId="@+id/toolbar">
 
             <ImageView
+                android:id="@+id/appbar_image"
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/post_appbar_background"
+                android:src="@color/white"
                 app:layout_collapseMode="parallax"/>
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -42,7 +43,7 @@
 
     <include layout="@layout/content_scrolling" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <!--com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,7 +53,7 @@
         app:srcCompat="@drawable/post_content_pic"
         app:maxImageSize="50dp"
         android:backgroundTint="@color/white"
-        android:scaleType="center"/>
+        android:scaleType="center"/-->
 
     <LinearLayout
         android:layout_height="45dp"

@@ -13,6 +13,7 @@ import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,11 +63,13 @@ public class PostContentActivity extends AppCompatActivity {
     private ListView commentListView;
     private CommentAdapter commentAdapter;
     private CommentDialogFragment commentDialogFragment;
-    private CollapsingToolbarLayout toolBarLayout;
+    private CollapsingToolbarLayout collapsingToolBarLayout;
+    private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private TextView contentTextView;
     private TextView contentTimeView;
     private TextView contentTitleView;
+    private TextView contentClubNameView;
     private ImageView contentImageView;
     private List<Comment> commentList = new ArrayList<Comment>();
     private List<String> imageUrlList = new ArrayList<>();
@@ -81,15 +85,17 @@ public class PostContentActivity extends AppCompatActivity {
     private boolean isCollected;
     private String imagePath;
     private String publishTime;
-    private String clubName;
-    private AppBarLayout appbar;
+    private String clubName = " ";
+    private String clubImageUrl;
+    private ImageView appbarImage;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private OkHttpClient okHttpClient = new OkHttpClient();
     public static final int getContentMsg = 0;
     public static final int likeMsg = 1;
     public static final int collectMsg = 2;
-    public static final int imgMsg = 3;
+    public static final int contentImgMsg = 3;
+    public static final int clubImgMsg = 4;
 
     //申请动态内容
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -109,16 +115,19 @@ public class PostContentActivity extends AppCompatActivity {
                         clubId = jsonObject.getInt("clubId");
                         isCollected = jsonObject.getBoolean("isCollected");
                         publishTime = jsonObject.getString("publishTime");
+                        clubImageUrl = jsonObject.getString("clubImage");
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
                         JSONArray imageUrlJSONArray = jsonObject.getJSONArray("imageUrls");
+
+                        clubImageUrl = imageBaseUrl + "/" + clubImageUrl;
 
                         Log.e("title",title);
                         Log.e("like",String.valueOf(isliked));
                         //设置标题，动态内容
-                        toolBarLayout.setTitle(clubName);
                         contentTimeView.setText(publishTime);
                         contentTextView.setText(content);
                         contentTitleView.setText(title);
+                        contentClubNameView.setText(clubName);
                         TextPaint tp = contentTitleView.getPaint();
                         tp.setFakeBoldText(true);
                         likeButtonText.setText("点赞("+Integer.toString(likeCnt)+")");
@@ -153,7 +162,11 @@ public class PostContentActivity extends AppCompatActivity {
                          */
                         //申请图片
                         Log.e("img","get img");
-                        getImgFromUrl();
+                        getContentImgFromUrl();
+                        getClubImgFromUrl();
+
+                        //申请社团头像
+
 
                         //点亮图标
                         if(isliked) {
@@ -182,8 +195,12 @@ public class PostContentActivity extends AppCompatActivity {
                         }
 
                         break;
-                    case imgMsg:
+                    case contentImgMsg:
                         contentImageView.setImageBitmap((Bitmap) msg.obj);
+                        break;
+
+                    case clubImgMsg:
+                        appbarImage.setImageBitmap((Bitmap) msg.obj);
                         break;
                     case likeMsg:
 
@@ -216,11 +233,15 @@ public class PostContentActivity extends AppCompatActivity {
     });
 
     private  void startClubHomeActivity(){
+        Log.e("intent","club");
         Intent intentClub = new Intent(this, ClubHomeActivity.class);
         intentClub.putExtra("userId", userId);
         intentClub.putExtra("clubId",clubId);
+        intentClub.putExtra("imageUrl", clubImageUrl);
+        intentClub.putExtra("permission", 0);
         startActivity(intentClub);
     }
+
     //从post获取数据
     private void getDataFromPost(String url, String json, int what) {
         //Log.e("TAG", "Start getDataFromGet()");
@@ -293,7 +314,7 @@ public class PostContentActivity extends AppCompatActivity {
         return response.body().string();
     }
 
-    private void getImgFromUrl() {
+    private void getContentImgFromUrl() {
         Log.e("start","start get");
         new Thread() {
             @Override
@@ -322,7 +343,7 @@ public class PostContentActivity extends AppCompatActivity {
                         out.flush();
                         out.close();
                         Message msg = Message.obtain();
-                        msg.what = imgMsg;
+                        msg.what = contentImgMsg;
                         msg.obj = bitmap;
                         getHandler.sendMessage(msg);
                     } catch (IOException e) {
@@ -330,6 +351,44 @@ public class PostContentActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
+                }
+            }
+        }.start();
+    }
+    private void getClubImgFromUrl() {
+        Log.e("start","start get");
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                //设置图片
+                // 获得图片url后请求图片
+                Log.e("img","start getImg");
+                Log.e("in","in");
+                String url = clubImageUrl;
+                InputStream inputStream = null;
+                try {
+                    inputStream = getImg(url);
+                    //将输入流数据转化为Bitmap位图数据
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    String savePath = imagePath + "club.jpg";
+                    Log.e("touxiang stores in ", savePath);
+                    File file = new File(savePath);
+                    file.createNewFile();
+                    //创建文件输出流对象用来向文件中写入数据
+                    FileOutputStream out = new FileOutputStream(file);
+                    //将bitmap存储为jpg格式的图片
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    //刷新文件流
+                    out.flush();
+                    out.close();
+                    Message msg = Message.obtain();
+                    msg.what = clubImgMsg;
+                    msg.obj = bitmap;
+                    getHandler.sendMessage(msg);
+                } catch (IOException e) {
+                    Log.e("img excep","excep");
+                    e.printStackTrace();
                 }
             }
         }.start();
@@ -355,27 +414,43 @@ public class PostContentActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        collapsingToolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         contentTitleView = (TextView)findViewById(R.id.content_title);
         contentTextView = (TextView)findViewById(R.id.content_text);
         contentTimeView = (TextView)findViewById(R.id.content_time);
         contentImageView = (ImageView)findViewById(R.id.content_image);
+        contentClubNameView = (TextView)findViewById(R.id.content_club_name);
         likeButton = (ShineButton)findViewById(R.id.like_button);
         likeButtonText = (TextView)findViewById(R.id.like_button_text);
         commentButton = (TextView)findViewById(R.id.comment_button);
         commentButtonImage = (ImageView)findViewById(R.id.comment_button_image);
         collectButton = (ShineButton)findViewById(R.id.collect_button);
         collectButtonText = (TextView)findViewById(R.id.collect_button_text);
-        appbar = (AppBarLayout)findViewById(R.id.app_bar);
+        appBarLayout = (AppBarLayout)findViewById(R.id.app_bar);
+        appbarImage = (ImageView)findViewById(R.id.appbar_image);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new MyOnClickListener());
-        fab.setVisibility(View.INVISIBLE);
-        appbar.setOnClickListener(new MyOnClickListener());
 
-        toolBarLayout.setTitle(" ");
+
+        collapsingToolBarLayout.setTitle(" ");
         contentTextView.setText("");
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
 
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolBarLayout.setTitle(clubName);
+                    isShow = true;
+                } else if(isShow) {
+                    collapsingToolBarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    isShow = false;
+                }
+            }
+        });
 
         //获取postId和userId
         Intent intent = getIntent();
@@ -400,14 +475,15 @@ public class PostContentActivity extends AppCompatActivity {
         commentButtonImage.setOnClickListener(new MyOnClickListener());
         collectButton.setOnClickListener(new MyOnClickListener());
         collectButtonText.setOnClickListener(new MyOnClickListener());
+        appbarImage.setOnClickListener(new MyOnClickListener());
         toolbar.setNavigationOnClickListener(new MyOnClickListener());
     }
 
-    class MyOnClickListener implements View.OnClickListener{
+    class MyOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Log.e("id",Integer.toString(v.getId()));
-            switch(v.getId()){
+            Log.e("id", Integer.toString(v.getId()));
+            switch (v.getId()) {
                 case -1:
                     finish();
                     break;
@@ -419,7 +495,7 @@ public class PostContentActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    getDataFromPost(viewUrl+"/like", jsonObjectLike.toString(), likeMsg);
+                    getDataFromPost(viewUrl + "/like", jsonObjectLike.toString(), likeMsg);
                     break;
                 case R.id.like_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
@@ -430,7 +506,7 @@ public class PostContentActivity extends AppCompatActivity {
                     });
                     break;
                 case R.id.comment_button:
-                    commentDialogFragment.show(getSupportFragmentManager(),"dialog");
+                    commentDialogFragment.show(getSupportFragmentManager(), "dialog");
                     break;
                 case R.id.comment_button_image:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
@@ -448,7 +524,7 @@ public class PostContentActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    getDataFromPost(viewUrl+"/collect", jsonObjectCollect.toString(), collectMsg);
+                    getDataFromPost(viewUrl + "/collect", jsonObjectCollect.toString(), collectMsg);
                     break;
                 case R.id.collect_button_text:
                     PostContentActivity.this.runOnUiThread(new Runnable() {
@@ -458,10 +534,10 @@ public class PostContentActivity extends AppCompatActivity {
                         }
                     });
                     break;
-                case R.id.fab:
-                    break;
-                case R.id.app_bar:
+                case R.id.appbar_image:
+                    Log.e("app bar", "clicked");
                     startClubHomeActivity();
+                    break;
                 default:
                     Toast.makeText(PostContentActivity.this, "not implemented", Toast.LENGTH_SHORT);
             }
