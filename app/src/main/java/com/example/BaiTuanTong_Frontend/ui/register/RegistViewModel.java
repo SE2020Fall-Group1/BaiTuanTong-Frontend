@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import android.util.Log;
 import android.util.Patterns;
 
 import com.example.BaiTuanTong_Frontend.data.LoginRepository;
@@ -26,14 +27,19 @@ public class RegistViewModel extends ViewModel {
 
     public void registDataChanged(String username, String email, String password, String passwordConfirm) {
         if (!isUserNameValid(username)) {
+            Log.e("invalid", "username");
             registFormState.setValue(new RegistFormState(R.string.invalid_username, null, null, null));
         } else if (!isEmailValid(email)) {
+            Log.e("invalid", "email");
             registFormState.setValue(new RegistFormState(null, R.string.invalid_email, null, null));
         } else if (!isPasswordValid(password)) {
+            Log.e("invalid", "password");
             registFormState.setValue(new RegistFormState(null, null, R.string.invalid_password, null));
         }else if (!isPasswordMatch(password, passwordConfirm)) {
+            Log.e("invalid", "confirm");
             registFormState.setValue(new RegistFormState(null, null, null, R.string.password_mismatch));
         }else {
+            Log.e("valid", "valid");
             registFormState.setValue(new RegistFormState(true));
         }
     }

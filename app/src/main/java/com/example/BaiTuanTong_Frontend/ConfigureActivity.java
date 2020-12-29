@@ -32,6 +32,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
+import com.example.BaiTuanTong_Frontend.ui.register.ModifyInformationActivity;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +53,7 @@ public class ConfigureActivity extends AppCompatActivity {
     private ImageView imgShow = null;
     private String imgPath = null;
     private Button btn_modify_touxiang;
+    private Button modifyPasswordButton;
     private final int IMAGE_CODE = 0;
     private final String IMAGE_TYPE = "image/*";
 
@@ -101,11 +104,19 @@ public class ConfigureActivity extends AppCompatActivity {
         getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
 
         btn_modify_touxiang = findViewById(R.id.btn_modify_touxiang);
+        modifyPasswordButton = (Button)findViewById(R.id.btn_modify_password);
 
         btn_modify_touxiang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectImage();
+            }
+        });
+            modifyPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentModifyPassword = new Intent(ConfigureActivity.this, ModifyInformationActivity.class);
+                startActivity(intentModifyPassword);
             }
         });
     }
