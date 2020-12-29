@@ -108,13 +108,10 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int PICTURE = 4;
     private static final int FOLLOW = 5;
     private static final int GET_IMG = 6;
-    private static final int GET_URL = 7;
     private static final int DELETE_POST = 101;
     private static final int EDIT_POST = 102;
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
-    private static final String LOCALURL = "http://10.0.2.2:5000/";
-
 
     private PostAdapter mMyAdapter;
 
@@ -134,9 +131,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private boolean isFollowed;
     public Bitmap clubImageBitmap;
 
-    private String userName;
-    // 本地存储头像路径，在安卓手机里
-    private String clubImgPath;
+    private String clubImageUrl;
 
     /**
      * 处理get请求与post请求的回调函数
@@ -145,14 +140,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what){
-                case GET_URL:
-                    if (((String) msg.obj).contains("invalid clubId") ||((String) msg.obj).contains("no club image"))
-                        Toast.makeText(getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
-                    else {
-                        Log.e("msg", (String)msg.obj);
-                        getPicture(SERVERURL + "static/images/" + (String) msg.obj, GET_IMG);
-                    }
-                    break;
                 case GET:
                 case POST:
                     try {
@@ -160,6 +147,8 @@ public class ClubHomeActivity extends AppCompatActivity {
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
                         Log.e("Post num", "" + postId.size());
+                        if(clubInfo.equals("null"))
+                            clubInfo = "社团还没有更新简介哦~";
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
@@ -171,8 +160,8 @@ public class ClubHomeActivity extends AppCompatActivity {
                     }
                     break;
                 case GET_IMG:
+                    clubImageBitmap = ((Bitmap)msg.obj); 
                     mCircleImageView.setImageBitmap((Bitmap)msg.obj);
-
                     for (int i = 0; i < postId.size(); i++) {
                         View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
                         if (null != view && null != mRecyclerView.getChildViewHolder(view)){
@@ -183,16 +172,18 @@ public class ClubHomeActivity extends AppCompatActivity {
                     }
                     return true;
                 case GETFAIL:
-                    if(retry_time < 3) { //尝试三次，如果不行就放弃
+                    if(retry_time < 5) { //尝试5次，如果不行就放弃
                         retry_time++;
-                        loadData();
-                        return true;
+                        if(((String)msg.obj).equals("clubdata"))
+                            getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
+                        else
+                            getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
                     }
                     else {
                         initEmptyView();
                         retry_time = 0;
-                        break;
                     }
+                    return true;
                 case FOLLOW:
                     String res = (String)msg.obj;
                     if(res.equals("follow committed")){
@@ -279,7 +270,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
-        //getPicture(SERVERURL + "static/images/2.jpg");
     }
 
     @Override
@@ -289,55 +279,24 @@ public class ClubHomeActivity extends AppCompatActivity {
         bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
+        clubImageUrl = getIntent().getStringExtra("imageUrl");
+        byte[] bis = getIntent().getByteArrayExtra("picture");
+        clubImageBitmap = BitmapFactory.decodeByteArray(bis, 0, bis.length);
+        mCircleImageView.setImageBitmap(clubImageBitmap);
+
         SharedPreferences shared = getSharedPreferences("share", MODE_PRIVATE);
         userId = shared.getString("userId", "");
-        userName = shared.getString("userName", "");
-        // 头像路径，即/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
-        clubImgPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "club_" + clubId + ".jpg";
+
         setClubinfoDialogFragment = new SetClubinfoDialogFragment();
         setClubImageDialogFragment = new SetClubImageDialogFragment();
-
 
         initRefreshLayout();
 
         initDetailButton();
 
         initToolBar();
-        Log.e("club path:", clubImgPath);
-        getTouxiang();
-        getPicture(SERVERURL+"club/image/download?clubId="+ clubId, GET_URL);
     }
-    // 从本地文件读取头像，没有的话直接返回，imgShow会显示默认的头像
-    // 默认的头像地址是/storage/emulated/0/Android/data/com.example.BaiTuanTong_Frontend/files/Download/touxiang.jpg
-    // 该地址是APP的私有存储空间
-    private void getTouxiang() {
-        Bitmap bitmap = null;
-        try{
-            File file = new File(clubImgPath);
-            // 本地没有保存的头像
-            if (file.length() == 0) {
-                Log.e("no touxiang picture: ", "local touxiang picture is null");
-                return;
-            }
-            Log.e("get touxiang from local", clubImgPath);
-            // 根据指定文件路径构建缓存输入流对象，文件不存在则会出现一个异常
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(clubImgPath));
-            // 从缓存输入流中解码位图数据
-            bitmap = BitmapFactory.decodeStream(bis);
-            bis.close();
-            mCircleImageView.setImageBitmap(bitmap);
-            for (int i = 0; i < postId.size(); i++) {
-                View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
-                if (null != view && null != mRecyclerView.getChildViewHolder(view)){
-                    PostListAdapter.PostListViewHolder viewHolder =
-                            (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
-                    viewHolder.club_img.setImageBitmap(bitmap);
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+
     /**
      * 开始刷新前先清除信息，目前只清除动态列表，因为一般来说社团名称与简介不会发生变化
      */
@@ -358,8 +317,7 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
-        getPicture(SERVERURL+"club/image/download?clubId="+ clubId, GET_URL);
-        //getPicture(SERVERURL + "static/images/2.jpg");
+        getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
     }
 
     private void initDetailButton() {
@@ -383,7 +341,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        //mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
         mRecyclerView.setAdapter(mMyAdapter);
         mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
@@ -395,7 +352,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         mMyAdapter.setOnItemLongClickListener(new PostAdapter.OnItemLongClickListener() {
             @Override
             public void onLongClick(int position) {
-                Log.e("click", "long click received.");
                 if(permission == 0)
                     return;
                 startEditPostActivity(position);
@@ -409,7 +365,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
-            loadData();
+            getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             clearData();
@@ -450,55 +406,38 @@ public class ClubHomeActivity extends AppCompatActivity {
                     Log.e("TAG", "get failed.");
                     Message msg = Message.obtain();
                     msg.what = GETFAIL;
+                    msg.obj = "clubdata";
                     getHandler.sendMessage(msg);
                 }
             }
         }.start();
     }
 
-    private void getPicture(String url, int what) {
+    private void getPicture(String url) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
-                    Log.e("URL", url);
-                    if (what == GET_URL) {
-                        // 请求一个图片的url
-                        String result = get(url);
-                        Log.e("TAG", result);
-                        Message msg = Message.obtain();
-                        msg.what = what;
-                        msg.obj = result;
-                        getHandler.sendMessage(msg);
+                    // 获得图片url后请求图片
+                    Log.e("ImgUrl", url);
+                    InputStream inputStream = getImg(url);
+                    //将输入流数据转化为Bitmap位图数据
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    if (bitmap == null) {
+                        Log.e("null bitmap", "123");
+                        return;
                     }
-                    else if (what == GET_IMG) {
-                        // 获得图片url后请求图片
-                        InputStream inputStream = getImg(url);
-                        //将输入流数据转化为Bitmap位图数据
-                        Bitmap bitmap= BitmapFactory.decodeStream(inputStream);
-                        if (bitmap == null)
-                            Log.e("null bitmap", "123");
-                        Log.e("touxiang stores in ",clubImgPath);
-                        File imgfile=new File(clubImgPath);
-                        imgfile.createNewFile();
-                        //创建文件输出流对象用来向文件中写入数据
-                        FileOutputStream out=new FileOutputStream(imgfile);
-                        //将bitmap存储为jpg格式的图片
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
-                        //刷新文件流
-                        out.flush();
-                        out.close();
-                        Message msg=Message.obtain();
-                        msg.what = what;
-                        msg.obj = bitmap;
-                        getHandler.sendMessage(msg);
-                    }
+                    Message msg=Message.obtain();
+                    msg.what = GET_IMG;
+                    msg.obj = bitmap;
+                    getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get picture failed.");
-                    /*Message msg = Message.obtain();
+                    Message msg = Message.obtain();
                     msg.what = GETFAIL;
-                    getHandler.sendMessage(msg);*/
+                    msg.obj = "picture";
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();
@@ -563,13 +502,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /*private void hideMenu() {
-        for(int i = 0; i < mMenu.size(); i++){
-            mMenu.getItem().setVisible(false);
-            mMenu.getItem().setEnabled(false);
-        }
-    }*/
-
     /**
      *菜单中按钮被点击时的回调函数
      */
@@ -580,7 +512,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             case R.id.release_post_menu_item:
                 Intent intent = new Intent(this, ReleasePostActivity.class);
                 intent.putExtra("clubId", clubId);
-                startActivity(intent);
+                startActivityForResult(intent, EDIT_POST);
                 break;
             case R.id.set_clubinfo_menu_item:
                 setClubinfoDialogFragment.show(getSupportFragmentManager(),"dialog");
@@ -683,13 +615,13 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     public void setClubImage(Bitmap bm){
         mCircleImageView.setImageBitmap(bm);
-        for (int i = 0; i < postId.size(); i++) {
+        /*for (int i = 0; i < postId.size(); i++) {
             View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
             if (null != view && null != mRecyclerView.getChildViewHolder(view)){
                 PostListAdapter.PostListViewHolder viewHolder =
                         (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
                 viewHolder.club_img.setImageBitmap(bm);
             }
-        }
+        }*/
     }
 }

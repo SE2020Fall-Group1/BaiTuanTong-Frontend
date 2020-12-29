@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -152,6 +153,11 @@ public class FollowedPostFragment extends Fragment {
     private void startClubHomeActivity(Integer position) {
         Intent intent = new Intent(getActivity(), ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
+        intent.putExtra("imageUrl", imgUrl.get(position));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        clubImg.get(position).compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] bitmapByte = baos.toByteArray();
+        intent.putExtra("picture", bitmapByte);
         intent.putExtra("permission", 0);
         startActivity(intent);
     }
