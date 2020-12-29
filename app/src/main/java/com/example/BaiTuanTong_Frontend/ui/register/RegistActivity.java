@@ -164,15 +164,22 @@ public class RegistActivity extends AppCompatActivity {
                 case POST:
                     Toast.makeText(getBaseContext(), (String)msg.obj, Toast.LENGTH_SHORT).show();
                     if (((String) msg.obj).contains("user established")) {
-                        String welcomeMessage = "欢迎！" + username;
-                        Toast.makeText(RegistActivity.this, welcomeMessage, Toast.LENGTH_SHORT).show();
-                        startHomePage();
+                        //String welcomeMessage = "欢迎！" + username;
+                        Toast.makeText(RegistActivity.this, "注册成功！", Toast.LENGTH_SHORT).show();
+                        //startHomePage();
+                        startLoginPage();
                     }
                     break;
             }
             return true;
         }
     });
+    // 转到LoginPageActivity
+    private void startLoginPage(){
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        this.finish();
+    }
     // 转到HomePageActivity
     private void startHomePage(){
         Intent intent = new Intent(this, HomePageActivity.class);
