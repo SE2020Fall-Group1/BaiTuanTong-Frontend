@@ -27,6 +27,7 @@ import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
 import com.example.BaiTuanTong_Frontend.data.Comment;
 import com.example.BaiTuanTong_Frontend.data.CommentDialogFragment;
 import com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -62,7 +63,6 @@ public class PostContentActivity extends AppCompatActivity {
     private CommentDialogFragment commentDialogFragment;
     private CollapsingToolbarLayout toolBarLayout;
     private Toolbar toolbar;
-    private FloatingActionButton clubHeadButton;
     private TextView contentTextView;
     private TextView contentTimeView;
     private TextView contentTitleView;
@@ -82,6 +82,7 @@ public class PostContentActivity extends AppCompatActivity {
     private String imagePath;
     private String publishTime;
     private String clubName;
+    private AppBarLayout appbar;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -365,10 +366,12 @@ public class PostContentActivity extends AppCompatActivity {
         commentButtonImage = (ImageView)findViewById(R.id.comment_button_image);
         collectButton = (ShineButton)findViewById(R.id.collect_button);
         collectButtonText = (TextView)findViewById(R.id.collect_button_text);
+        appbar = (AppBarLayout)findViewById(R.id.app_bar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new MyOnClickListener());
         fab.setVisibility(View.INVISIBLE);
+        appbar.setOnClickListener(new MyOnClickListener());
 
         toolBarLayout.setTitle(" ");
         contentTextView.setText("");
@@ -456,6 +459,9 @@ public class PostContentActivity extends AppCompatActivity {
                     });
                     break;
                 case R.id.fab:
+                    break;
+                case R.id.app_bar:
+                    startClubHomeActivity();
                 default:
                     Toast.makeText(PostContentActivity.this, "not implemented", Toast.LENGTH_SHORT);
             }
