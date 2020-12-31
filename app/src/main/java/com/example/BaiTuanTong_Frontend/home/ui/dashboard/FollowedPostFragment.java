@@ -46,7 +46,6 @@ import okhttp3.Response;
 import static android.content.Context.MODE_PRIVATE;
 
 public class FollowedPostFragment extends Fragment {
-    private Context mContext;
     private View mView;
     // recyclerview
     private RecyclerView rv_post_list;
@@ -88,7 +87,6 @@ public class FollowedPostFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mContext = getActivity();
         mView = inflater.inflate(R.layout.fragment_followed_post, container, false);
         rv_post_list = (RecyclerView)mView.findViewById(R.id.rv_post_list_followed_post);
         mSwipeRefreshLayout = mView.findViewById(R.id.swipe_refresh_layout_followed_post);
@@ -141,6 +139,8 @@ public class FollowedPostFragment extends Fragment {
         likeCnt.clear();
         commentCnt.clear();
         clubId.clear();
+        imgUrl.clear();
+        clubImg.clear();
         myAdapter.notifyItemRangeRemoved(0, size);
     }
 
@@ -173,13 +173,13 @@ public class FollowedPostFragment extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
         updateView();
+
         rv_post_list.setOnTouchListener((v, event) -> mIsRefreshing);
-        //Log.e("init rv","1");
     }
 
     // 在获得GET请求返回的数据后更新UI
     private void updateView() {
-        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
+        myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
         rv_post_list.setAdapter(myAdapter);
 
         if (clubImg.size() < imgUrl.size()) {
@@ -254,7 +254,8 @@ public class FollowedPostFragment extends Fragment {
             try {
                 if (msg.what == getResult) {
                     parseJsonPacketForView((String) msg.obj);
-                    //updateView();
+                    if (recycleViewInitiated)
+                        updateView();
                     retry_time = 0;
                 } else if (msg.what == getPostInfo) {
                     parseJsonPacketForInfo((String) msg.obj);

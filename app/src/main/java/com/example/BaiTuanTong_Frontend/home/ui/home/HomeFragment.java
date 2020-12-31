@@ -48,7 +48,6 @@ import okhttp3.Response;
 import static android.content.Context.MODE_PRIVATE;
 
 public class HomeFragment extends Fragment {
-    //private Context mContext;
     private View mView;
     // recyclerview
     private RecyclerView rv_post_list;
@@ -129,12 +128,8 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.e("msg", "onResume");
-        /*if (postId.isEmpty()){
-            Log.e("msg", "empty");
 
-        getDataFromGet(SERVERURL + "post/homepage", getResult);
-        }
-        else*/ if (clickedPosition != -1) {
+        if (clickedPosition != -1) {
             String strPostId = postId.get(clickedPosition).toString();
             getDataFromGet(SERVERURL + "post/view/info?userId=" + userId + "&postId=" + strPostId, getPostInfo);
         }
@@ -190,6 +185,7 @@ public class HomeFragment extends Fragment {
     protected void clearData(){
         mIsRefreshing = true;
         int size = postId.size();
+        Log.e("clear data", "go");
         postId.clear();
         title.clear();
         clubName.clear();
@@ -197,6 +193,8 @@ public class HomeFragment extends Fragment {
         likeCnt.clear();
         commentCnt.clear();
         clubId.clear();
+        imgUrl.clear();
+        clubImg.clear();
         myAdapter.notifyItemRangeRemoved(0, size);
     }
 
@@ -227,27 +225,15 @@ public class HomeFragment extends Fragment {
     }
     // 初始化线性布局的循环视图
     private void initRecyclerLinear() throws IOException {
-
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         rv_post_list.setLayoutManager(manager);
-        //Log.e("init rv","1");
         updateView();
-        //myAdapter = new PostAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt);
-        //rv_post_list.setAdapter(myAdapter);
-        //rv_post_list.setItemAnimator(new DefaultItemAnimator());
-        // 通过url传输数据
-        // getDataFromGet(SERVERURL + "post/homepage", );
+
         rv_post_list.setOnTouchListener((v, event) -> mIsRefreshing);
-
-
-        /*// 通过url获得图片
-        for (int i = 0; i < imgUrl.size(); i++) {
-            getDataFromGet(SERVERURL + "static/images/tiny/" + imgUrl.get(i), getImg + i);
-        }*/
     }
     // 提示框，未实现
     private void doSearch(String text) {
-       /* if(text.indexOf("北")==0){
+        /* if(text.indexOf("北")==0){
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                     R.layout.search_list_auto,hintArray);
             sac_key.setAdapter(adapter);
@@ -329,14 +315,6 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-        /*View view = rv_post_list.getLayoutManager().findViewByPosition(position);
-        Log.e("position", position + "");
-        if (view == null)Log.e("null", position + "");
-        if (null != view && null != rv_post_list.getChildViewHolder(view)){
-            PostListAdapter.PostListViewHolder viewHolder =
-                    (PostListAdapter.PostListViewHolder) rv_post_list.getChildViewHolder(view);
-            viewHolder.club_img.setImageBitmap(bm);
-        }*/
     }
     /*//View加载完成时回调
     rv_post_list.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
@@ -357,7 +335,8 @@ public class HomeFragment extends Fragment {
             try {
                 if (msg.what == getResult) {
                     parseJsonPacketForView((String) msg.obj);
-                    //updateView();
+                    if (recycleViewInitiated)
+                        updateView();
                     retry_time = 0;
                 } else if (msg.what == getPostInfo) {
                     parseJsonPacketForInfo((String) msg.obj);
@@ -385,15 +364,8 @@ public class HomeFragment extends Fragment {
                     e.printStackTrace();
                 }
                 recycleViewInitiated = true;
-            } else {
-                //updateView();
-                /*try {
-                    initRecyclerLinear();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
             }
-                refreshComplete();
+            refreshComplete();
             return true;
         }
     });
@@ -411,7 +383,7 @@ public class HomeFragment extends Fragment {
      */
     private void parseJsonPacketForView(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-
+        Log.e("json", json);
         JSONArray postList = jsonObject.getJSONArray("postSummary");
         for (int i = 0; i < postList.length(); i++) {
             postId.add(postList.getJSONObject(i).getInt("postId"));
