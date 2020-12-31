@@ -1,6 +1,7 @@
 package com.example.BaiTuanTong_Frontend;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,20 @@ import java.util.List;
 public abstract class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapter.ClubListViewHolder> {
     private List<String> clubName;
     private List<String> introduction;
+    private List<Bitmap> clubImg;
     private Context mContext;
 
     public ClubListAdapter(Context mContext, List<String> clubName, List<String> introduction) {
         this.mContext = mContext;
         this.clubName = clubName;
         this.introduction = introduction;
+    }
+
+    public ClubListAdapter(Context mContext, List<String> clubName, List<String> introduction, List<Bitmap> clubImg) {
+        this.mContext = mContext;
+        this.clubName = clubName;
+        this.introduction = introduction;
+        this.clubImg = clubImg;
     }
 
     // 下面是为点击事件添加的代码
@@ -62,6 +71,8 @@ public abstract class ClubListAdapter extends RecyclerView.Adapter<ClubListAdapt
         holder.club_name.setText(clubName.get(position));
         holder.club_intro.setText(introduction.get(position));
         holder.club_intro.setTag(position);
+        if (clubImg != null)
+            holder.club_img.setImageBitmap(clubImg.get(position));
         holder.club_img.setTag(position);
         holder.club_list_content.setTag(position);
 

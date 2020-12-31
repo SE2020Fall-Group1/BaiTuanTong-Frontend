@@ -70,6 +70,10 @@ public class ClubSearchResultFragment extends Fragment {
         public ClubSearchResultAdapter(Context mContext, List<String> clubName, List<String> introduction) {
             super(mContext, clubName, introduction);
         }
+
+        public ClubSearchResultAdapter(Context mContext, List<String> clubName, List<String> introduction, List<Bitmap> clubImg) {
+            super(mContext, clubName, introduction, clubImg);
+        }
     }
 
     @Nullable
@@ -137,13 +141,28 @@ public class ClubSearchResultFragment extends Fragment {
     }
 
     private void updateClubImage(Bitmap bm, int position) {
-        clubImg.set(position, bm);
+        /*clubImg.set(position, bm);
         View view = mRecyclerView.getLayoutManager().findViewByPosition(position);
         if (null != view && null != mRecyclerView.getChildViewHolder(view)){
             ClubListAdapter.ClubListViewHolder viewHolder =
                     (ClubListAdapter.ClubListViewHolder) mRecyclerView.getChildViewHolder(view);
             viewHolder.club_img.setImageBitmap(bm);
+        }*/
+
+        while (position >= clubImg.size()){
+            clubImg.add(null);
         }
+        clubImg.set(position, bm);
+        mClubSearchResultAdapter = new ClubSearchResultAdapter(getActivity(), clubName, introduction, clubImg);
+        mRecyclerView.setAdapter(mClubSearchResultAdapter);
+
+        // 下面是为点击事件添加的代码
+        mClubSearchResultAdapter.setOnItemClickListener(new ClubSearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                startClubHomeActivity(position);
+            }
+        });
     }
 
     // 处理get请求与post请求的回调函数

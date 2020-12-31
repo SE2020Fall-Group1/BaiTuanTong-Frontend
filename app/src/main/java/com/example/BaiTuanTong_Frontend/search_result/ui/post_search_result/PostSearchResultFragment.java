@@ -23,6 +23,7 @@ import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.PostListAdapter;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.club.ClubHomeActivity;
+import com.example.BaiTuanTong_Frontend.home.ui.home.HomeFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,8 +87,14 @@ public class PostSearchResultFragment extends Fragment {
     // RecyclerView的适配器
     public class PostSearchResultAdapter extends PostListAdapter {
 
-        public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+        public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName,
+                                       List<String> text, List<String> likeCnt, List<String> commentCnt) {
             super(mContext, title, clubName, text, likeCnt, commentCnt);
+        }
+
+        public PostSearchResultAdapter(Context mContext, List<String> title, List<String> clubName,
+                                       List<String> text, List<String> likeCnt, List<String> commentCnt, List<Bitmap> clubImg) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt, clubImg);
         }
 
         class PostSearchResultViewHolder extends PostListAdapter.PostListViewHolder {
@@ -197,13 +204,33 @@ public class PostSearchResultFragment extends Fragment {
     }
 
     private void updateClubImage(Bitmap bm, int position) {
-        clubImg.set(position, bm);
+        /*clubImg.set(position, bm);
         View view = mRecyclerView.getLayoutManager().findViewByPosition(position);
         if (null != view && null != mRecyclerView.getChildViewHolder(view)){
-            PostListAdapter.PostListViewHolder viewHolder =
-                    (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
+            PostSearchResultAdapter.PostSearchResultViewHolder viewHolder =
+                    (PostSearchResultAdapter.PostSearchResultViewHolder) mRecyclerView.getChildViewHolder(view);
             viewHolder.club_img.setImageBitmap(bm);
+        }*/
+
+        while (position >= clubImg.size()){
+            clubImg.add(null);
         }
+        clubImg.set(position, bm);
+        mPostSearchResultAdapter = new PostSearchResultAdapter(getActivity(), title, clubName, text, likeCnt, commentCnt, clubImg);
+        mRecyclerView.setAdapter(mPostSearchResultAdapter);
+
+        // 下面是为点击事件添加的代码
+        mPostSearchResultAdapter.setOnItemClickListener(new HomeFragment.HomeFragmentAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                switch (view.getId()) {
+                    case R.id.post_clubName:
+                    case R.id.club_img:
+                        startClubHomeActivity(position); break;
+                    default: startPostContentActivity(position);
+                }
+            }
+        });
     }
 
     // 处理get请求与post请求的回调函数
