@@ -6,6 +6,7 @@
  */
 package com.example.BaiTuanTong_Frontend.club;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -113,7 +114,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private int retry_time = 0;
     private static final String SERVERURL = "http://47.92.233.174:5000/";
 
-    private PostAdapter mMyAdapter;
+    private ClubHomeActivityAdapter mMyAdapter;
 
     public List<Integer> postId = new ArrayList<>();        // 动态ID
     public List<String> title = new ArrayList<>();          // 动态标题
@@ -122,6 +123,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     public List<String> likeCnt = new ArrayList<>();        // 动态点赞数
     public List<String> commentCnt = new ArrayList<>();     // 动态评论数
     public List<Integer> PostClubId = new ArrayList<>();        // 社团ID
+    public List<Bitmap> clubImg = new ArrayList<>();        // 社团头像
     private String clubName;
     public String clubInfo;  //社团简介
     private String clubPresident;  //社长
@@ -132,6 +134,23 @@ public class ClubHomeActivity extends AppCompatActivity {
     public Bitmap clubImageBitmap;
 
     private String clubImageUrl;
+
+    public static class ClubHomeActivityAdapter extends PostListAdapter {
+
+        public ClubHomeActivityAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt);
+        }
+
+        public ClubHomeActivityAdapter(Context mContext, List<String> title, List<String> clubName, List<String> text, List<String> likeCnt, List<String> commentCnt, List<Bitmap> bm) {
+            super(mContext, title, clubName, text, likeCnt, commentCnt, bm);
+        }
+
+        class ClubHomeActivityViewHolder extends PostListAdapter.PostListViewHolder {
+            public ClubHomeActivityViewHolder(@NonNull View itemView, OnItemClickListener onItemClickListener) {
+                super(itemView, onItemClickListener);
+            }
+        }
+    }
 
     /**
      * 处理get请求与post请求的回调函数
@@ -162,14 +181,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                 case GET_IMG:
                     clubImageBitmap = ((Bitmap)msg.obj); 
                     mCircleImageView.setImageBitmap((Bitmap)msg.obj);
-                    for (int i = 0; i < postId.size(); i++) {
-                        View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
-                        if (null != view && null != mRecyclerView.getChildViewHolder(view)){
-                            PostListAdapter.PostListViewHolder viewHolder =
-                                    (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
-                            viewHolder.club_img.setImageBitmap((Bitmap)msg.obj);
-                        }
-                    }
                     return true;
                 case GETFAIL:
                     if(retry_time < 5) { //尝试5次，如果不行就放弃
@@ -244,6 +255,7 @@ public class ClubHomeActivity extends AppCompatActivity {
             likeCnt.add("" + postList.getJSONObject(i).getInt("likeCnt"));
             commentCnt.add("" + postList.getJSONObject(i).getInt("commentCnt"));
             PostClubId.add(postList.getJSONObject(i).getInt("clubId"));
+            clubImg.add(clubImageBitmap);
         }
     }
 
@@ -314,6 +326,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         likeCnt.clear();
         commentCnt.clear();
         PostClubId.clear();
+        clubImg.clear();
         if(mMyAdapter != null)
             mMyAdapter.notifyItemRangeRemoved(0, size);
     }
@@ -345,7 +358,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mMyAdapter = new PostAdapter(this, title, PostClubName, text, likeCnt, commentCnt);
+        mMyAdapter = new ClubHomeActivityAdapter(this, title, PostClubName, text, likeCnt, commentCnt, clubImg);
         mRecyclerView.setAdapter(mMyAdapter);
         mMyAdapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
             @Override
