@@ -49,13 +49,13 @@ public class CollectedPostsActivity extends AppCompatActivity {
             = MediaType.get("application/json; charset=utf-8");
     public static final MediaType STRING
             = MediaType.get("text/plain; charset=utf-8");
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = HttpServer.client;
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int getResult = 0;
     private static final int getPostInfo = 1;
     private static final int getImg = 3;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
     private static final String LOCALURL = "http://10.0.2.2:5000/";
     private int retry_time = 0;
 

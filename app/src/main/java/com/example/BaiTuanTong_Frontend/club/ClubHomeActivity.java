@@ -33,6 +33,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.BaiTuanTong_Frontend.GridView.EditPostGridActivity;
 import com.example.BaiTuanTong_Frontend.GridView.ReleasePostActivity;
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.PostContentActivity;
 import com.example.BaiTuanTong_Frontend.PostListAdapter;
 import com.example.BaiTuanTong_Frontend.R;
@@ -66,7 +67,6 @@ import okhttp3.Response;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-
 public class ClubHomeActivity extends AppCompatActivity {
 
     public static final MediaType JSON
@@ -96,13 +96,13 @@ public class ClubHomeActivity extends AppCompatActivity {
     @BindView(R.id.follow_club_button)
     Button followClubButton; //关注社团按钮
 
-    private SetClubinfoDialogFragment setClubinfoDialogFragment;
-    private SetClubImageDialogFragment setClubImageDialogFragment;
+    private SetClubinfoDialogFragment setClubinfoDialogFragment; //设置社团简介的fragment
+    private SetClubImageDialogFragment setClubImageDialogFragment; //设置社团头像的fragment
 
     private boolean extended = false;    //当前文本框是否展开
     private boolean mIsRefreshing = false; //是否正在刷新
-    private boolean recycleViewInitiated = false;
-    private final OkHttpClient client = new OkHttpClient();
+    private boolean recycleViewInitiated = false; //recycleView是否被初始化
+    private final OkHttpClient client = HttpServer.client;
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int GETFAIL = 3;
@@ -112,7 +112,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private static final int DELETE_POST = 101;
     private static final int EDIT_POST = 102;
     private int retry_time = 0;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
 
     private ClubHomeActivityAdapter mMyAdapter;
 
@@ -131,7 +131,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     private String userId;
     private int permission;
     private boolean isFollowed;
-    public Bitmap clubImageBitmap;
+    public Bitmap clubImageBitmap; //club的头像，对于本页面来说，页面要展示的头像和post列表的头像都是相同的
 
     private String clubImageUrl;
 
@@ -183,9 +183,9 @@ public class ClubHomeActivity extends AppCompatActivity {
                     mCircleImageView.setImageBitmap((Bitmap)msg.obj);
                     return true;
                 case GETFAIL:
-                    if(retry_time < 5) { //尝试5次，如果不行就放弃
+                    if(retry_time < 5) { //总共尝试5次，如果不行就放弃
                         retry_time++;
-                        if(((String)msg.obj).equals("clubdata"))
+                        if(((String)msg.obj).equals("clubdata")) //判断请求失败的社团信息还是头像
                             getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
                         else
                             getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
@@ -193,7 +193,7 @@ public class ClubHomeActivity extends AppCompatActivity {
                     else {
                         mSwipeRefreshLayout.setRefreshing(false);
                         mIsRefreshing = false;
-                        initEmptyView();
+                        initEmptyView(); //如果5次全部失败，就显示加载失败页面
                         retry_time = 0;
                     }
                     return true;
@@ -235,6 +235,10 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
     }
 
+    public void hideEmptyView() {
+        mCustomEmptyView.setVisibility(View.GONE);
+    }
+
     /**
      * 解析post返回的json包
      * @param json post返回的json包
@@ -259,6 +263,9 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 初始化关注按钮，如果已经关注当前社团，就显示已关注按钮，否则就显示关注按钮
+     */
     private void initFollowButton(){
         if(isFollowed){
             followClubButton.setText("已关注");
@@ -275,6 +282,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     public void followClubButtonClickListener(View view){
         followClubFromPost(SERVERURL + "club/follow");
     }
+
     /**
      * 初始化页面上方标题栏
      */
@@ -293,7 +301,7 @@ public class ClubHomeActivity extends AppCompatActivity {
         bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
-        clubImageUrl = getIntent().getStringExtra("imageUrl");
+        clubImageUrl = getIntent().getStringExtra("imageUrl"); //直接从上一个页面获取社团头像的url
         byte[] bis = getIntent().getByteArrayExtra("picture");
         if(bis != null) {
             clubImageBitmap = BitmapFactory.decodeByteArray(bis, 0, bis.length);
@@ -382,7 +390,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         mSwipeRefreshLayout.post(() -> {
             mSwipeRefreshLayout.setRefreshing(true);
             mIsRefreshing = true;
-            //getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
             loadData();
         });
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -400,10 +407,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
         mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~请刷新.");
         Snackbar.make(mRecyclerView, "数据加载失败,请重新加载或者检查网络是否链接", Snackbar.LENGTH_SHORT).show();
-    }
-
-    public void hideEmptyView() {
-        mCustomEmptyView.setVisibility(View.GONE);
     }
 
     /**
@@ -461,6 +464,9 @@ public class ClubHomeActivity extends AppCompatActivity {
         }.start();
     }
 
+    /**
+     * 向后端发送关注请求，对当前的关注状态执行取反操作
+     */
     private void followClubFromPost(String url) {
         new Thread(){
             @Override
@@ -502,12 +508,13 @@ public class ClubHomeActivity extends AppCompatActivity {
             }
         }.start();
     }
+
     /**
      *初始化右上角菜单按钮
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (permission == 1) {
+        if (permission == 1) { //如果是普通管理员，不显示“管理社团”按钮
             followClubButton.setVisibility(GONE);
             getMenuInflater().inflate(R.menu.club_home_menu, menu);
             menu.getItem(3).setVisible(false);
@@ -546,7 +553,6 @@ public class ClubHomeActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     /**
      * Okhttp的get请求
@@ -597,6 +603,7 @@ public class ClubHomeActivity extends AppCompatActivity {
      * 点击列表中某一项时的处理函数
      * @param position 被点击项的序号
      */
+
     private void startPostContentActivity(Integer position){
         Intent intent = new Intent(this, PostContentActivity.class);
         intent.putExtra("postId", postId.get(position));
@@ -613,7 +620,7 @@ public class ClubHomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         Log.e("re", "resultCode="+resultCode+"requestCode="+requestCode);
-        if(requestCode == DELETE_POST || requestCode == EDIT_POST){
+        if(requestCode == DELETE_POST || requestCode == EDIT_POST){ //从编辑社团页面返回时刷新页面
             mSwipeRefreshLayout.setRefreshing(true);
             clearData();
             loadData();
@@ -626,20 +633,19 @@ public class ClubHomeActivity extends AppCompatActivity {
         bind.unbind();
     }
 
+    /**
+     *如下两个函数在设置社团简介和设置社团头像的Fragment中被调用，用于更新社团主页的信息
+     */
     public void setClubProfile(String s) {
         String print = s +"\n"+"社长: "+clubPresident;
         clubProfile.setText(print);
     }
 
     public void setClubImage(Bitmap bm){
+        clubImageBitmap = bm;
         mCircleImageView.setImageBitmap(bm);
-        /*for (int i = 0; i < postId.size(); i++) {
-            View view = mRecyclerView.getLayoutManager().findViewByPosition(i);
-            if (null != view && null != mRecyclerView.getChildViewHolder(view)){
-                PostListAdapter.PostListViewHolder viewHolder =
-                        (PostListAdapter.PostListViewHolder) mRecyclerView.getChildViewHolder(view);
-                viewHolder.club_img.setImageBitmap(bm);
-            }
-        }*/
+        for (int i = 0; i < clubImg.size(); i++) {
+            clubImg.set(i, clubImageBitmap);
+        }
     }
 }

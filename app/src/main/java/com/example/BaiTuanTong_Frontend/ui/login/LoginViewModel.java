@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import android.util.Log;
 import android.util.Patterns;
 
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.data.LoginRepository;
 import com.example.BaiTuanTong_Frontend.data.Result;
 import com.example.BaiTuanTong_Frontend.data.model.LoggedInUser;
@@ -45,7 +46,7 @@ public class LoginViewModel extends ViewModel {
 
     public String login(String username, String password) {
         // can be launched in a separate asynchronous job
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = HttpServer.client;
 
         String baseUrl = "";
 

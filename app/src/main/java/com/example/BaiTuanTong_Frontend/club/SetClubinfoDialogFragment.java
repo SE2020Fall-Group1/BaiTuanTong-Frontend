@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.utils.ScreenUtil;
 
@@ -45,7 +46,7 @@ public class SetClubinfoDialogFragment extends DialogFragment {
     private String comment;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = HttpServer.client;
 
     private String baseUrl = "http://47.92.233.174:5000/";
     private String viewUrl = baseUrl+"club/homepage/changeIntroduction";

@@ -59,12 +59,12 @@ public class ConfigureActivity extends AppCompatActivity {
 
     // 与后端通信部分
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = HttpServer.client;
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int POST_IMG = 3;
     private static final int GET_IMG = 4;
-    private static final String SERVERURL = "http://47.92.233.174:5000";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
     private static String userId_str = null;
     private static String userName;
     private TextView tv_username;
@@ -101,7 +101,7 @@ public class ConfigureActivity extends AppCompatActivity {
         // 首先尝试从本地路径获取头像，没有的话使用默认的“照相机”icon
         getTouxiang();
         // 从后端刷新头像
-        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+        getDataFromGet(SERVERURL + "user/image/download?userId="+userId_str, GET);
 
         btn_modify_touxiang = findViewById(R.id.btn_modify_touxiang);
         modifyPasswordButton = (Button)findViewById(R.id.btn_modify_password);
@@ -218,7 +218,7 @@ public class ConfigureActivity extends AppCompatActivity {
                 handleImageOnKitKat(data);
                 Log.e("img path", imgPath);
                 // 发送给后端
-                getDataFromPostImg(SERVERURL+"/user/image/upload");
+                getDataFromPostImg(SERVERURL+"user/image/upload");
 
             } catch (IOException e) {
                 Log.e("TAG-->Error", e.toString());
@@ -272,7 +272,7 @@ public class ConfigureActivity extends AppCompatActivity {
                     if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("no user image"))
                         Toast.makeText(getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
                     else
-                        getDataFromGet(SERVERURL + "/static/images/" +(String) msg.obj, GET_IMG);
+                        getDataFromGet(SERVERURL + "static/images/" +(String) msg.obj, GET_IMG);
                     break;
                 case GET_IMG:
                     imgShow.setImageBitmap((Bitmap) msg.obj);

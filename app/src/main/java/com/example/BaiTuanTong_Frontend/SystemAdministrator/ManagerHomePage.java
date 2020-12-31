@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 public class ManagerHomePage extends AppCompatActivity implements ChangeAdminListener, CreateClubListener {
@@ -58,13 +61,45 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
     private static final int CHANGE_PRESIDENT_POST = 4;
     private static final int LOGOUT_POST = 5;
 
+    /**
+     * Okhttp的get请求
+     * @param url 向服务器请求的url
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    public static String get(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Response response = HttpServer.client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    /**
+     * Okhttp的post请求
+     * @param url 向服务器请求的url
+     * @param json 向服务器发送的json包
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    public static String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = HttpServer.client.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
+
     private void getDataFromGet(String url) {
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 try {
-                    String result = HttpServer.get(url);
+                    String result = get(url);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
@@ -84,7 +119,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 super.run();
                 try {
                     String json = "{\"clubName\":\"" + clubName + "\",\"president\":\"" + adminName +"\"}";
-                    String result = HttpServer.post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = ADD_CLUB_POST;
@@ -105,7 +140,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 try {
                     String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\"}";
-                    String result = HttpServer.post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = DELETE_CLUB_POST;
@@ -126,7 +161,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 try {
                     String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\",\"president\":\"" + newAdminName +"\"}";
-                    String result = HttpServer.post(url, json);
+                    String result = post(url, json);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = CHANGE_PRESIDENT_POST;
@@ -145,7 +180,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             public void run() {
                 super.run();
                 try {
-                    String result = HttpServer.post(url, "");
+                    String result = post(url, "");
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = LOGOUT_POST;

@@ -52,6 +52,24 @@ public class LoginActivity extends AppCompatActivity {
     private final int POSTFAIL = 1;
     private int retry_time = 0;
 
+    /**
+     * Okhttp的post请求
+     * @param url 向服务器请求的url
+     * @param json 向服务器发送的json包
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    public static String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = HttpServer.client.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
+
     //处理异步线程发来的消息
     private Handler getHandler = new Handler(new Handler.Callback() {
         @Override
@@ -188,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(LoginActivity.this.getWindow().getDecorView().getWindowToken(), 0);
                 //String msg = loginViewModel.login(usernameEditText.getText().toString(),
                 //         passwordEditText.getText().toString());
-                OkHttpClient okHttpClient = new OkHttpClient();
+                OkHttpClient okHttpClient = HttpServer.client;
 
                 username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
@@ -245,7 +263,7 @@ public class LoginActivity extends AppCompatActivity {
                 super.run();
                 //Log.e("TAG", "new thread run.");
                 try {
-                    String result = HttpServer.post(url, json); //jason用于上传数据，目前不需要
+                    String result = post(url, json); //jason用于上传数据，目前不需要
                     Log.e("result", result);
                     Message msg = Message.obtain();
                     msg.what = POST;
@@ -261,11 +279,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         }.start();
     }
-    /**
-     * Okhttp的post请求
-     * @param url
-     * @param json
-     * @return 服务器返回的字符串
-     * @throws IOException
-     */
 }

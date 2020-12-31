@@ -38,6 +38,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.utils.ScreenUtil;
 import com.example.BaiTuanTong_Frontend.widget.CircleImageView;
@@ -73,11 +74,11 @@ public class SetClubImageDialogFragment extends DialogFragment {
     private String imgPath = null;
     private Bitmap temp_bitmap;
 
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = HttpServer.client;
     private static final int POST_IMG = 3;
     private static final int POST_FAIL = 4;
     private int retry_time = 0;
-    private static final String SERVERURL = "http://47.92.233.174:5000";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
 
     @Nullable
     @Override
@@ -155,7 +156,7 @@ public class SetClubImageDialogFragment extends DialogFragment {
                 handleImageOnKitKat(data);
                 Log.e("img path", imgPath);
                 // 发送给后端
-                getDataFromPostImg(SERVERURL+"/club/image/upload");
+                getDataFromPostImg(SERVERURL+"club/image/upload");
 
             } catch (IOException e) {
                 Log.e("TAG-->Error", e.toString());
@@ -218,7 +219,7 @@ public class SetClubImageDialogFragment extends DialogFragment {
             } else if(msg.what == POST_FAIL) {
                 if(retry_time < 3) {
                     retry_time++;
-                    getDataFromPostImg(SERVERURL + "/club/image/upload");
+                    getDataFromPostImg(SERVERURL + "club/image/upload");
                     return true;
                 }
                 else{
