@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
@@ -49,10 +50,10 @@ public class RegistActivity extends AppCompatActivity {
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private RegistViewModel registViewModel;
-    private OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = HttpServer.client;
     private  static final int GET = 1;
     private  static final int POST = 2;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
     private static final String LOCALURL = "http://10.0.2.2:5000/";
     private String username;
     private String password;

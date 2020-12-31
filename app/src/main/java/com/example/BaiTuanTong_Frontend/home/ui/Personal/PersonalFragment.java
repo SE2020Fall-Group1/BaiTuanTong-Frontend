@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.BaiTuanTong_Frontend.CollectedPostsActivity;
 import com.example.BaiTuanTong_Frontend.ConfigureActivity;
 import com.example.BaiTuanTong_Frontend.FollowedClubsDisplayActivity;
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.ManageClubsActivity;
 import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
@@ -74,13 +75,13 @@ public class PersonalFragment extends Fragment {
     private String txPath;
     // 与后端通信部分
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = HttpServer.client;
     private static final int GET = 1;
     private static final int POST = 2;
     private static final int POST_IMG = 3;
     private static final int GET_IMG = 4;
     private static final int LOG_OUT = 5;
-    private static final String SERVERURL = "http://47.92.233.174:5000";
+    private static final String SERVERURL = HttpServer.CURRENTURL;
 
     @Override
     public void onAttach(Context context){
@@ -127,14 +128,14 @@ public class PersonalFragment extends Fragment {
 
         getTouxiang();
         // 从后端刷新头像
-        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+        getDataFromGet(SERVERURL + "user/image/download?userId="+userId_str, GET);
         return root;
     }
     @Override
     public void onResume() {
         super.onResume();
         // 从后端刷新头像
-        getDataFromGet(SERVERURL + "/user/image/download?userId="+userId_str, GET);
+        getDataFromGet(SERVERURL + "user/image/download?userId="+userId_str, GET);
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) { //如果点击关注社团按钮，就跳转到关注社团页面
@@ -160,7 +161,7 @@ public class PersonalFragment extends Fragment {
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("userId", userId);
-                    logOutFromPost(SERVERURL + "/user/logout", jsonObject.toString());
+                    logOutFromPost(SERVERURL + "user/logout", jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -261,7 +262,7 @@ public class PersonalFragment extends Fragment {
                     if (((String) msg.obj).contains("invalid userId") ||((String) msg.obj).contains("no user image"))
                         Toast.makeText(getActivity().getBaseContext(), "加载头像失败！", Toast.LENGTH_SHORT).show();
                     else
-                        getDataFromGet(SERVERURL + "/static/images/" +(String) msg.obj, GET_IMG);
+                        getDataFromGet(SERVERURL + "static/images/" +(String) msg.obj, GET_IMG);
                     break;
                 case GET_IMG:
                     touxiang.setImageBitmap((Bitmap) msg.obj);

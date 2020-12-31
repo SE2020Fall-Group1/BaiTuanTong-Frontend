@@ -1,4 +1,5 @@
 package com.example.BaiTuanTong_Frontend.ui.login;
+import com.example.BaiTuanTong_Frontend.HttpServer;
 
 import android.content.Context;
 import android.content.Intent;
@@ -46,12 +47,28 @@ public class LoginActivity extends AppCompatActivity {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private LoginViewModel loginViewModel;
     private int loginResult;
-    private OkHttpClient okHttpClient = new OkHttpClient();
     private String username;
     private final int POST = 0;
     private final int POSTFAIL = 1;
     private int retry_time = 0;
-    private final String baseUrl = "http://47.92.233.174:5000/";
+
+    /**
+     * Okhttp的post请求
+     * @param url 向服务器请求的url
+     * @param json 向服务器发送的json包
+     * @return 服务器返回的字符串
+     * @throws IOException 请求出错
+     */
+    public static String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = HttpServer.client.newCall(request).execute()) {
+            return response.body().string();
+        }
+    }
 
     //处理异步线程发来的消息
     private Handler getHandler = new Handler(new Handler.Callback() {
@@ -97,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(retry_time < 3) { //尝试三次，如果不行就放弃
                     retry_time++;
                     String json = (String)msg.obj;
-                    getDataFromPost(baseUrl+"user/login", json);
+                    getDataFromPost(HttpServer.CURRENTURL+"user/login", json);
                 }
                 else {
                     retry_time = 0;
@@ -189,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(LoginActivity.this.getWindow().getDecorView().getWindowToken(), 0);
                 //String msg = loginViewModel.login(usernameEditText.getText().toString(),
                 //         passwordEditText.getText().toString());
-                OkHttpClient okHttpClient = new OkHttpClient();
+                OkHttpClient okHttpClient = HttpServer.client;
 
                 username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
@@ -198,7 +215,7 @@ public class LoginActivity extends AppCompatActivity {
                 map.put("password", password);
                 Gson gson = new Gson();
                 String data = gson.toJson(map);
-                getDataFromPost(baseUrl+"user/login", data);
+                getDataFromPost(HttpServer.CURRENTURL+"user/login", data);
             }
         });
 
@@ -261,22 +278,5 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }.start();
-    }
-    /**
-     * Okhttp的post请求
-     * @param url
-     * @param json
-     * @return 服务器返回的字符串
-     * @throws IOException
-     */
-    private String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(json, JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        try (Response response = okHttpClient.newCall(request).execute()) {
-            return response.body().string();
-        }
     }
 }

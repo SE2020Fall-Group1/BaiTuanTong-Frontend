@@ -90,7 +90,7 @@ public class PostContentActivity extends AppCompatActivity {
     private ImageView appbarImage;
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = HttpServer.client;
     public static final int getContentMsg = 0;
     public static final int likeMsg = 1;
     public static final int collectMsg = 2;

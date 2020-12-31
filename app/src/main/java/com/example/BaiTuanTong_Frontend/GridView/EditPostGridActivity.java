@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.BaiTuanTong_Frontend.HttpServer;
 import com.example.BaiTuanTong_Frontend.R;
 
 import org.json.JSONArray;
@@ -80,10 +81,10 @@ public class EditPostGridActivity extends AppCompatActivity {
             = MediaType.get("application/json; charset=utf-8");
     public static final MediaType STRING
             = MediaType.get("text/plain; charset=utf-8");
-    private final OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = HttpServer.client;
     private static final int GET = 1;
     private static final int POST = 2;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";//服务器用 port5000
+    private static final String SERVERURL = HttpServer.CURRENTURL;//服务器用 port5000
     private static final String LOCALURL = "http://10.0.2.2:5000/";//本地测试用
     private String baseUrl = "http://47.92.233.174:5000/";
     private String imageBaseUrl = baseUrl + "static/images";
