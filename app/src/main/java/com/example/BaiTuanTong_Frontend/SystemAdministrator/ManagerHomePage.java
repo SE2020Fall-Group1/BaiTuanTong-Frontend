@@ -5,6 +5,7 @@ import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditAdminDialogFragment.ChangeAdminListener;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
+import com.example.BaiTuanTong_Frontend.HttpServer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -32,14 +33,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 
 public class ManagerHomePage extends AppCompatActivity implements ChangeAdminListener, CreateClubListener {
@@ -54,47 +52,11 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             = MediaType.get("application/json; charset=utf-8");
     public static final MediaType STRING
             = MediaType.get("text/plain; charset=utf-8");
-    private final OkHttpClient client = new OkHttpClient();
     private static final int GET = 1;
     private static final int ADD_CLUB_POST = 2;
     private static final int DELETE_CLUB_POST = 3;
     private static final int CHANGE_PRESIDENT_POST = 4;
     private static final int LOGOUT_POST = 5;
-    private static final String SERVERURL = "http://47.92.233.174:5000/";
-    private static final String LOCALURL = "http://10.0.2.2:5000/";
-    private static final String TESTURL = "http://api.m.mtime.cn/PageSubArea/TrailerList.api";
-    private static final String CURRENTURL = SERVERURL;
-    /**
-     * Okhttp的get请求
-     * @param url 向服务器请求的url
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
-
-    /**
-     * Okhttp的post请求
-     * @param url 向服务器请求的url
-     * @param json 向服务器发送的json包
-     * @return 服务器返回的字符串
-     * @throws IOException 请求出错
-     */
-    private String post(String url, String json) throws IOException {
-        RequestBody body = RequestBody.create(json, JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        }
-    }
 
     private void getDataFromGet(String url) {
         new Thread(){
@@ -102,7 +64,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             public void run() {
                 super.run();
                 try {
-                    String result = get(url);
+                    String result = HttpServer.get(url);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = GET;
@@ -122,7 +84,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 super.run();
                 try {
                     String json = "{\"clubName\":\"" + clubName + "\",\"president\":\"" + adminName +"\"}";
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = HttpServer.post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = ADD_CLUB_POST;
@@ -143,7 +105,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 try {
                     String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\"}";
-                    String result = post(url, json); //jason用于上传数据，目前不需要
+                    String result = HttpServer.post(url, json); //jason用于上传数据，目前不需要
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = DELETE_CLUB_POST;
@@ -164,7 +126,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 try {
                     String clubName = adapter.getClubOnPosition(position).getClubName();
                     String json = "{\"clubName\":\"" + clubName + "\",\"president\":\"" + newAdminName +"\"}";
-                    String result = post(url, json);
+                    String result = HttpServer.post(url, json);
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = CHANGE_PRESIDENT_POST;
@@ -183,7 +145,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
             public void run() {
                 super.run();
                 try {
-                    String result = post(url, "");
+                    String result = HttpServer.post(url, "");
                     Log.e("TAG", result);
                     Message msg = Message.obtain();
                     msg.what = LOGOUT_POST;
@@ -389,7 +351,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 // adapter.addData(1);
                 break;
             case R.id.logout:
-                logoutPost(CURRENTURL+"systemAdmin/logout");
+                logoutPost(HttpServer.CURRENTURL+"systemAdmin/logout");
                 break;
             default:
                 break;
@@ -399,13 +361,13 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
 
     @Override
     public void createClubComplete(String clubName, String adminName) {
-        addClubPost(CURRENTURL+"systemAdmin/homepage/addClub", clubName, adminName);
+        addClubPost(HttpServer.CURRENTURL+"systemAdmin/homepage/addClub", clubName, adminName);
         //adapter.addData(1, clubName, adminName);
     }
 
     @Override
     public void changeAdminComplete(String newAdminName, int position) {
-        changePresidentPost(CURRENTURL+"systemAdmin/homepage/changeClubPresident", position, newAdminName);
+        changePresidentPost(HttpServer.CURRENTURL+"systemAdmin/homepage/changeClubPresident", position, newAdminName);
         // adapter.changeAdmin(position, newAdminName);
     }
 
@@ -418,7 +380,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
         adapter = new ManageClubAdapter(this, mClubData);
         rv_manage_club.setAdapter(adapter);
         rv_manage_club.setItemAnimator(new DefaultItemAnimator());
-        getDataFromGet(CURRENTURL+"systemAdmin/homepage");
+        getDataFromGet(HttpServer.CURRENTURL+"systemAdmin/homepage");
 
         adapter.setOnItemClickListener(new ManageClubAdapter.OnItemClickListener() {
             @Override
@@ -457,7 +419,7 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 });
                 delete_confirm.setPositiveButton("确定", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
-                        deleteClubPost(CURRENTURL+"systemAdmin/homepage/deleteClub", position);
+                        deleteClubPost(HttpServer.CURRENTURL+"systemAdmin/homepage/deleteClub", position);
                         //adapter.removeData(position);
                     }
                 });
