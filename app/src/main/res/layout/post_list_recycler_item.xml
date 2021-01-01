@@ -9,14 +9,25 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_margin="5dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
-        card_view:cardCornerRadius="4dp">
+        android:layout_margin="5dp"
+        card_view:cardCornerRadius="15dp">
 
         <TextView
             android:id="@+id/tvItem"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+
+            android:background="@drawable/text_view_border"
+            android:gravity="center"
+            android:textSize="25dp"
+            android:textStyle="italic" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            card_view:srcCompat="@drawable/ic_baseline_person_24" />
     </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -81,7 +81,7 @@ public class EditClubAdminActivity extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.length(); ++i)
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
-                            adminList.add("username：" + tmp.getString("username"));
+                            adminList.add(" " + tmp.getString("username"));
                             adminIdList.add(tmp.getInt("userId"));
                             mMyAdapter.notifyDataSetChanged();
                         //    mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());

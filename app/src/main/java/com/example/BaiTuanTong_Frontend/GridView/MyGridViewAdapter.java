@@ -27,6 +27,7 @@ public class MyGridViewAdapter extends BaseAdapter {
     private List<Uri> mUriList;
     private List<String> mPathList;
     // 最多发布图片数
+    
     private final int MAX_IMG_NUM = 1;
 
     public MyGridViewAdapter(Context context, List<Uri> uriList, List<String> pathList)
