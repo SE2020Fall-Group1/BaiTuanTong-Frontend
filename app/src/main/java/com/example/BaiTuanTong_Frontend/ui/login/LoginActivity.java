@@ -27,6 +27,7 @@ import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.SystemAdministrator.ManagerHomePage;
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistActivity;
+import com.example.BaiTuanTong_Frontend.utils.MD5Util;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -192,7 +193,8 @@ public class LoginActivity extends AppCompatActivity {
                 OkHttpClient okHttpClient = new OkHttpClient();
 
                 username = usernameEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
+                String password = MD5Util.encryp(passwordEditText.getText().toString());
+                Log.e("encryp",password);
                 HashMap<String, String> map = new HashMap<>();
                 map.put("username", username);
                 map.put("password", password);

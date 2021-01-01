@@ -26,6 +26,7 @@ import com.example.BaiTuanTong_Frontend.R;
 import com.example.BaiTuanTong_Frontend.adapter.CommentAdapter;
 import com.example.BaiTuanTong_Frontend.data.Comment;
 import com.example.BaiTuanTong_Frontend.data.ListViewUnderScroll;
+import com.example.BaiTuanTong_Frontend.utils.MD5Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,8 +124,8 @@ public class ModifyInformationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SharedPreferences shared = getSharedPreferences("share",  MODE_PRIVATE);
                 userId = shared.getString("userId", "");
-                originPassword = originPasswordEditText.getText().toString();
-                newPassword = newPasswordEditText.getText().toString();
+                originPassword = MD5Util.encryp(originPasswordEditText.getText().toString());
+                newPassword = MD5Util.encryp(newPasswordEditText.getText().toString());
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("userId", Integer.parseInt(userId));

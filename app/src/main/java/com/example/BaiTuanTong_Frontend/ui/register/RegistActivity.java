@@ -33,6 +33,7 @@ import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModel;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModelFactory;
 import com.example.BaiTuanTong_Frontend.ui.register.RegistViewModel;
+import com.example.BaiTuanTong_Frontend.utils.MD5Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -131,7 +132,7 @@ public class RegistActivity extends AppCompatActivity {
             public void onClick(View v) {
                 JSONObject mJson =new JSONObject();
                 username = usernameEditText.getText().toString();
-                password = passwordEditText.getText().toString();
+                password = MD5Util.encryp(passwordEditText.getText().toString());
                 email = emailEditText.getText().toString();
                 captcha = captchaEditText.getText().toString();
                 try {
