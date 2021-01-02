@@ -86,7 +86,9 @@ public class SetClubinfoDialogFragment extends DialogFragment {
             window.setAttributes(params);
         }
         ClubHomeActivity clubHomeActivity = (ClubHomeActivity) getActivity();
-        clubInfoEditText.setText(clubHomeActivity.clubInfo);
+        String info = clubHomeActivity.clubInfo;
+        if(!info.equals("社团还没有更新简介哦~"))
+            clubInfoEditText.setText(clubHomeActivity.clubInfo);
     }
     @Override
     public void onResume() {

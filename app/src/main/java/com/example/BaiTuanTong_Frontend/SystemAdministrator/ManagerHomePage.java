@@ -370,6 +370,10 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
 
         mClubData = new ArrayList<>();
         initRecyclerLinear();
+        Toast.makeText(this,
+                "长按社团进行删除",
+                Toast.LENGTH_LONG
+        ).show();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

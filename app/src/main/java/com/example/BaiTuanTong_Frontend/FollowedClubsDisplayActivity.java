@@ -255,28 +255,6 @@ public class FollowedClubsDisplayActivity extends AppCompatActivity {
             }
         }.start();
     }
-    /*private void getDataFromGet(String url) {
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    Log.e("URL", url);
-                    String result = get(url);
-                    Log.e("RES", result);
-                    Message msg = Message.obtain();
-                    msg.what = GET;
-                    msg.obj = result;
-                    getHandler.sendMessage(msg);
-                } catch (java.io.IOException IOException) {
-                    Log.e("TAG", "get failed.");
-                    Message msg = Message.obtain();
-                    msg.what = GETFAIL;
-                    getHandler.sendMessage(msg);
-                }
-            }
-        }.start();
-    }*/
 
     /**
      * Okhttp的get请求
