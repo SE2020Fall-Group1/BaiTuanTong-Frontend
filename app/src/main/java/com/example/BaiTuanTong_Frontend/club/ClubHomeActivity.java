@@ -342,7 +342,8 @@ public class ClubHomeActivity extends AppCompatActivity {
 
     protected void loadData(){
         getDataFromGet(SERVERURL + "club/homepage?" + "clubId=" + clubId + "&" + "userId=" + userId);
-        getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
+        if(!clubImageUrl.equals("null"))
+            getPicture(SERVERURL + "static/images/tiny/" + clubImageUrl);
     }
 
     private void initDetailButton() {
