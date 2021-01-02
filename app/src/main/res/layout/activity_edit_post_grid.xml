@@ -19,10 +19,10 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/edit_bg"
         android:ems="10"
-        android:hint="动态标题"
-        android:textStyle="italic"
-        android:inputType="textMultiLine"
         android:gravity="top|start"
+        android:hint="动态标题"
+        android:inputType="textMultiLine"
+        android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/EditPostText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,5 +74,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Gridview1" />
+
+    <TextView
+        android:id="@+id/titlelen_edit"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="right"
+        android:text="0/100 "
+        app:layout_constraintBottom_toBottomOf="@+id/EditPostTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textlen_edit"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="right"
+        android:text="0/5000"
+        app:layout_constraintBottom_toBottomOf="@+id/EditPostText"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

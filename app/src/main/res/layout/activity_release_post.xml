@@ -19,14 +19,17 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/edit_bg"
         android:ems="10"
-        android:hint="动态标题"
-        android:textStyle="italic"
-        android:inputType="textMultiLine"
         android:gravity="top|start"
+        android:hint="动态标题"
+        android:inputType="textMultiLine"
+        android:maxLength="100"
+        android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/EditPostText"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/EditPostText"
@@ -40,16 +43,28 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/edit_bg"
         android:ems="10"
-        android:textStyle="italic"
         android:gravity="top|start"
         android:hint="请写入动态内容"
         android:inputType="textMultiLine"
+        android:maxLength="5000"
+        android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/Gridview1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textlen"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="right"
+        android:text="0/5000 "
+        app:layout_constraintBottom_toBottomOf="@+id/EditPostText"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <GridView
         android:id="@+id/Gridview1"
@@ -74,5 +89,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Gridview1" />
+
+    <TextView
+        android:id="@+id/titlelen"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="right"
+        android:text="0/100 "
+        app:layout_constraintBottom_toBottomOf="@+id/EditPostTitle"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

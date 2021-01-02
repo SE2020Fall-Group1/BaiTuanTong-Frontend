@@ -20,6 +20,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BaiTuanTong_Frontend.HttpServer;
@@ -52,6 +55,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class EditPostGridActivity extends AppCompatActivity {
+
+
+    //最大字数限制
+    private int max_num_title = 100;
+    private int max_num_text = 5000;
+    private TextView titleNum;
+    private TextView textNum;
+
 
     private GridView gridView;
     private Context mContext;
@@ -620,6 +631,81 @@ public class EditPostGridActivity extends AppCompatActivity {
 
             }
         });
+
+        titleNum = (TextView)findViewById(R.id.titlelen_edit);
+        textNum = (TextView)findViewById(R.id.textlen_edit);
+
+        //字数限制 标题部分
+        myTitle.addTextChangedListener(new TextWatcher() {
+
+            private CharSequence wordnum_title;
+            private int selectionStart;
+            private int selectionEnd;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                wordnum_title = s;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int number = s.length();
+                if (number > max_num_text)
+                    number = max_num_text;
+                titleNum.setText("" + number + "/100 ");
+                selectionStart = myTitle.getSelectionStart();
+                selectionEnd = myTitle.getSelectionEnd();
+                if (wordnum_title.length() > max_num_title)
+                {
+                    //删除多余输入的字（不会显示出来）
+                    s.delete(selectionStart - 1, selectionEnd);
+                    int tempSelection = selectionEnd;
+                    myTitle.setText(s);
+                    myTitle.setSelection(tempSelection);//设置光标在最后
+                }
+            }
+        });
+
+        //字数限制 文字部分
+        myText.addTextChangedListener(new TextWatcher() {
+
+            private CharSequence wordnum_text;
+            private int selectionStart;
+            private int selectionEnd;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                wordnum_text = s;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                int number = s.length();
+                if (number > max_num_text)
+                    number = max_num_text;
+                //TextView显示剩余字数
+                textNum.setText("" + number + "/5000 ");
+                selectionStart = myText.getSelectionStart();
+                selectionEnd = myText.getSelectionEnd();
+                if (wordnum_text.length() > max_num_text)
+                {
+                    //删除多余输入的字（不会显示出来）
+                    s.delete(selectionStart - 1, selectionEnd);
+                    int tempSelection = selectionEnd;
+                    myText.setText(s);
+                    myText.setSelection(tempSelection);//设置光标在最后
+                }
+            }
+        });
+
 
     }
 
