@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:scaleType="fitCenter"
-        android:background="@drawable/icon_fangkuang"
+        android:src="@drawable/icon_fangkuang"
         android:padding="1dp"/>
 
 
