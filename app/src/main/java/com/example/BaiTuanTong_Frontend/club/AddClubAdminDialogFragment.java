@@ -65,39 +65,6 @@ public class AddClubAdminDialogFragment extends DialogFragment {
             //super.handleMessage(msg);
             Log.e("TAG", (String)msg.obj);
             switch (msg.what){
-                /*unused
-                case GET:// used in this page,for get the post context.
-
-                    JSONObject jsonObject = null;
-                    try {
-                        jsonObject = new JSONObject((String) msg.obj);
-                        Log.e("TAG_GET", (String)msg.obj);
-                        post_text = jsonObject.getString("content");
-                        post_title = jsonObject.getString("title");
-                        Log.e("post_text", post_text);
-                        Log.e("post_title", post_title);
-                        postText.setText(post_text);
-                        postTitle.setText(post_title);
-                        JSONArray jsonArray = jsonObject.getJSONArray("adminSummary");
-                        for (int i = 0; i < jsonArray.length(); ++i)
-                        {
-                            JSONObject tmp = jsonArray.getJSONObject(i);
-                            //   adminList.add("username：" + tmp.getString("username"));
-                            //   mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
-                            Log.e("!!!", tmp.getString("username"));
-                        }
-
-                        //    Log.e("!!!", jsonObjString);
-
-                        //    List<PurchaseOrder> purchaseOrders = (List<PurchaseOrder>) JSONArray.parseArray(jsonObjString, PurchaseOrder.class);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    //   club_profile.setText((String)msg.obj);
-                    //   adminList.
-                    break;
-                    */
                 case POST://posting result
                     Log.e("POST_RES", (String) msg.obj);
                     Toast.makeText(getActivity(),
@@ -107,16 +74,6 @@ public class AddClubAdminDialogFragment extends DialogFragment {
                     //club_profile.setText((String)msg.obj);
                     try {
                         parseJsonPacket((String)msg.obj);
-                 /*        if (code == 200){
-                            Toast.makeText(getApplicationContext(),
-                                    "success",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        else if (code == 300){
-                            Toast.makeText(getApplicationContext(),
-                                    data,
-                                    Toast.LENGTH_SHORT).show();
-                        }*/
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -133,8 +90,6 @@ public class AddClubAdminDialogFragment extends DialogFragment {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-//        code = jsonObject.getInt("code");
-        //       data = jsonObject.getString("data");
     }
 
     /**
@@ -206,20 +161,7 @@ public class AddClubAdminDialogFragment extends DialogFragment {
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "post failed.");
                 }
-/*                Toast.makeText(getApplicationContext(),
-                        "删除完成！",
-                        Toast.LENGTH_SHORT).show();
-
- */
                 Log.e("post_code", ""+post_code);
-/*                if(post_code == 200) {
-                    Intent intent = new Intent();
-                   intent.putExtra("adminName", newAdminName.getText().toString());
-                    ((EditClubAdminActivity)getActivity()).onActivityResult(
-                            EditClubAdminActivity.REQUEST_CODE_SUBMIT, Activity.RESULT_OK, intent);
-                    ((EditClubAdminActivity)getActivity()).refresh();
-                    getDialog().dismiss();
-                }*/
 
             }
         }.start();
@@ -239,8 +181,8 @@ public class AddClubAdminDialogFragment extends DialogFragment {
         add_admin_button = (Button)view.findViewById(R.id.add_button);
         add_admin_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-            //    Toast.makeText(view.getContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
+            public void onClick(View v)
+            {
                 //这里传递文本框的数据。
                 newAdminName = (EditText)view.findViewById(R.id.editText1);
                 newAdmin = newAdminName.getText().toString();
@@ -254,7 +196,6 @@ public class AddClubAdminDialogFragment extends DialogFragment {
                 JSONObject obj = new JSONObject();
                 try {
                     obj.put("clubId", clubID);
-                    //   obj.put("userId", 4);
                     Log.e("newAdminName", newAdmin);
                     obj.put("username", newAdmin);
                 } catch (JSONException e) {
@@ -262,10 +203,7 @@ public class AddClubAdminDialogFragment extends DialogFragment {
                 }
                 Log.e("posting json", obj.toString());
                 getDataFromPost(SERVERURL + "club/admin/add", obj.toString());
-/*                Toast.makeText(view.getContext(),
-                        "添加请求已发送！",
-                        Toast.LENGTH_SHORT).show();
- */
+
                 while (post_code == 0)
                 {
                     try {

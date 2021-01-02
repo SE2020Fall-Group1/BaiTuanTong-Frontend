@@ -233,21 +233,6 @@ public class EditClubAdminActivity extends AppCompatActivity {
         {
             String newAdmin = data.getStringExtra("adminName");
 //            adminList.add("username：" + newAdmin);//离线方法，测试用
-
-            //以下为okhttp方法。
-        /*    JSONObject obj = new JSONObject();
-            try {
-                obj.put("clubId", clubID);
-             //   obj.put("userId", 4);
-                Log.e("newAdminName", newAdmin);
-                obj.put("username", newAdmin);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Log.e("posting json", obj.toString());
-            getDataFromPost(SERVERURL + "club/admin/add", obj.toString());
-            */
-        //    refresh();
         }
     }
 
@@ -256,10 +241,6 @@ public class EditClubAdminActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.delete_post_button:
-            /*    Toast.makeText(getApplicationContext(),
-                        "点击了添加成员按钮",
-                        Toast.LENGTH_SHORT).show();
-                        */
 
                 dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;
@@ -390,57 +371,4 @@ public class EditClubAdminActivity extends AppCompatActivity {
 
 
     }
-/*
-    class MyOnClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            switch(v.getId()){
-                case R.id.add_club_admin:
-                    Toast.makeText(getApplicationContext(), "点击了确认按钮", Toast.LENGTH_SHORT).show();
-                    break;
-
-            }
-        }
-    }
-*/
-    /*
-        Button commentButton = (Button)findViewById(R.id.comment_button);
-        commentButton.setOnClickListener(new MyOnClickListener());
-
-    }
-    class MyOnClickListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            switch(v.getId()){
-                case R.id.comment_button:
-                    commentDialogFragment.show(getSupportFragmentManager(),"dialog");
-                    break;
-
-            }
-        }
-    }*/
-
- /*       addAdminButton = (Button)findViewById(R.id.add_button);
-        addAdminButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "提交！", Toast.LENGTH_SHORT).show();
-            }
-        });
-*/
-
-/*        PopupMenu popupMenu = new PopupMenu(this, view);
-        getMenuInflater().inflate(R.menu.edit_club_admin_menu, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
-        {
-            @Override
-            public boolean onMenuItemClick(MenuItem item)
-            {
-                Toast.makeText(this, "my flaut", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-        popupMenu.show();
-*/
-
 }

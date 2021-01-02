@@ -99,7 +99,7 @@ public class ReleasePostActivity extends AppCompatActivity {
             //super.handleMessage(msg);
             Log.e("msgTAG", (String)msg.obj);
             switch (msg.what){
-                case GET://not used in this page
+                case GET:
 
                     JSONObject jsonObject = null;
                     try {
@@ -108,19 +108,12 @@ public class ReleasePostActivity extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.length(); ++i)
                         {
                             JSONObject tmp = jsonArray.getJSONObject(i);
-                        //   adminList.add("username：" + tmp.getString("username"));
-                        //   mMyAdapter.notifyItemRangeChanged(adminList.size()-1, adminList.size());
                             Log.e("!!!", tmp.getString("username"));
                         }
 
-                        //    Log.e("!!!", jsonObjString);
-
-                        //    List<PurchaseOrder> purchaseOrders = (List<PurchaseOrder>) JSONArray.parseArray(jsonObjString, PurchaseOrder.class);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //   club_profile.setText((String)msg.obj);
-                    //   adminList.
                     break;
                 case POST://posting result
                     Log.e("POST_RES", (String) msg.obj);
@@ -132,18 +125,6 @@ public class ReleasePostActivity extends AppCompatActivity {
         }
     });
 
-
-    /**
-     * 解析post返回的json包
-     * @param json post返回的json包
-     * @throws JSONException 解析出错
-     */
- /*     private void parseJsonPacket(String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-      code = jsonObject.getInt("code");
-        data = jsonObject.getString("data");
-    }
-*/
 
     /**
      * Okhttp的get请求
@@ -245,7 +226,6 @@ public class ReleasePostActivity extends AppCompatActivity {
     }
     private void selectPic(int maxTotal) {
         Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
-     //   PictureSelector.create(this, maxTotal);
         // TODO Auto-generated method stub
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;
@@ -370,20 +350,16 @@ public class ReleasePostActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
         if(actionBar != null){
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-//        myOnClickListener = new MyOnClickListener();
 
         mContext = this;
         gridView = (GridView)findViewById(R.id.Gridview1);
-     //   gridView.setAdapter(myGridViewAdapter);
         initGridView();
-     //   gridView.setAdapter(new MyGridViewAdapter(ReleasePostActivity.this));
 
         //点击提交按钮，目前只支持传回的动态内容为文字和标题。
         myTitle = (EditText)findViewById(R.id.EditPostTitle);//title
@@ -413,38 +389,10 @@ public class ReleasePostActivity extends AppCompatActivity {
                 // 新的post方法，不是JSON了
                 getDataFromPost(SERVERURL + "post/release");
 
-
-//                Log.e("code", ""+code);
-//                Log.e("data", data);
-       /*         if (code == 200)
-                    ReleasePostActivity.this.finish();
-               else
-                {
-
-                    if (data == null)
-                        data = "null";
-                    Toast.makeText(getApplicationContext(),
-                            data,
-                            Toast.LENGTH_SHORT).show();
-                }
-*/
             }
         });
 
 
     }
 
-
-    // 处理选择的照片的地址
- /*   private void refreshAdapter(List<LocalMedia> picList) {
-        for (LocalMedia localMedia : picList) {
-            //被压缩后的图片路径
-            if (localMedia.isCompressed()) {
-                String compressPath = localMedia.getCompressPath(); //压缩后的图片路径
-                mPicList.add(compressPath); //把图片添加到将要上传的图片数组中
-                myGridViewAdapter.notifyDataSetChanged();
-            }
-        }
-    }
-*/
 }

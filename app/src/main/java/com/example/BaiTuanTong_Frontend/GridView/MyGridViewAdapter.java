@@ -38,13 +38,6 @@ public class MyGridViewAdapter extends BaseAdapter {
         myLayout = LayoutInflater.from(context);
     }
 
-    static class ViewHolder
-    {
-        public ImageView Grid_imageview;
-    //    public TextView Grid_textview;
-    }
-
-
     //如果超过九个 就不显示+号了，也就没法添加新的
     @Override
     public int getCount() {
@@ -65,25 +58,8 @@ public class MyGridViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-    /*    ViewHolder holder = null;
-        if(convertView == null){
-            //填写ListView的图标和标题等控件的来源，来自于layout_list_item这个布局文件
-            //把控件所在的布局文件加载到当前类中
-            convertView = myLayout.inflate(R.layout.layout_gird_item,null);
-            //生成一个ViewHolder的对象
-            holder = new ViewHolder();
-            //获取控件对象
-            holder.Grid_imageview=convertView.findViewById(R.id.grid_IV_Id);
-         //   holder.Grid_textview=convertView.findViewById(R.id.grid_TV_Id);
-            convertView.setTag(holder);
-
-        }else{
-            holder = (ViewHolder) convertView.getTag();
-        }
-        //修改空间属性
-     //   holder.Grid_textview.setText("汽车");
-*/
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         convertView = myLayout.inflate(R.layout.layout_gird_item, parent, false);
         ImageView iv = (ImageView)convertView.findViewById(R.id.grid_IV_Id);
 

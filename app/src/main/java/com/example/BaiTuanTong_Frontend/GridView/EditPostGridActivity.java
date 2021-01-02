@@ -153,8 +153,6 @@ public class EditPostGridActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //   club_profile.setText((String)msg.obj);
-                    //   adminList.
                     break;
                 case POST://posting result
                     Log.e("POST_RES", (String) msg.obj);
@@ -165,17 +163,6 @@ public class EditPostGridActivity extends AppCompatActivity {
                     //club_profile.setText((String)msg.obj);
                    try {
                         parseJsonPacket((String)msg.obj);
-                 /*        if (code == 200){
-                            Toast.makeText(getApplicationContext(),
-                                    "success",
-                                    Toast.LENGTH_SHORT).show();
-                            finish();   //如果成功就直接返回
-                        }
-                        else if (code == 300){
-                            Toast.makeText(getApplicationContext(),
-                                    data,
-                                    Toast.LENGTH_SHORT).show();
-                        }*/
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -245,8 +232,6 @@ public class EditPostGridActivity extends AppCompatActivity {
      */
     private void parseJsonPacket(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
-//        code = jsonObject.getInt("code");
- //       data = jsonObject.getString("data");
     }
 
 
@@ -319,11 +304,6 @@ public class EditPostGridActivity extends AppCompatActivity {
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "post failed.");
                 }
-/*                Toast.makeText(getApplicationContext(),
-                        "删除完成！",
-                        Toast.LENGTH_SHORT).show();
-
- */
                 Log.e("post_code", ""+post_code);
                 if(post_code == 200)
                     EditPostGridActivity.this.finish();
@@ -539,14 +519,9 @@ public class EditPostGridActivity extends AppCompatActivity {
         switch (item.getItemId())
         {
             case R.id.delete_post_button:
-             /*  Toast.makeText(getApplicationContext(),
-                        "点击了删除动态按钮",
-                        Toast.LENGTH_SHORT).show();
-               */
 
                 deletePost();
 
-         //       dialogFragment.show(getSupportFragmentManager(), "add_Admin");
                 break;
 
 
@@ -574,7 +549,6 @@ public class EditPostGridActivity extends AppCompatActivity {
 
 
 
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
         ActionBar actionBar = getSupportActionBar();  //设置返回键功能,这样点击左上角返回按钮时才能返回到同一个社团主页
         if(actionBar != null){
             actionBar.setHomeButtonEnabled(true);
@@ -640,26 +614,9 @@ public class EditPostGridActivity extends AppCompatActivity {
                 // 新的post方法，不是JSON了
                 getDataFromPost2(SERVERURL + "post/edit");
 
-
-//                Log.e("code", ""+code);
-//                Log.e("data", data);
-             /*   if (code == 200)
-                    ReleasePostActivity.this.finish();
-                else
-                {
-
-                    if (data == null)
-                        data = "null";
-                    Toast.makeText(getApplicationContext(),
-                            data,
-                            Toast.LENGTH_SHORT).show();
-                }
-*/
             }
         });
 
     }
-
-
 
 }
