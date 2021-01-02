@@ -22,7 +22,7 @@
             android:layout_height="45dp"
             android:layout_gravity="top"
             android:layout_marginRight="10dp"
-            android:src="@drawable/icon_touxiang" />
+            android:src="@drawable/ic_hotbitmapgg_avatar" />
 
         <LinearLayout
             android:layout_width="match_parent"

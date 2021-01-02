@@ -166,8 +166,6 @@ public class ClubHomeActivity extends AppCompatActivity {
                         if(!message.equals("club do not exist"))
                             parseJsonPacket((String)msg.obj);
                         Log.e("Post num", "" + postId.size());
-                        if(clubInfo.equals("null"))
-                            clubInfo = "社团还没有更新简介哦~";
                         String print = clubInfo+"\n"+"社长: "+clubPresident;
                         clubNameView.setText(clubName);
                         clubProfile.setText(print);
@@ -245,6 +243,7 @@ public class ClubHomeActivity extends AppCompatActivity {
      * @throws JSONException 解析出错
      */
     private void parseJsonPacket(String json) throws JSONException {
+        Log.e("json", json);
         JSONObject jsonObject = new JSONObject(json);
         clubName = jsonObject.getString("clubName");
         clubInfo = jsonObject.getString("introduction");
@@ -301,6 +300,8 @@ public class ClubHomeActivity extends AppCompatActivity {
         bind = ButterKnife.bind(this);
         clubId = getIntent().getIntExtra("clubId", -1);
         permission = getIntent().getIntExtra("permission", 0);
+        if(permission > 0)
+            Toast.makeText(this, "长按动态进行编辑", Toast.LENGTH_LONG).show();
         clubImageUrl = getIntent().getStringExtra("imageUrl"); //直接从上一个页面获取社团头像的url
         byte[] bis = getIntent().getByteArrayExtra("picture");
         if(bis != null) {
