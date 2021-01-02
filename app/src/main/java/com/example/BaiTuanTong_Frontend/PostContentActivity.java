@@ -119,7 +119,8 @@ public class PostContentActivity extends AppCompatActivity {
                         JSONArray commentJSONArray = jsonObject.getJSONArray("comments");
                         JSONArray imageUrlJSONArray = jsonObject.getJSONArray("imageUrls");
 
-                        clubImageUrl = imageBaseUrl + "/" + clubImageUrl;
+                        if(!clubImageUrl.equals("null"))
+                            clubImageUrl = imageBaseUrl + "/" + clubImageUrl;
 
                         Log.e("title",title);
                         Log.e("like",String.valueOf(isliked));
@@ -163,7 +164,8 @@ public class PostContentActivity extends AppCompatActivity {
                         //申请图片
                         Log.e("img","get img");
                         getContentImgFromUrl();
-                        getClubImgFromUrl();
+                        if(!clubImageUrl.equals("null"))
+                            getClubImgFromUrl();
 
                         //申请社团头像
 
