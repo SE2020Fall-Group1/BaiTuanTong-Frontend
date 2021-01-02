@@ -6,8 +6,9 @@
     <TextView
         android:id="@+id/id_admin_name"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:gravity="center_vertical"
+        android:layout_height="36dp"
+        android:layout_marginLeft="16dp"
+        android:gravity="bottom"
         android:text="新管理员名称:" />
 
     <EditText
@@ -15,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/id_admin_name"
+        android:layout_marginRight="16dp"
         android:imeOptions="actionDone"
         android:inputType="text" />
 

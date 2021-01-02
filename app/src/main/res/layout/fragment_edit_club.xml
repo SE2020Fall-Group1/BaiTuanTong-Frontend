@@ -6,14 +6,17 @@
     <TextView
         android:id="@+id/id_club_name"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:gravity="center_vertical"
+        android:layout_height="36dp"
+        android:layout_marginLeft="16dp"
+        android:gravity="bottom"
         android:text="社团名称:" />
 
     <EditText
         android:id="@+id/id_edit_club_name"
-        android:layout_width="match_parent"
+        android:layout_width="291dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="16dp"
         android:layout_toRightOf="@id/id_club_name"
         android:imeOptions="actionDone"
         android:inputType="text" />
@@ -21,16 +24,18 @@
     <TextView
         android:id="@+id/id_admin_name"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
+        android:layout_height="36dp"
         android:layout_marginTop="50dp"
-        android:gravity="center_vertical"
-        android:text="管理员名称:" />
+        android:layout_marginLeft="16dp"
+        android:gravity="bottom"
+        android:text="总管理员名称:" />
 
     <EditText
         android:id="@+id/id_edit_admin_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
+        android:layout_marginRight="16dp"
         android:layout_toRightOf="@id/id_admin_name"
         android:imeOptions="actionDone"
         android:inputType="text" />
