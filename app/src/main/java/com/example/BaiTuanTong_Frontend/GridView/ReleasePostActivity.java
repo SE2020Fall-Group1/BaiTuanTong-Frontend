@@ -323,12 +323,16 @@ public class ReleasePostActivity extends AppCompatActivity {
                     //这个位置就是“加号”的位置。
                     if (mPicList.size() == MAX_IMG_NUM) {
                         //最多添加5张图片
-                        viewPluImg(position);
+                        //viewPluImg(position);
+                        mPicList.clear();
+                        picPathList.clear();
+                        selectPic(MAX_IMG_NUM - mPicList.size());
                     } else {
                         //添加凭证图片
                         selectPic(MAX_IMG_NUM - mPicList.size());
                     }
-                } else {
+                }
+                else  {
                     viewPluImg(position);
                 }
             }
