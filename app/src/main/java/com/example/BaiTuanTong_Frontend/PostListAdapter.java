@@ -162,7 +162,10 @@ public abstract class PostListAdapter extends RecyclerView.Adapter<PostListAdapt
                 clubImg.add(null);
             }
             //TODO 等图片加载问题解决后可以删除这里的处理
-            holder.club_img.setImageBitmap(clubImg.get(position));
+            if(clubImg.get(position) == null)
+                holder.club_img.setImageResource(R.drawable.ic_hotbitmapgg_avatar);
+            else
+                holder.club_img.setImageBitmap(clubImg.get(position));
         }
     }
 
