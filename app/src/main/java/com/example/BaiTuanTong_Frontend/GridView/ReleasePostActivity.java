@@ -337,6 +337,16 @@ public class ReleasePostActivity extends AppCompatActivity {
                 }
             }
         });
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                mPicList.clear();
+                picPathList.clear();
+                myGridViewAdapter = new MyGridViewAdapter(mContext, mPicList, picPathList);
+                gridView.setAdapter(myGridViewAdapter);
+                return true;
+            }
+        });
     }
 
     @Override
