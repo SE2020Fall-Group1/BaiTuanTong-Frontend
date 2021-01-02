@@ -6,6 +6,7 @@ import com.example.BaiTuanTong_Frontend.SystemAdministrator.EditAdminDialogFragm
 import com.example.BaiTuanTong_Frontend.home.HomePageActivity;
 import com.example.BaiTuanTong_Frontend.ui.login.LoginActivity;
 import com.example.BaiTuanTong_Frontend.HttpServer;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -42,6 +43,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.view.View.GONE;
+
 
 public class ManagerHomePage extends AppCompatActivity implements ChangeAdminListener, CreateClubListener {
 
@@ -60,6 +63,8 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
     private static final int DELETE_CLUB_POST = 3;
     private static final int CHANGE_PRESIDENT_POST = 4;
     private static final int LOGOUT_POST = 5;
+    private static final int GETFAIL = 6;
+    private int retry_time = 0;
 
     /**
      * Okhttp的get请求
@@ -107,6 +112,10 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                     getHandler.sendMessage(msg);
                 } catch (java.io.IOException IOException) {
                     Log.e("TAG", "get failed.");
+                    Message msg = Message.obtain();
+                    msg.what = GETFAIL;
+                    msg.obj = "clubdata";
+                    getHandler.sendMessage(msg);
                 }
             }
         }.start();
@@ -239,6 +248,16 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                         e.printStackTrace();
                     }
                     break;
+                case GETFAIL:
+                    if (retry_time < 5) { //总共尝试5次，如果不行就放弃
+                        retry_time++;
+                        if (((String)msg.obj).equals("clubdata")) //判断请求失败的社团信息还是头像
+                            getDataFromGet(HttpServer.CURRENTURL+"systemAdmin/homepage");
+                    }
+                    else {
+                        initEmptyView(); //如果5次全部失败，就显示加载失败页面
+                        retry_time = 0;
+                    }
                 default:
                     break;
             }
@@ -332,17 +351,6 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 break;
         }
     }
-    /*private void parseJsonPacket(String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-        clubInfo = jsonObject.getString("introduction");
-        clubPresident = jsonObject.getString("president");
-        JSONArray jsonArray = jsonObject.getJSONArray("club_post_list");
-        for(int i = 0; i < jsonArray.length(); i++){
-            postList.add(jsonArray.getString(i));
-        }
-    }*/
-
-
 
     public void initToolBar() {
         mNavigation.setTitle("社团管理");
@@ -363,14 +371,6 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
         mClubData = new ArrayList<>();
         initRecyclerLinear();
     }
-
-    // List初始化，测试用
-    /*
-    private void getClubData(){
-        for (int i = 0; i < 20; i++)
-            mClubData.add(new ClubData("Club " + i + "", "Admin " + i + ""));
-    }
-     */
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.manager_homepage_menu, menu);
@@ -396,6 +396,14 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
 
     @Override
     public void createClubComplete(String clubName, String adminName) {
+        if (clubName.length() == 0) {
+            Toast.makeText(this, "社团名不能为空", Toast.LENGTH_LONG).show();
+            return;
+        }
+        else if (clubName.length() > 20) {
+            Toast.makeText(this, "社团名过长", Toast.LENGTH_LONG).show();
+            return;
+        }
         addClubPost(HttpServer.CURRENTURL+"systemAdmin/homepage/addClub", clubName, adminName);
         //adapter.addData(1, clubName, adminName);
     }
@@ -406,12 +414,15 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
         // adapter.changeAdmin(position, newAdminName);
     }
 
+    public void initEmptyView() {
+        Snackbar.make(rv_manage_club, "数据加载失败,请重新加载或者检查网络是否链接", Snackbar.LENGTH_SHORT).show();
+    }
+
     public void initRecyclerLinear() {
         rv_manage_club = findViewById(R.id.rv_manage_club);
         manager = new LinearLayoutManager(this);
         rv_manage_club.setLayoutManager(manager);
 
-        // getClubData();
         adapter = new ManageClubAdapter(this, mClubData);
         rv_manage_club.setAdapter(adapter);
         rv_manage_club.setItemAnimator(new DefaultItemAnimator());
@@ -427,23 +438,14 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                         bundle.putInt("position", position);
                         editAdminDialog.setArguments(bundle);
                         editAdminDialog.show(getFragmentManager(), "EditClubDialog");
-                        // Toast.makeText(ManagerHomePage.this, position + " button click", Toast.LENGTH_SHORT).show();
                         break;
                     default:
-                        // Toast.makeText(ManagerHomePage.this, position + " click", Toast.LENGTH_SHORT).show();
-                        // Log.e("Click", position + " click");
                         break;
                 }
-
-                //Intent intent = new Intent(ManagerHomePage.this, ManageAdministrator.class);
-                //intent.putExtra("clubName", mList.get(position));
-                //startActivity(intent);
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-
-                // Toast.makeText(ManagerHomePage.this, position + " Long click", Toast.LENGTH_SHORT).show();
                 AlertDialog.Builder delete_confirm = new AlertDialog.Builder(ManagerHomePage.this);
                 delete_confirm.setMessage("确认删除该社团吗？");
                 delete_confirm.setTitle("提示");
@@ -455,7 +457,6 @@ public class ManagerHomePage extends AppCompatActivity implements ChangeAdminLis
                 delete_confirm.setPositiveButton("确定", new AlertDialog.OnClickListener() {
                     public void onClick(DialogInterface arg0, int arg1) {
                         deleteClubPost(HttpServer.CURRENTURL+"systemAdmin/homepage/deleteClub", position);
-                        //adapter.removeData(position);
                     }
                 });
 
