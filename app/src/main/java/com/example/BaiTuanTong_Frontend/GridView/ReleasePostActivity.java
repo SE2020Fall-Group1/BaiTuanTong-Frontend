@@ -225,7 +225,7 @@ public class ReleasePostActivity extends AppCompatActivity {
         Toast.makeText(this, "click a pic", Toast.LENGTH_SHORT).show();
     }
     private void selectPic(int maxTotal) {
-        Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
         // TODO Auto-generated method stub
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;

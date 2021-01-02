@@ -125,10 +125,14 @@ public class ManageClubsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ClubHomeActivity.class);
         intent.putExtra("clubId", clubId.get(position));
         intent.putExtra("imageUrl", imgUrl.get(position));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        clubImg.get(position).compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] bitmapByte = baos.toByteArray();
-        intent.putExtra("picture", bitmapByte);
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            clubImg.get(position).compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] bitmapByte = baos.toByteArray();
+            intent.putExtra("picture", bitmapByte);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         if(president.get(position).equals(userName))
             intent.putExtra("permission", 2);

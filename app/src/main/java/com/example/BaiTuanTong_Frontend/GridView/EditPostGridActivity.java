@@ -381,9 +381,10 @@ public class EditPostGridActivity extends AppCompatActivity {
 
 
     private void selectPic(int maxTotal) {
-        Toast.makeText(this, "want to update a pic", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "目前尚不支持编辑图片", Toast.LENGTH_SHORT).show();
         //   PictureSelector.create(this, maxTotal);
         // TODO Auto-generated method stub
+        /*
         boolean isKitKatO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         Intent getAlbum;
         if (isKitKatO) {
@@ -394,6 +395,8 @@ public class EditPostGridActivity extends AppCompatActivity {
         getAlbum.setType(IMAGE_TYPE);
 
         startActivityForResult(getAlbum, IMAGE_CODE);
+
+         */
     }
 
 
@@ -558,7 +561,8 @@ public class EditPostGridActivity extends AppCompatActivity {
 
         mContext = this;
         gridView = (GridView)findViewById(R.id.Gridview1);
-        initGridView();
+     //目前编辑不支持编辑图片，就不显示了
+        //   initGridView();
 
 
         /*
